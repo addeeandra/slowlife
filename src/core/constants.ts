@@ -1,4 +1,4 @@
-import type { MoodKey } from './types'
+import type { MoodKey, EventType, RecurrenceRule } from './types'
 
 export const TAGS: Record<string, string[]> = {
   casual: ['gratitude', 'reflection', 'memory', 'idea', 'dream', 'vent', 'milestone'],
@@ -32,8 +32,37 @@ export const MOODS: Record<MoodKey, string> = {
   awful: '\u{1F61E}',
 }
 
+export const EVENT_TYPES: Record<EventType, { label: string; color: string; dimColor: string }> = {
+  meeting:  { label: 'meeting',  color: '#6a9ec4', dimColor: '#1f2e3d' },
+  agenda:   { label: 'agenda',   color: '#c4956a', dimColor: '#3d2e1f' },
+  holiday:  { label: 'holiday',  color: '#6aaa7a', dimColor: '#1f3326' },
+  reminder: { label: 'reminder', color: '#c46a6a', dimColor: '#3d1f1f' },
+}
+
+export const RECURRENCE_PRESETS: { label: string; value: RecurrenceRule | null }[] = [
+  { label: 'none', value: null },
+  { label: 'daily', value: { freq: 'daily', interval: 1 } },
+  { label: 'weekly', value: { freq: 'weekly', interval: 1 } },
+  { label: 'biweekly', value: { freq: 'weekly', interval: 2 } },
+  { label: 'monthly', value: { freq: 'monthly', interval: 1 } },
+  { label: 'yearly', value: { freq: 'yearly', interval: 1 } },
+]
+
 export const MONTH_ABBR = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 export const DAY_ABBR = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+
+export function toISO(d: Date): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+export function sortByDateTime<T extends { occurrence_date?: string; date?: string; time: string | null }>(a: T, b: T): number {
+  const ad = a.occurrence_date || a.date || ''
+  const bd = b.occurrence_date || b.date || ''
+  return ad.localeCompare(bd) || (a.time || '').localeCompare(b.time || '')
+}
 
 export function renewalLabel(nextDate: string): string {
   const nd = new Date(nextDate + 'T00:00:00')

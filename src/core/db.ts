@@ -112,4 +112,21 @@ async function migrate(db: Database) {
       sort_order INTEGER DEFAULT 0
     )
   `)
+
+  await migrateEvents(db)
+}
+
+async function migrateEvents(db: Database) {
+  const cols = [
+    "ALTER TABLE events ADD COLUMN end_time TEXT",
+    "ALTER TABLE events ADD COLUMN description TEXT",
+    "ALTER TABLE events ADD COLUMN space_id TEXT",
+    "ALTER TABLE events ADD COLUMN category_id TEXT",
+    "ALTER TABLE events ADD COLUMN recurrence_rule TEXT",
+    "ALTER TABLE events ADD COLUMN google_id TEXT",
+    "ALTER TABLE events ADD COLUMN source TEXT DEFAULT 'local'",
+  ]
+  for (const sql of cols) {
+    try { await db.execute(sql) } catch (_) { /* column already exists */ }
+  }
 }

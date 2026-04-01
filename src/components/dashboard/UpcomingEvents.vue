@@ -28,11 +28,11 @@ function dateLabel(dateStr: string): string {
       >
         nothing scheduled
       </div>
-      <div v-for="ev in events" :key="ev.id" class="ev">
+      <div v-for="ev in events" :key="ev.id + '-' + ev.occurrence_date" class="ev">
         <span class="ev-t">{{ ev.time || '--:--' }}</span>
         <span class="ev-d" :style="{ background: ev.color }"></span>
         <span class="ev-n">{{ ev.title }}</span>
-        <span class="ev-tag" :class="ev.type">{{ dateLabel(ev.date) }}</span>
+        <span class="ev-tag" :class="ev.type">{{ dateLabel(ev.occurrence_date) }}</span>
       </div>
     </div>
   </div>
@@ -90,6 +90,11 @@ function dateLabel(dateStr: string): string {
 .ev-tag.holiday {
   border-color: var(--green-dim);
   color: var(--green);
+}
+
+.ev-tag.reminder {
+  border-color: var(--red-dim, #3d1f1f);
+  color: var(--red);
 }
 
 @media (max-width: 1024px) {

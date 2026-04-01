@@ -11,14 +11,39 @@ export interface JournalEntry {
   created_at: string
 }
 
+export type EventType = 'meeting' | 'agenda' | 'holiday' | 'reminder'
+
+export interface RecurrenceRule {
+  freq: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  interval: number
+  until?: string
+  count?: number
+  byDay?: string[]
+}
+
+export type EventSource = 'local' | 'google'
+
 export interface Event {
   id: number
   title: string
   date: string
   time: string | null
-  type: string
+  end_time: string | null
+  type: EventType
   color: string
+  description: string | null
+  space_id: string | null
+  category_id: string | null
+  recurrence_rule: string | null
+  google_id: string | null
+  source: EventSource
   created_at: string
+}
+
+export interface EventOccurrence extends Event {
+  occurrence_date: string
+  is_recurring_instance: boolean
+  parent_id: number | null
 }
 
 export interface Account {

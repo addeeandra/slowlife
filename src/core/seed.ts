@@ -33,12 +33,13 @@ export async function seedIfEmpty(db: Database) {
   await db.execute("INSERT INTO pinned (space_id, category_id, item_id, sort_order) VALUES ('casual', 'education', 'self-learning-rust', 2)")
 
   // events
-  await db.execute("INSERT INTO events (title, date, time, type, color) VALUES ('team standup', '2026-04-01', '09:00', 'meeting', '#6a9ec4')")
+  await db.execute("INSERT INTO events (title, date, time, end_time, type, color, space_id, category_id, recurrence_rule) VALUES ('team standup', '2026-04-01', '09:00', '09:30', 'meeting', '#6a9ec4', 'work', 'company-x', '{\"freq\":\"weekly\",\"interval\":1,\"byDay\":[\"mon\",\"wed\",\"fri\"]}')")
   await db.execute("INSERT INTO events (title, date, time, type, color) VALUES ('dentist', '2026-04-01', '14:00', 'agenda', '#c4956a')")
-  await db.execute("INSERT INTO events (title, date, time, type, color) VALUES ('sprint review', '2026-04-02', '16:00', 'meeting', '#6a9ec4')")
+  await db.execute("INSERT INTO events (title, date, time, end_time, type, color, space_id, category_id) VALUES ('sprint review', '2026-04-02', '16:00', '17:00', 'meeting', '#6a9ec4', 'work', 'company-x')")
   await db.execute("INSERT INTO events (title, date, time, type, color) VALUES ('hari raya', '2026-04-03', '', 'holiday', '#6aaa7a')")
-  await db.execute("INSERT INTO events (title, date, time, type, color) VALUES ('1-on-1 w/ manager', '2026-04-03', '10:00', 'meeting', '#6a9ec4')")
-  await db.execute("INSERT INTO events (title, date, time, type, color) VALUES ('side project hack', '2026-04-05', '13:00', 'agenda', '#c4956a')")
+  await db.execute("INSERT INTO events (title, date, time, end_time, type, color, space_id, category_id) VALUES ('1-on-1 w/ manager', '2026-04-03', '10:00', '10:30', 'meeting', '#6a9ec4', 'work', 'company-x')")
+  await db.execute("INSERT INTO events (title, date, time, type, color, space_id, category_id) VALUES ('side project hack', '2026-04-05', '13:00', 'agenda', '#c4956a', 'casual', 'side-projects')")
+  await db.execute("INSERT INTO events (title, date, time, type, color, description) VALUES ('submit tax docs', '2026-04-10', '09:00', 'reminder', '#c46a6a', 'deadline for annual tax filing')")
 
   // accounts
   await db.execute("INSERT INTO accounts (name, balance, currency) VALUES ('main account', 4250000, 'IDR')")

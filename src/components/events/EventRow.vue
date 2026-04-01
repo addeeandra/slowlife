@@ -2,10 +2,11 @@
 import type { Event } from '../../core/types'
 
 defineProps<{ event: Event; showType?: boolean }>()
+const emit = defineEmits<{ select: [event: Event] }>()
 </script>
 
 <template>
-  <div class="ev">
+  <div class="ev" @click="emit('select', event)">
     <span class="ev-t">{{ event.time || '--:--' }}</span>
     <span class="ev-d" :style="{ background: event.color }"></span>
     <span class="ev-n">{{ event.title }}</span>
@@ -19,6 +20,12 @@ defineProps<{ event: Event; showType?: boolean }>()
   align-items: center;
   gap: 6px;
   padding: 5px 0;
+  cursor: pointer;
+  transition: background var(--dur-base) var(--ease);
+}
+
+.ev:hover {
+  background: var(--bg-hover);
 }
 
 .ev-t {
@@ -55,5 +62,10 @@ defineProps<{ event: Event; showType?: boolean }>()
 .ev-tag.holiday {
   border-color: var(--green-dim);
   color: var(--green);
+}
+
+.ev-tag.reminder {
+  border-color: var(--red-dim, #3d1f1f);
+  color: var(--red);
 }
 </style>
