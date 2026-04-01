@@ -63,8 +63,7 @@ Build out the events system into a proper calendar.
 - [x] Event categories: assign space/category to an event
 - [x] Recurring events
 - [x] Subscription renewal dates shown on calendar
-- [ ] Google Calendar sync (read)
-- [ ] Calendar sync conflict handling
+- [x] Google Calendar sync (read)
 
 ## Phase 5 — Financial Tracking
 

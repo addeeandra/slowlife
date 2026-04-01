@@ -53,7 +53,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 
 - [x] Global quick capture (system-wide shortcut)
 - [x] Calendar views and event CRUD
-- [ ] Calendar sync (Google Calendar)
+- [x] Calendar sync (Google Calendar)
 - [ ] Financial CRUD and budget tracking
 - [ ] Full-text search and command palette
 - [ ] cr-sqlite for cross-device sync
