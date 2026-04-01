@@ -46,14 +46,27 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 - Keyboard shortcuts (Ctrl+1/2/3 for navigation, Ctrl+N for quick capture)
 - System tray support planned
 
+## Current Status
+
+Phase 1 (Foundation) is complete. The app is fully functional with:
+
+- [x] All views implemented (dashboard, journal, events, finances)
+- [x] SQLite data persistence with seed data on first run
+- [x] Sidebar with space switching, collapsible category tree, and entry counts
+- [x] Dashboard with signal cards, activity heatmap, pinned projects, mood trend, upcoming events, subscriptions, and recent entries
+- [x] Journal with write/timeline tabs, mood picker, writing prompts, tags, word count, and breadcrumb navigation
+- [x] Keyboard shortcuts and floating shortcut help panel
+- [x] Mobile-responsive layout
+
 ## Roadmap Preview
 
 See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 
-- [ ] Migrate prototype UI into Vue components
-- [ ] SQLite data persistence
 - [ ] Global quick capture (system-wide shortcut)
+- [ ] Calendar views and event CRUD
 - [ ] Calendar sync (Google Calendar, Apple Calendar)
+- [ ] Financial CRUD and budget tracking
+- [ ] Full-text search and command palette
 - [ ] cr-sqlite for cross-device sync
 - [ ] Mobile support via Tauri v2
 

@@ -4,38 +4,44 @@ This is the complete roadmap for slowlife, organized by phase. Each phase builds
 
 ---
 
-## Phase 1 — Foundation
+## Phase 1 — Foundation ✓
 
 Migrate the validated prototype into a real application.
 
-- [ ] Migrate design tokens (colors, typography, spacing) from prototype
-- [ ] Build sidebar component with full navigation tree
-- [ ] Build dashboard view with grid layout
-- [ ] Build journal write view (editor, mood picker, prompts, tags)
-- [ ] Build journal timeline view
-- [ ] Build events view
-- [ ] Build finances view (accounts, subscriptions, transactions)
-- [ ] SQLite schema and migrations (journal_entries, events, accounts, transactions, subscriptions, spaces, categories, projects, pinned)
-- [ ] CRUD operations for all entities
-- [ ] Keyboard shortcuts (Ctrl+1/2/3, Ctrl+N, Ctrl+S)
-- [ ] Floating shortcut help panel
+- [x] Migrate design tokens (colors, typography, spacing) from prototype
+- [x] Build sidebar component with full navigation tree
+- [x] Build dashboard view with grid layout
+- [x] Build journal write view (editor, mood picker, prompts, tags)
+- [x] Build journal timeline view
+- [x] Build events view
+- [x] Build finances view (accounts, subscriptions, transactions)
+- [x] SQLite schema and migrations (journal_entries, events, accounts, transactions, subscriptions, spaces, categories, projects, pinned)
+- [x] CRUD operations for all entities
+- [x] Keyboard shortcuts (Ctrl+1/2/3, Ctrl+N, Ctrl+S)
+- [x] Floating shortcut help panel
+- [x] Breadcrumb navigation with clickable segments
+- [x] Activity heatmap (20-week contribution grid)
+- [x] Signal cards on dashboard (streak, weekly activity, mood, net worth, sub burn)
+- [x] Pinned projects on dashboard with last-entry and weekly signals
+- [x] Mood trend (7-day visual)
+- [x] Quiet-day nudge (time-aware prompt when no entries today)
+- [x] Add/remove categories and projects from sidebar
+- [x] Context-aware writing prompts (casual vs work)
+- [x] Context-aware tag sets (casual vs work)
+- [x] Word count in editor
+- [x] Entry saved feedback
+- [x] First-run seed data (spaces, categories, projects, events, accounts, subscriptions, transactions)
+- [x] Mobile-responsive sidebar (overlay + toggle on small screens)
 
 ## Phase 2 — Core Experience
 
 Polish the daily-use experience. Make it feel right.
 
-- [ ] Breadcrumb navigation with clickable segments
-- [ ] Activity heatmap (20-week contribution grid)
-- [ ] Signal cards on dashboard (streak, weekly activity, mood, net worth, sub burn)
-- [ ] Pinned projects on dashboard with last-entry and weekly signals
-- [ ] Mood trend (7-day visual)
-- [ ] Quiet-day nudge (time-aware prompt when no entries today)
-- [ ] Add/remove categories and projects from sidebar
 - [ ] Pin/unpin projects from within a space view
-- [ ] Context-aware writing prompts (casual vs work)
-- [ ] Context-aware tag sets (casual vs work)
-- [ ] Word count in editor
-- [ ] Entry saved feedback
+- [ ] Edit/delete journal entries
+- [ ] Edit/delete categories and projects from sidebar
+- [ ] Drag-to-reorder pinned projects
+- [ ] Smooth animations and transitions
 
 ## Phase 3 — Quick Capture
 

@@ -23,13 +23,35 @@ pnpm tauri dev
 ```
 slowlife-app/
   src/                    # Vue frontend
-    main.ts               # app entry
-    App.vue               # shell layout
+    main.ts               # app entry (async init + seed)
+    App.vue               # shell layout + keyboard init
     router/index.ts       # route definitions
-    core/db.ts            # SQLite abstraction + migrations
+    core/
+      db.ts               # SQLite abstraction + migrations
+      types.ts            # TypeScript interfaces for all entities
+      constants.ts        # tags, prompts, moods, currency formatter
+      seed.ts             # first-run sample data
+    composables/
+      useSidebar.ts       # sidebar open/close state
+      useSpaces.ts        # spaces/categories/projects tree + CRUD
+      useJournal.ts       # journal entries CRUD, streak, heatmap, mood stats
+      useEvents.ts        # events CRUD, date grouping
+      useFinances.ts      # accounts, transactions, subscriptions
+      usePinned.ts        # pinned items with resolved metadata
+      useKeyboard.ts      # global ctrl+key shortcuts
     styles/tokens.css     # design tokens
-    components/           # shared components
-    views/                # page-level views
+    components/
+      AppSidebar.vue      # sidebar with nav, space tabs, category tree
+      AppFab.vue          # floating shortcut help button
+      PageHeader.vue      # shared title + breadcrumb
+      sidebar/            # SpaceTabs, CategoryTree, StreakFooter
+      dashboard/          # NudgeCard, SignalRow, ActivityHeatmap, PinnedProjects,
+                          # UpcomingEvents, SubscriptionsCard, MoodWeek, RecentEntries
+      journal/            # DateBar, MoodPicker, WritingPrompt, EntryEditor, TagRow,
+                          # TimelineEntry
+      events/             # EventRow
+      finances/           # FinanceSummary, AccountRow, SubscriptionRow, TransactionRow
+    views/                # DashboardView, JournalView, EventsView, FinancesView
   src-tauri/              # Rust backend (Tauri)
     src/lib.rs            # plugin registration
     src/main.rs           # desktop entry point
@@ -64,6 +86,8 @@ remove unused greet command from rust backend
 - Scoped CSS — no global styles outside `tokens.css`
 - Keep components small and focused
 - Use design tokens from `tokens.css` — don't hardcode colors or fonts
+- Composables use module-scoped refs (singleton pattern) — no Pinia
+- New entity types go in `core/types.ts`, constants in `core/constants.ts`
 
 **Backend (Rust):**
 - Follow standard Rust conventions
@@ -98,8 +122,23 @@ These are non-negotiable. Every PR should align with them.
 
 1. Add the migration in `src/core/db.ts` inside the `migrate()` function
 2. Use `CREATE TABLE IF NOT EXISTS` — migrations must be idempotent
-3. Add TypeScript types for the new entity
-4. Document the schema in your PR description
+3. Add TypeScript types in `src/core/types.ts`
+4. Add seed data in `src/core/seed.ts` if applicable
+5. Create a composable in `src/composables/` for CRUD and derived state
+6. Document the schema in your PR description
+
+## Adding a New Component
+
+Components are organized by feature area:
+
+- `components/sidebar/` — sidebar sub-components
+- `components/dashboard/` — dashboard cards and widgets
+- `components/journal/` — journal editor and timeline components
+- `components/events/` — event display components
+- `components/finances/` — finance display components
+- `components/` — shared components (PageHeader, AppFab, AppSidebar)
+
+Each component should be self-contained with scoped styles. Use composables for data access — don't call `getDb()` directly from components.
 
 ## Reporting Bugs
 

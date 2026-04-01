@@ -15,7 +15,7 @@
         "title": "slowlife",
         "width": 1100,
         "height": 700,
-        "minWidth": 800,
+        "minWidth": 360,
         "minHeight": 500
       }
     ],

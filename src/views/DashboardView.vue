@@ -1,40 +1,41 @@
 <script setup lang="ts">
+import PageHeader from '../components/PageHeader.vue'
+import NudgeCard from '../components/dashboard/NudgeCard.vue'
+import SignalRow from '../components/dashboard/SignalRow.vue'
+import ActivityHeatmap from '../components/dashboard/ActivityHeatmap.vue'
+import PinnedProjects from '../components/dashboard/PinnedProjects.vue'
+import UpcomingEvents from '../components/dashboard/UpcomingEvents.vue'
+import SubscriptionsCard from '../components/dashboard/SubscriptionsCard.vue'
+import MoodWeek from '../components/dashboard/MoodWeek.vue'
+import RecentEntries from '../components/dashboard/RecentEntries.vue'
 </script>
 
 <template>
   <div>
-    <div class="page-hdr">
-      <h2>dashboard</h2>
-      <span class="meta">signal, not noise</span>
+    <PageHeader title="dashboard" meta="signal, not noise" />
+    <div class="dg">
+      <NudgeCard />
+      <SignalRow />
+      <ActivityHeatmap />
+      <PinnedProjects />
+      <UpcomingEvents />
+      <SubscriptionsCard />
+      <MoodWeek />
+      <RecentEntries />
     </div>
-    <div class="placeholder">dashboard — coming soon</div>
   </div>
 </template>
 
 <style scoped>
-.page-hdr {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border);
+.dg {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 10px;
 }
 
-.page-hdr h2 {
-  font-family: var(--mono);
-  font-size: 0.9rem;
-  font-weight: 400;
-}
-
-.meta {
-  font-size: 0.65rem;
-  color: var(--text-dim);
-}
-
-.placeholder {
-  color: var(--text-dim);
-  font-size: 0.78rem;
-  padding: 40px 0;
+@media (max-width: 768px) {
+  .dg {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

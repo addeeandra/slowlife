@@ -1,0 +1,59 @@
+<script setup lang="ts">
+import type { Event } from '../../core/types'
+
+defineProps<{ event: Event; showType?: boolean }>()
+</script>
+
+<template>
+  <div class="ev">
+    <span class="ev-t">{{ event.time || '--:--' }}</span>
+    <span class="ev-d" :style="{ background: event.color }"></span>
+    <span class="ev-n">{{ event.title }}</span>
+    <span class="ev-tag" :class="event.type">{{ event.type }}</span>
+  </div>
+</template>
+
+<style scoped>
+.ev {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 0;
+}
+
+.ev-t {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  width: 38px;
+  flex-shrink: 0;
+}
+
+.ev-d {
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+}
+
+.ev-n {
+  font-size: 0.72rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.ev-tag {
+  font-size: 0.5rem;
+  padding: 0 4px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.ev-tag.meeting {
+  border-color: var(--work-dim);
+  color: var(--work);
+}
+
+.ev-tag.holiday {
+  border-color: var(--green-dim);
+  color: var(--green);
+}
+</style>

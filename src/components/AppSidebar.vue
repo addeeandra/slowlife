@@ -1,23 +1,33 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
+import { useSidebar } from '../composables/useSidebar'
+import SpaceTabs from './sidebar/SpaceTabs.vue'
+import CategoryTree from './sidebar/CategoryTree.vue'
+import StreakFooter from './sidebar/StreakFooter.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { isOpen, close } = useSidebar()
 
 function isActive(name: string) {
   return route.name === name
 }
+
+function navigateTo(path: string) {
+  router.push(path)
+  if (window.innerWidth <= 768) close()
+}
 </script>
 
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ open: isOpen }">
     <div class="sb-brand">slowlife<span>v0</span></div>
 
     <nav class="sb-nav">
       <button
         class="sb-item"
         :class="{ active: isActive('dashboard') }"
-        @click="router.push('/')"
+        @click="navigateTo('/')"
       >
         dashboard
         <span class="sb-k">ctrl+1</span>
@@ -25,7 +35,7 @@ function isActive(name: string) {
       <button
         class="sb-item"
         :class="{ active: isActive('events') }"
-        @click="router.push('/events')"
+        @click="navigateTo('/events')"
       >
         events
         <span class="sb-k">ctrl+2</span>
@@ -33,7 +43,7 @@ function isActive(name: string) {
       <button
         class="sb-item"
         :class="{ active: isActive('finances') }"
-        @click="router.push('/finances')"
+        @click="navigateTo('/finances')"
       >
         finances
         <span class="sb-k">ctrl+3</span>
@@ -43,11 +53,9 @@ function isActive(name: string) {
     <div class="sb-sep"></div>
 
     <div class="sb-label">journal</div>
-    <!-- Journal tree will be added here -->
-
-    <div class="sb-footer">
-      <span class="streak">start your streak</span>
-    </div>
+    <SpaceTabs />
+    <CategoryTree />
+    <StreakFooter />
   </aside>
 </template>
 
@@ -64,6 +72,7 @@ function isActive(name: string) {
   bottom: 0;
   z-index: 20;
   overflow-y: auto;
+  transition: transform 0.2s;
 }
 
 .sb-brand {
@@ -131,11 +140,13 @@ function isActive(name: string) {
   padding: 8px 8px 3px;
 }
 
-.sb-footer {
-  padding: 8px 12px;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
-  font-size: 0.65rem;
-  color: var(--text-dim);
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
 }
 </style>
