@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useQuickCapture } from '../composables/useQuickCapture'
 
 const isOpen = ref(false)
+const { open } = useQuickCapture()
 
 function toggle() {
   isOpen.value = !isOpen.value
 }
 
-
+function triggerQuickCapture() {
+  open()
+}
 </script>
 
 <template>
@@ -19,6 +23,11 @@ function toggle() {
     <div class="sc-r"><span class="sc-l">finances</span><span class="sc-k">ctrl+3</span></div>
     <div class="sc-r"><span class="sc-l">new entry</span><span class="sc-k">ctrl+n</span></div>
     <div class="sc-r"><span class="sc-l">toggle sidebar</span><span class="sc-k">ctrl+s</span></div>
+    <div class="sc-r">
+      <span class="sc-l">quick capture</span>
+      <span class="sc-k">ctrl+shift+k</span>
+      <button class="sc-btn" @click="triggerQuickCapture">open</button>
+    </div>
   </div>
   <Teleport to="body">
     <div v-if="isOpen" class="fab-backdrop" @click="isOpen = false"></div>

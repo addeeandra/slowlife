@@ -13,6 +13,7 @@
     "windows": [
       {
         "title": "slowlife",
+        "label": "main",
         "width": 1100,
         "height": 700,
         "minWidth": 360,

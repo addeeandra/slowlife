@@ -47,11 +47,10 @@ Polish the daily-use experience. Make it feel right.
 
 Reduce friction for capturing thoughts.
 
-- [ ] Global quick capture shortcut (system-wide, even when app is minimized)
-- [ ] Quick capture modal — write, pick space/category, save, dismiss
-- [ ] System tray icon with quick capture trigger
-- [ ] Auto-focus editor on capture
-- [ ] Default space/category for captures (configurable)
+- [x] Global quick capture shortcut (system-wide, even when app is minimized)
+- [x] Quick capture modal — write, pick space/category, save, dismiss
+- [x] System tray icon with quick capture trigger
+- [x] Auto-focus editor on capture
 
 ## Phase 4 — Events & Calendar
 

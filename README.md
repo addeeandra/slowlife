@@ -3,13 +3,11 @@
 ![CI](https://github.com/addeeandra/slowlife/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/addeeandra/slowlife/graph/badge.svg)](https://codecov.io/gh/addeeandra/slowlife)
 
-A personal operating system for people who move fast — designed to make everything feel manageable.
+A personal operating system for people who move fast — designed to make everything feel in-place.
 
 slowlife is a desktop-first journaling, events, and financial tracking app built with a brutalist, terminal-inspired aesthetic. It prioritizes signal over noise: no vanity metrics, no bloat — just the information you need to stay grounded.
 
 ## Philosophy
-
-> Not actually slow — but helps those who move fast to feel like slowing down and see everything as manageable.
 
 - **Signal, not noise** — useful metrics over generic totals
 - **Offline-first** — your data lives on your machine, always available
@@ -64,9 +62,9 @@ Phase 1 (Foundation) is complete. Phase 2 (Core Experience) polish is now shippe
 
 See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 
-- [ ] Global quick capture (system-wide shortcut)
+- [x] Global quick capture (system-wide shortcut)
 - [ ] Calendar views and event CRUD
-- [ ] Calendar sync (Google Calendar, Apple Calendar)
+- [ ] Calendar sync (Google Calendar)
 - [ ] Financial CRUD and budget tracking
 - [ ] Full-text search and command palette
 - [ ] cr-sqlite for cross-device sync

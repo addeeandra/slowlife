@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import AppSidebar from './components/AppSidebar.vue'
 import AppFab from './components/AppFab.vue'
+import QuickCaptureModal from './components/QuickCaptureModal.vue'
 import { useKeyboard } from './composables/useKeyboard'
 import { useSpaces } from './composables/useSpaces'
 import { useJournal } from './composables/useJournal'
@@ -9,12 +10,16 @@ import { useEvents } from './composables/useEvents'
 import { useFinances } from './composables/useFinances'
 import { usePinned } from './composables/usePinned'
 import { useSidebar } from './composables/useSidebar'
+import { useQuickCapture } from './composables/useQuickCapture'
 
 const { init, destroy } = useKeyboard()
 const { isOpen: sidebarOpen, toggle: toggleSidebar, close: closeSidebar } = useSidebar()
+const { init: initQuickCapture, destroy: destroyQuickCapture } = useQuickCapture()
 
 onMounted(async () => {
   init()
+  initQuickCapture()
+  window.addEventListener('contextmenu', blockContextMenu)
   await Promise.all([
     useSpaces().load(),
     useJournal().load(),
@@ -26,7 +31,13 @@ onMounted(async () => {
 
 onUnmounted(() => {
   destroy()
+  destroyQuickCapture()
+  window.removeEventListener('contextmenu', blockContextMenu)
 })
+
+function blockContextMenu(e: MouseEvent) {
+  e.preventDefault()
+}
 </script>
 
 <template>
@@ -41,6 +52,7 @@ onUnmounted(() => {
   </div>
 
   <AppFab />
+  <QuickCaptureModal />
 </template>
 
 <style scoped>

@@ -1,11 +1,13 @@
 import { useRouter } from 'vue-router'
 import { useSidebar } from './useSidebar'
+import { useQuickCapture } from './useQuickCapture'
 
 let handler: ((e: KeyboardEvent) => void) | null = null
 
 export function useKeyboard() {
   const router = useRouter()
   const { toggle } = useSidebar()
+  const { open } = useQuickCapture()
 
   function init() {
     if (handler) return
@@ -35,6 +37,11 @@ export function useKeyboard() {
         case 's':
           e.preventDefault()
           toggle()
+          break
+        case 'k':
+          if (!e.shiftKey) break
+          e.preventDefault()
+          open()
           break
       }
     }
