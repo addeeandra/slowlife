@@ -1,42 +1,69 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import draggable from 'vuedraggable'
 import { usePinned } from '../../composables/usePinned'
 
 const router = useRouter()
-const { pinnedWithMeta, unpin } = usePinned()
+const { pinnedWithMeta, unpin, updateSortOrder } = usePinned()
 
-function navigate(p: { spaceId: string; category_id: string; item_id: string | null }) {
+type PinnedMeta = (typeof pinnedWithMeta.value)[number]
+
+const localPins = ref<PinnedMeta[]>([...pinnedWithMeta.value])
+
+watch(
+  pinnedWithMeta,
+  value => {
+    localPins.value = [...value]
+  },
+  { deep: true }
+)
+
+function navigate(p: PinnedMeta) {
   const path = p.item_id
     ? `/journal/${p.spaceId}/${p.category_id}/${p.item_id}`
     : `/journal/${p.spaceId}/${p.category_id}`
   router.push(path)
+}
+
+async function persistOrder() {
+  await updateSortOrder(localPins.value.map(p => p.id))
 }
 </script>
 
 <template>
   <div class="c s5">
     <div class="c-t">pinned</div>
-    <div class="pin-list">
-      <div
-        v-if="!pinnedWithMeta.length"
-        style="font-size: 0.68rem; color: var(--text-dim); padding: 4px 0"
-      >
-        nothing pinned
-      </div>
-      <div
-        v-for="p in pinnedWithMeta"
-        :key="p.id"
-        class="pin"
-        :class="p.spaceId"
-        @click="navigate(p)"
-      >
-        <div class="p-info">
-          <div class="p-name">{{ p.name }}</div>
-          <div class="p-meta">{{ p.lastStr }} / {{ p.weekCount }} this wk</div>
+
+    <div v-if="!localPins.length" class="empty">nothing pinned</div>
+
+    <draggable
+      v-else
+      v-model="localPins"
+      :list="localPins"
+      item-key="id"
+      handle=".drag-handle"
+      :animation="150"
+      :force-fallback="true"
+      :fallback-on-body="true"
+      :fallback-tolerance="10"
+      fallback-class="pin-dragging"
+      chosen-class="pin-chosen"
+      drag-class="pin-drag"
+      @change="persistOrder"
+      @end="persistOrder"
+    >
+      <template #item="{ element: p }">
+        <div class="pin" :class="p.spaceId">
+          <span class="drag-handle">⠿</span>
+          <div class="p-info" @click="navigate(p)">
+            <div class="p-name">{{ p.name }}</div>
+            <div class="p-meta">{{ p.lastStr }} / {{ p.weekCount }} this wk</div>
+          </div>
+          <button class="p-x" @click.stop="unpin(p.id)">[x]</button>
         </div>
-        <button class="p-x" @click.stop="unpin(p.id)">[x]</button>
-      </div>
-    </div>
+      </template>
+    </draggable>
   </div>
 </template>
 
@@ -45,10 +72,10 @@ function navigate(p: { spaceId: string; category_id: string; item_id: string | n
   grid-column: span 5;
 }
 
-.pin-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.empty {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  padding: 4px 0;
 }
 
 .pin {
@@ -56,26 +83,34 @@ function navigate(p: { spaceId: string; category_id: string; item_id: string | n
   align-items: center;
   gap: 6px;
   padding: 5px 6px;
+  margin-bottom: 3px;
   border-left: 2px solid var(--border);
   cursor: pointer;
-  transition: background 0.08s;
+  transition: background var(--dur-fast) var(--ease);
+  user-select: none;
 }
 
 .pin:hover {
   background: var(--bg-hover);
 }
 
-.pin.casual {
-  border-left-color: var(--accent);
+.pin.casual { border-left-color: var(--accent); }
+.pin.work   { border-left-color: var(--work); }
+
+.drag-handle {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  opacity: 0;
+  cursor: grab;
+  flex-shrink: 0;
+  transition: opacity var(--dur-fast) var(--ease);
 }
 
-.pin.work {
-  border-left-color: var(--work);
-}
+.drag-handle:active { cursor: grabbing; }
 
-.p-info {
-  flex: 1;
-}
+.pin:hover .drag-handle { opacity: 1; }
+
+.p-info { flex: 1; }
 
 .p-name {
   font-size: 0.72rem;
@@ -94,21 +129,28 @@ function navigate(p: { spaceId: string; category_id: string; item_id: string | n
   border: none;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.1s;
+  transition: opacity var(--dur-base) var(--ease);
   font-family: var(--mono);
 }
 
-.pin:hover .p-x {
-  opacity: 1;
-}
-
-.p-x:hover {
-  color: var(--red);
-}
+.pin:hover .p-x { opacity: 1; }
+.p-x:hover { color: var(--red); }
 
 @media (max-width: 1024px) {
-  .s5 {
-    grid-column: span 12;
-  }
+  .s5 { grid-column: span 12; }
+}
+</style>
+
+<!-- SortableJS fallback classes are injected outside scoped context -->
+<style>
+.pin-dragging {
+  opacity: 0.85 !important;
+  background: #2a2a27 !important;
+  border-left: 2px solid #c4956a !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+.pin-chosen {
+  opacity: 0.5;
 }
 </style>

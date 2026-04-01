@@ -12,10 +12,48 @@ export function usePinned() {
     pinnedItems.value = await db.select<Pinned[]>('SELECT * FROM pinned ORDER BY sort_order')
   }
 
+  function matchesPinned(
+    p: Pinned,
+    space_id: string,
+    category_id: string,
+    item_id: string | null
+  ): boolean {
+    if (p.space_id !== space_id || p.category_id !== category_id) return false;
+    if (item_id === null) return p.item_id === null || p.item_id === undefined;
+    return p.item_id === item_id;
+  }
+
+  async function pin(space_id: string, category_id: string, item_id: string | null) {
+    const db = await getDb()
+    const maxOrder = pinnedItems.value.reduce((max, p) => Math.max(max, p.sort_order), -1)
+    await db.execute(
+      'INSERT INTO pinned (space_id, category_id, item_id, sort_order) VALUES ($1, $2, $3, $4)',
+      [space_id, category_id, item_id, maxOrder + 1]
+    )
+    await load()
+  }
+
   async function unpin(id: number) {
     const db = await getDb()
     await db.execute('DELETE FROM pinned WHERE id = $1', [id])
     await load()
+  }
+
+  async function updateSortOrder(orderedIds: number[]) {
+    const db = await getDb()
+    for (let i = 0; i < orderedIds.length; i++) {
+      await db.execute('UPDATE pinned SET sort_order = $1 WHERE id = $2', [i, orderedIds[i]])
+    }
+    await load()
+  }
+
+  function isPinned(space_id: string, category_id: string, item_id: string | null): boolean {
+    return pinnedItems.value.some(p => matchesPinned(p, space_id, category_id, item_id))
+  }
+
+  function getPinnedId(space_id: string, category_id: string, item_id: string | null): number | null {
+    const found = pinnedItems.value.find(p => matchesPinned(p, space_id, category_id, item_id))
+    return found ? found.id : null
   }
 
   const pinnedWithMeta = computed(() => {
@@ -59,5 +97,5 @@ export function usePinned() {
     })
   })
 
-  return { pinnedItems, load, unpin, pinnedWithMeta }
+  return { pinnedItems, load, pin, unpin, updateSortOrder, isPinned, getPinnedId, pinnedWithMeta }
 }

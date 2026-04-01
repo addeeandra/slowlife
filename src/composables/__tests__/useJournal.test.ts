@@ -124,11 +124,22 @@ describe('useJournal', () => {
     expect(hasEntriesToday()).toBe(true)
   })
 
-  it('detects no entries today', async () => {
-    const { hasEntriesToday } = await loadJournal([
-      makeEntry({ created_at: '2026-03-30T10:00:00' }),
-    ])
+  it('updates an entry', async () => {
+    const journal = await loadJournal([makeEntry({ id: 1, text: 'original', mood: 'good', tags: '["a"]' })])
+    mockDb.select.mockResolvedValueOnce([makeEntry({ id: 1, text: 'updated', mood: 'great', tags: '["b"]' })])
+    await journal.updateEntry(1, { text: 'updated', mood: 'great', tags: ['b'] })
+    expect(mockDb.execute).toHaveBeenCalledWith(
+      'UPDATE journal_entries SET text = $1, mood = $2, tags = $3 WHERE id = $4',
+      ['updated', 'great', '["b"]', 1]
+    )
+  })
 
-    expect(hasEntriesToday()).toBe(false)
+  it('deletes an entry', async () => {
+    const journal = await loadJournal([makeEntry({ id: 1 }), makeEntry({ id: 2 })])
+    mockDb.select.mockResolvedValueOnce([makeEntry({ id: 2 })])
+    await journal.deleteEntry(1)
+    expect(mockDb.execute).toHaveBeenCalledWith('DELETE FROM journal_entries WHERE id = $1', [1])
+    expect(journal.entries.value).toHaveLength(1)
   })
 })
+

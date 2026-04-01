@@ -42,7 +42,7 @@ const { currentSpace, switchSpace } = useSpaces()
   background: none;
   color: var(--text-dim);
   cursor: pointer;
-  transition: all 0.1s;
+  transition: all var(--dur-base) var(--ease);
 }
 
 .sb-tab:first-child {

@@ -123,7 +123,7 @@ function onKeydown(e: KeyboardEvent) {
   font-size: 0.68rem;
   padding: 4px 12px;
   cursor: pointer;
-  transition: opacity 0.1s;
+  transition: opacity var(--dur-base) var(--ease);
 }
 
 .dlg-btn.cancel {

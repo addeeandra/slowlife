@@ -55,7 +55,7 @@ function select(mood: MoodKey) {
   background: none;
   cursor: pointer;
   font-size: 0.85rem;
-  transition: all 0.1s;
+  transition: all var(--dur-base) var(--ease);
   display: flex;
   align-items: center;
   justify-content: center;

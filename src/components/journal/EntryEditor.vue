@@ -86,7 +86,7 @@ function save() {
   background: var(--text);
   color: var(--bg);
   cursor: pointer;
-  transition: opacity 0.1s;
+  transition: opacity var(--dur-base) var(--ease);
 }
 
 .save-btn:hover {

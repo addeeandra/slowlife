@@ -48,7 +48,7 @@ function tagsForSpace(): string[] {
   background: none;
   color: var(--text-dim);
   cursor: pointer;
-  transition: all 0.1s;
+  transition: all var(--dur-base) var(--ease);
 }
 
 .tag:hover {

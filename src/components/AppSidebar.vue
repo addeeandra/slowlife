@@ -72,7 +72,7 @@ function navigateTo(path: string) {
   bottom: 0;
   z-index: 20;
   overflow-y: auto;
-  transition: transform 0.2s;
+  transition: transform var(--dur-slow) var(--ease);
 }
 
 .sb-brand {
@@ -106,7 +106,7 @@ function navigateTo(path: string) {
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: all 0.08s;
+  transition: all var(--dur-fast) var(--ease);
 }
 
 .sb-item:hover {

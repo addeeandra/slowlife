@@ -37,11 +37,11 @@ Migrate the validated prototype into a real application.
 
 Polish the daily-use experience. Make it feel right.
 
-- [ ] Pin/unpin projects from within a space view
-- [ ] Edit/delete journal entries
-- [ ] Edit/delete categories and projects from sidebar
-- [ ] Drag-to-reorder pinned projects
-- [ ] Smooth animations and transitions
+- [x] Pin/unpin projects from the sidebar (CategoryTree)
+- [x] Edit/delete journal entries (inline on timeline)
+- [x] Edit/delete categories and projects from sidebar (inline, with confirm)
+- [x] Drag-to-reorder pinned projects (dashboard, sortable + persistence)
+- [x] Smooth animations and transitions (centralized tokens)
 
 ## Phase 3 — Quick Capture
 
@@ -61,10 +61,10 @@ Build out the events system into a proper calendar.
 - [ ] Calendar week view
 - [ ] Create/edit/delete events
 - [ ] Event types: meeting, agenda, holiday, reminder
+- [ ] Event categories: assign space/category to an event
 - [ ] Recurring events
 - [ ] Subscription renewal dates shown on calendar
 - [ ] Google Calendar sync (read)
-- [ ] Apple Calendar sync (read)
 - [ ] Calendar sync conflict handling
 
 ## Phase 5 — Financial Tracking
@@ -78,8 +78,7 @@ Expand finances beyond basic tracking.
 - [ ] Income vs expense trend chart
 - [ ] Subscription management (add, edit, cancel tracking)
 - [ ] Net worth over time chart
-- [ ] Multi-currency support
-- [ ] CSV import/export for transactions
+- [ ] Multi-currency support (IDR, USD, SGD, CNY)
 
 ## Phase 6 — Search & Insights
 

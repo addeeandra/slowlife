@@ -66,6 +66,37 @@ export function useSpaces() {
     await load()
   }
 
+  async function updateCategory(id: string, spaceId: string, label: string) {
+    const db = await getDb()
+    await db.execute('UPDATE categories SET label = $1 WHERE id = $2 AND space_id = $3', [label, id, spaceId])
+    await load()
+  }
+
+  async function deleteCategory(id: string, spaceId: string) {
+    const db = await getDb()
+    await db.execute('DELETE FROM projects WHERE category_id = $1 AND space_id = $2', [id, spaceId])
+    await db.execute('DELETE FROM categories WHERE id = $1 AND space_id = $2', [id, spaceId])
+    await load()
+  }
+
+  async function updateProject(id: string, categoryId: string, spaceId: string, label: string) {
+    const db = await getDb()
+    await db.execute(
+      'UPDATE projects SET label = $1 WHERE id = $2 AND category_id = $3 AND space_id = $4',
+      [label, id, categoryId, spaceId]
+    )
+    await load()
+  }
+
+  async function deleteProject(id: string, categoryId: string, spaceId: string) {
+    const db = await getDb()
+    await db.execute(
+      'DELETE FROM projects WHERE id = $1 AND category_id = $2 AND space_id = $3',
+      [id, categoryId, spaceId]
+    )
+    await load()
+  }
+
   const currentSpaceData = computed(() => spaces.value.find(s => s.id === currentSpace.value))
 
   return {
@@ -81,5 +112,9 @@ export function useSpaces() {
     toggleCategory,
     addCategory,
     addProject,
+    updateCategory,
+    deleteCategory,
+    updateProject,
+    deleteProject,
   }
 }

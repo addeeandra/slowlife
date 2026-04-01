@@ -51,15 +51,14 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 
 ## Current Status
 
-Phase 1 (Foundation) is complete. The app is fully functional with:
+Phase 1 (Foundation) is complete. Phase 2 (Core Experience) polish is now shipped:
 
-- [x] All views implemented (dashboard, journal, events, finances)
-- [x] SQLite data persistence with seed data on first run
-- [x] Sidebar with space switching, collapsible category tree, and entry counts
-- [x] Dashboard with signal cards, activity heatmap, pinned projects, mood trend, upcoming events, subscriptions, and recent entries
-- [x] Journal with write/timeline tabs, mood picker, writing prompts, tags, word count, and breadcrumb navigation
-- [x] Keyboard shortcuts and floating shortcut help panel
-- [x] Mobile-responsive layout
+- [x] Pin/unpin projects from the sidebar (CategoryTree) with live dashboard sync
+- [x] Drag-to-reorder pinned projects on the dashboard (sortable with persistence)
+- [x] Edit/delete journal entries inline on the timeline
+- [x] Edit/delete categories and projects inline in the sidebar (with confirmations)
+- [x] Animation/transition tokens applied across UI (durations/easing centralized)
+- [x] All Phase 1 foundations (views, SQLite persistence, shortcuts, responsive layout)
 
 ## Roadmap Preview
 

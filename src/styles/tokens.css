@@ -17,6 +17,11 @@
   --border: #2a2a27;
   --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
   --sidebar-w: 210px;
+  --dur-fast: 80ms;
+  --dur-base: 100ms;
+  --dur-mid: 150ms;
+  --dur-slow: 200ms;
+  --ease: ease;
 }
 
 *, *::before, *::after {

@@ -29,6 +29,24 @@ export function useJournal() {
     await load()
   }
 
+  async function updateEntry(
+    id: number,
+    patch: { text: string; mood: MoodKey | null; tags: string[] }
+  ) {
+    const db = await getDb()
+    await db.execute(
+      'UPDATE journal_entries SET text = $1, mood = $2, tags = $3 WHERE id = $4',
+      [patch.text, patch.mood, JSON.stringify(patch.tags), id]
+    )
+    await load()
+  }
+
+  async function deleteEntry(id: number) {
+    const db = await getDb()
+    await db.execute('DELETE FROM journal_entries WHERE id = $1', [id])
+    await load()
+  }
+
   function filteredEntries(space: string, category: string, item: string | null): JournalEntry[] {
     return entries.value.filter(
       e => e.space === space && e.category === category && (!item || e.item === item)
@@ -167,6 +185,8 @@ export function useJournal() {
     entries,
     load,
     saveEntry,
+    updateEntry,
+    deleteEntry,
     filteredEntries,
     countEntries,
     streak,

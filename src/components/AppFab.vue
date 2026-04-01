@@ -42,7 +42,7 @@ function toggle() {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.1s;
+  transition: all var(--dur-base) var(--ease);
 }
 
 .fab:hover {

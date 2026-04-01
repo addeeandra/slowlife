@@ -118,6 +118,7 @@ async function handleSave() {
         v-for="entry in timeline"
         :key="entry.id"
         :entry="entry"
+        :space="space"
       />
     </div>
   </div>
