@@ -109,13 +109,77 @@ These are non-negotiable. Every PR should align with them.
 4. **Minimal friction** — fewer clicks, fewer steps
 5. **User-owned data** — everything exportable, nothing locked in
 
+## Testing
+
+We use [Vitest](https://vitest.dev/) for testing. Tests run in a `happy-dom` environment.
+
+### Running Tests
+
+```bash
+pnpm test              # run all tests once
+pnpm test:watch        # run in watch mode during development
+pnpm test:coverage     # run with coverage report
+```
+
+### Test Structure
+
+Tests live alongside the code they test, in `__tests__/` directories:
+
+```
+src/
+  core/__tests__/          # tests for utilities, constants, formatters
+  composables/__tests__/   # tests for composable business logic
+```
+
+### Mocking the Database
+
+Since SQLite runs inside Tauri's Rust process, it's not available in a Node.js test environment. We mock the database layer using a shared mock at `src/__mocks__/@tauri-apps/plugin-sql.ts`.
+
+To use it in a composable test:
+
+```ts
+import { mockDb } from '../../__mocks__/@tauri-apps/plugin-sql'
+
+// Set up what the mock DB should return
+mockDb.select.mockResolvedValueOnce([/* your test data */])
+
+// Import the composable (use dynamic import after vi.resetModules())
+const { useMyComposable } = await import('../useMyComposable')
+```
+
+Use `vi.resetModules()` in `beforeEach` to ensure module-level refs are fresh between tests. Use `vi.clearAllMocks()` to reset mock call counts.
+
+### What to Test
+
+- **Composables** (highest value): business logic like calculations, filtering, data transformations
+- **Utility functions**: formatters, date helpers, label generators
+- **Vue components** (with `@vue/test-utils`): rendering, user interaction, emitted events
+
+### Writing a Test for a New Composable
+
+1. Create `src/composables/__tests__/useMyComposable.test.ts`
+2. Import `mockDb` from the shared mock
+3. Set up mock return values for each DB call your composable makes in `load()`
+4. Use dynamic imports (`await import(...)`) after `vi.resetModules()` to get fresh module state
+5. Use `vi.useFakeTimers()` if your composable depends on the current date/time
+
+### CI
+
+Tests run automatically on every push and pull request via GitHub Actions. The CI pipeline includes:
+
+- **Test**: runs all tests with coverage, uploads to Codecov
+- **Typecheck**: runs `vue-tsc --noEmit`
+- **Rust Check**: runs `cargo check` on the Tauri backend
+
+All checks must pass before merging.
+
 ## Adding a New Feature
 
 1. Check the [ROADMAP.md](ROADMAP.md) — is it planned?
 2. If not, open an issue to discuss before building
 3. Create a feature branch from `dev`
-4. Implement with tests where applicable
-5. Ensure `pnpm build` and `cargo check` pass
+4. Implement with tests (see [Testing](#testing) section)
+5. Ensure `pnpm test`, `pnpm build`, and `cargo check` pass
 6. Open a PR against `dev`
 
 ## Adding a New Database Table

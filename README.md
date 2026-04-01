@@ -1,5 +1,8 @@
 # slowlife
 
+![CI](https://github.com/addeeandra/slowlife/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/addeeandra/slowlife/graph/badge.svg)](https://codecov.io/gh/addeeandra/slowlife)
+
 A personal operating system for people who move fast — designed to make everything feel manageable.
 
 slowlife is a desktop-first journaling, events, and financial tracking app built with a brutalist, terminal-inspired aesthetic. It prioritizes signal over noise: no vanity metrics, no bloat — just the information you need to stay grounded.
