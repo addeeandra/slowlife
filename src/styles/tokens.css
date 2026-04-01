@@ -1,0 +1,43 @@
+:root {
+  --bg: #111110;
+  --bg-card: #1a1a18;
+  --bg-hover: #222220;
+  --bg-active: #2a2a27;
+  --text: #e8e4df;
+  --text-mid: #9a958e;
+  --text-dim: #5a5650;
+  --accent: #c4956a;
+  --accent-dim: #3d2e1f;
+  --work: #6a9ec4;
+  --work-dim: #1f2e3d;
+  --green: #6aaa7a;
+  --green-dim: #1f3326;
+  --red: #c46a6a;
+  --red-dim: #3d1f1f;
+  --border: #2a2a27;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --sidebar-w: 210px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 13px;
+}
+
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
