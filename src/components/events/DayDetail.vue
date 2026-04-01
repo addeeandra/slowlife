@@ -54,6 +54,7 @@ const events = computed(() =>
           <span class="dd-time">{{ ev.time || 'all day' }}</span>
           <span class="dd-dot" :style="{ background: ev.color }"></span>
           <span class="dd-name">{{ ev.title }}</span>
+          <span v-if="ev.source === 'google'" class="dd-src">google</span>
           <span class="dd-tag" :class="ev.type">{{ ev.type }}</span>
           <span v-if="ev.is_recurring_instance" class="dd-rec" title="recurring">r</span>
         </div>
@@ -176,6 +177,13 @@ const events = computed(() =>
   border: 1px solid var(--border);
   padding: 0 3px;
   font-style: italic;
+}
+
+.dd-src {
+  font-size: 0.48rem;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0 3px;
 }
 
 .dd-empty {

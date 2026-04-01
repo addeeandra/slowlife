@@ -39,7 +39,6 @@ async function persistOrder() {
 
     <draggable
       v-else
-      v-model="localPins"
       :list="localPins"
       item-key="id"
       handle=".drag-handle"

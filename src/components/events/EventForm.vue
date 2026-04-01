@@ -138,7 +138,7 @@ function handleDelete() {
     <div v-if="open" class="ef-modal">
       <div class="ef-head">
         <div class="ef-title">{{ isEdit ? 'edit event' : 'new event' }}</div>
-        <button class="ef-close" @click="emit('close')">esc</button>
+        <button type="button" class="b-close" @click="emit('close')">esc</button>
       </div>
 
       <div class="ef-field">
@@ -301,16 +301,6 @@ function handleDelete() {
 .ef-title {
   font-family: var(--mono);
   font-size: 0.9rem;
-}
-
-.ef-close {
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  padding: 4px 8px;
-  cursor: pointer;
 }
 
 .ef-field {

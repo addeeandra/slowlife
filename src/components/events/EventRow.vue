@@ -10,6 +10,7 @@ const emit = defineEmits<{ select: [event: Event] }>()
     <span class="ev-t">{{ event.time || '--:--' }}</span>
     <span class="ev-d" :style="{ background: event.color }"></span>
     <span class="ev-n">{{ event.title }}</span>
+    <span v-if="event.source === 'google'" class="ev-src">google</span>
     <span class="ev-tag" :class="event.type">{{ event.type }}</span>
   </div>
 </template>
@@ -67,5 +68,12 @@ const emit = defineEmits<{ select: [event: Event] }>()
 .ev-tag.reminder {
   border-color: var(--red-dim, #3d1f1f);
   color: var(--red);
+}
+
+.ev-src {
+  font-size: 0.5rem;
+  padding: 0 4px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
 }
 </style>

@@ -19,7 +19,9 @@ const { init: initQuickCapture, destroy: destroyQuickCapture } = useQuickCapture
 onMounted(async () => {
   init()
   initQuickCapture()
-  window.addEventListener('contextmenu', blockContextMenu)
+  if (import.meta.env.PROD) {
+    window.addEventListener('contextmenu', blockContextMenu)
+  }
   await Promise.all([
     useSpaces().load(),
     useJournal().load(),
@@ -32,7 +34,9 @@ onMounted(async () => {
 onUnmounted(() => {
   destroy()
   destroyQuickCapture()
-  window.removeEventListener('contextmenu', blockContextMenu)
+  if (import.meta.env.PROD) {
+    window.removeEventListener('contextmenu', blockContextMenu)
+  }
 })
 
 function blockContextMenu(e: MouseEvent) {

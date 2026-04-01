@@ -202,15 +202,11 @@ Components are organized by feature area:
 - `components/finances/` — finance display components
 - `components/` — shared components (PageHeader, AppFab, AppSidebar)
 
-Each component should be self-contained with scoped styles. Use composables for data access — don't call `getDb()` directly from components.
+Each component should be self-contained with scoped styles, but use global styles for atomic/molecule component if available. Use composables for data access — don't call `getDb()` directly from components.
 
-## Reporting Bugs
+## Common Mistakes / Avoid
 
-Open an issue with:
-- What you expected
-- What happened
-- Steps to reproduce
-- OS and app version
+- DO NOT use `window.prompt()` and create a dialog instead
 
 ## Questions?
 

@@ -1,7 +1,79 @@
+use serde::Serialize;
+
+#[derive(Clone, Serialize)]
+struct OAuthCallbackPayload {
+    code: Option<String>,
+    state: Option<String>,
+    error: Option<String>,
+}
+
+#[derive(Serialize)]
+struct OAuthStartResponse {
+    auth_url: String,
+    redirect_uri: String,
+}
+
+#[tauri::command]
+async fn start_google_oauth(app: tauri::AppHandle, auth_url: String) -> Result<OAuthStartResponse, String> {
+    use std::net::TcpListener;
+    use std::thread;
+    use tauri::Emitter;
+    use tiny_http::{Response, Server};
+    use url::Url;
+
+    let listener = TcpListener::bind("127.0.0.1:0").map_err(|e| e.to_string())?;
+    let port = listener.local_addr().map_err(|e| e.to_string())?.port();
+    drop(listener);
+
+    let redirect_uri = format!("http://127.0.0.1:{port}/oauth/google/callback");
+    let auth_url = auth_url.replace("__REDIRECT_URI__", &urlencoding::encode(&redirect_uri));
+    let app_handle = app.clone();
+
+    thread::spawn(move || {
+        let server = match Server::http(format!("127.0.0.1:{port}")) {
+            Ok(server) => server,
+            Err(_) => return,
+        };
+
+        if let Ok(request) = server.recv() {
+            let parsed = Url::parse(&format!("http://localhost{}", request.url())).ok();
+            let mut code = None;
+            let mut state = None;
+            let mut error = None;
+
+            if let Some(url) = parsed {
+                for (key, value) in url.query_pairs() {
+                    match key.as_ref() {
+                        "code" => code = Some(value.into_owned()),
+                        "state" => state = Some(value.into_owned()),
+                        "error" => error = Some(value.into_owned()),
+                        _ => {}
+                    }
+                }
+            }
+
+            let body = if error.is_some() {
+                "authorization failed. you can close this window."
+            } else {
+                "authorization complete. you can close this window and return to slowlife."
+            };
+
+            let _ = request.respond(Response::from_string(body));
+            let _ = app_handle.emit(
+                "google-oauth-callback",
+                OAuthCallbackPayload { code, state, error },
+            );
+        }
+    });
+
+    Ok(OAuthStartResponse { auth_url, redirect_uri })
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     use tauri::Emitter;
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![start_google_oauth])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(

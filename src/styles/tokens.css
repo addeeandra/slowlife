@@ -74,3 +74,23 @@ body {
 .c-t a:hover {
   color: var(--accent);
 }
+
+.b-close {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease);
+}
+
+.b-close:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.b-close:active {
+  transform: translateY(1px);
+}

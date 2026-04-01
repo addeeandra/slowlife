@@ -4,9 +4,8 @@ import { useSpaces } from '../composables/useSpaces'
 import { useQuickCapture } from '../composables/useQuickCapture'
 import MoodPicker from './journal/MoodPicker.vue'
 import TagRow from './journal/TagRow.vue'
-import WritingPrompt from './journal/WritingPrompt.vue'
 
-const { spaces, categories, projects } = useSpaces()
+const { spaces } = useSpaces()
 const {
   isOpen,
   text,
@@ -46,7 +45,7 @@ function pickProject(id: string | null) {
           <div class="qc-title">quick capture</div>
           <div class="qc-hint">ctrl+shift+k</div>
         </div>
-        <button class="qc-close" @click="close">esc</button>
+        <button type="button" class="b-close" @click="close">esc</button>
       </div>
 
       <div class="space-tabs">
@@ -169,16 +168,6 @@ function pickProject(id: string | null) {
 .qc-hint {
   font-size: 0.68rem;
   color: var(--text-dim);
-}
-
-.qc-close {
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  padding: 4px 8px;
-  cursor: pointer;
 }
 
 .qc-grid {

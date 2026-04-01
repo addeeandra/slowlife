@@ -74,6 +74,7 @@ const columns = computed<DayColumn[]>(() => {
           @click.stop="emit('selectEvent', ev)"
         >
           <span class="cw-ev-n">{{ ev.title }}</span>
+          <span v-if="ev.source === 'google'" class="cw-ev-src">google</span>
           <span class="cw-ev-tag" :class="ev.type">{{ ev.type }}</span>
         </div>
         <div
@@ -85,6 +86,7 @@ const columns = computed<DayColumn[]>(() => {
         >
           <span class="cw-ev-time">{{ ev.time }}</span>
           <span class="cw-ev-n">{{ ev.title }}</span>
+          <span v-if="ev.source === 'google'" class="cw-ev-src">google</span>
         </div>
         <div v-if="!col.allDay.length && !col.timed.length" class="cw-empty">--</div>
       </div>
@@ -185,6 +187,11 @@ const columns = computed<DayColumn[]>(() => {
 .cw-ev-tag.meeting { color: var(--work); }
 .cw-ev-tag.holiday { color: var(--green); }
 .cw-ev-tag.reminder { color: var(--red); }
+
+.cw-ev-src {
+  font-size: 0.48rem;
+  color: var(--accent);
+}
 
 .cw-empty {
   font-size: 0.6rem;

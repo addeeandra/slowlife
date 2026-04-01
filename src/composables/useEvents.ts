@@ -156,6 +156,9 @@ export function useEvents() {
   }
 
   async function updateEvent(id: number, patch: Partial<Event>) {
+    const existing = events.value.find(ev => ev.id === id)
+    if (existing?.source === 'google' || existing?.is_readonly) return
+
     const db = await getDb()
     const fields: string[] = []
     const values: unknown[] = []
@@ -177,6 +180,9 @@ export function useEvents() {
   }
 
   async function deleteEvent(id: number) {
+    const existing = events.value.find(ev => ev.id === id)
+    if (existing?.source === 'google' || existing?.is_readonly) return
+
     const db = await getDb()
     await db.execute('DELETE FROM events WHERE id = $1', [id])
     await load()
@@ -241,6 +247,12 @@ export function useEvents() {
         recurrence_rule: null,
         google_id: null,
         source: 'local' as const,
+        external_calendar_id: null,
+        external_url: null,
+        external_status: null,
+        is_readonly: 0,
+        sync_updated_at: null,
+        external_event_type: null,
         created_at: '',
         occurrence_date: s.next_date,
         is_recurring_instance: false,
@@ -264,21 +276,25 @@ export function useEvents() {
       .slice(0, count)
   }
 
-  function groupedByDate(): { date: string; label: string; isToday: boolean; events: Event[] }[] {
+  function groupedByDate(): { date: string; label: string; isToday: boolean; events: EventOccurrence[] }[] {
     const todayISO = toISO(new Date())
-    const sorted = [...events.value].sort(sortByDateTime)
-    const groups: { date: string; label: string; isToday: boolean; events: Event[] }[] = []
+    const futureDate = toISO(addDays(new Date(), 90))
+    const sorted = [...expandRecurrences(events.value, todayISO, futureDate), ...upcomingEvents(10_000)].filter(
+      ev => ev.occurrence_date >= todayISO && ev.occurrence_date <= futureDate
+    ).sort(sortByDateTime)
+    const deduped = sorted.filter((ev, index, arr) => arr.findIndex(candidate => candidate.id === ev.id && candidate.occurrence_date === ev.occurrence_date) === index)
+    const groups: { date: string; label: string; isToday: boolean; events: EventOccurrence[] }[] = []
     let currentDate = ''
 
-    sorted.forEach(ev => {
-      if (ev.date !== currentDate) {
-        currentDate = ev.date
-        const isToday = ev.date === todayISO
-        const d = new Date(ev.date + 'T00:00:00')
+    deduped.forEach(ev => {
+      if (ev.occurrence_date !== currentDate) {
+        currentDate = ev.occurrence_date
+        const isToday = ev.occurrence_date === todayISO
+        const d = new Date(ev.occurrence_date + 'T00:00:00')
         const label = isToday
           ? 'today'
           : `${DAY_ABBR[d.getDay()]}, ${MONTH_ABBR[d.getMonth()]} ${d.getDate()}`
-        groups.push({ date: ev.date, label, isToday, events: [] })
+        groups.push({ date: ev.occurrence_date, label, isToday, events: [] })
       }
       groups[groups.length - 1].events.push(ev)
     })

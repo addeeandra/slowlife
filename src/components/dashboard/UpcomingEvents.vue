@@ -32,6 +32,7 @@ function dateLabel(dateStr: string): string {
         <span class="ev-t">{{ ev.time || '--:--' }}</span>
         <span class="ev-d" :style="{ background: ev.color }"></span>
         <span class="ev-n">{{ ev.title }}</span>
+        <span v-if="ev.source === 'google'" class="ev-src">google</span>
         <span class="ev-tag" :class="ev.type">{{ dateLabel(ev.occurrence_date) }}</span>
       </div>
     </div>
@@ -95,6 +96,13 @@ function dateLabel(dateStr: string): string {
 .ev-tag.reminder {
   border-color: var(--red-dim, #3d1f1f);
   color: var(--red);
+}
+
+.ev-src {
+  font-size: 0.5rem;
+  padding: 0 4px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
 }
 
 @media (max-width: 1024px) {

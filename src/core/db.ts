@@ -113,6 +113,43 @@ async function migrate(db: Database) {
     )
   `)
 
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS google_account (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      client_id TEXT,
+      client_secret TEXT,
+      email TEXT,
+      access_token TEXT,
+      refresh_token TEXT,
+      expires_at TEXT,
+      connected INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS google_calendars (
+      calendar_id TEXT PRIMARY KEY,
+      summary TEXT NOT NULL,
+      "primary" INTEGER NOT NULL DEFAULT 0,
+      selected INTEGER NOT NULL DEFAULT 0,
+      background_color TEXT,
+      foreground_color TEXT,
+      access_role TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS google_calendar_sync_state (
+      calendar_id TEXT PRIMARY KEY,
+      next_sync_token TEXT,
+      last_synced_at TEXT,
+      last_error TEXT,
+      FOREIGN KEY (calendar_id) REFERENCES google_calendars(calendar_id)
+    )
+  `)
+
   await migrateEvents(db)
 }
 
@@ -125,8 +162,17 @@ async function migrateEvents(db: Database) {
     "ALTER TABLE events ADD COLUMN recurrence_rule TEXT",
     "ALTER TABLE events ADD COLUMN google_id TEXT",
     "ALTER TABLE events ADD COLUMN source TEXT DEFAULT 'local'",
+    "ALTER TABLE events ADD COLUMN external_calendar_id TEXT",
+    "ALTER TABLE events ADD COLUMN external_url TEXT",
+    "ALTER TABLE events ADD COLUMN external_status TEXT",
+    "ALTER TABLE events ADD COLUMN is_readonly INTEGER DEFAULT 0",
+    "ALTER TABLE events ADD COLUMN sync_updated_at TEXT",
+    "ALTER TABLE events ADD COLUMN external_event_type TEXT",
   ]
   for (const sql of cols) {
     try { await db.execute(sql) } catch (_) { /* column already exists */ }
   }
+
+  try { await db.execute("ALTER TABLE google_account ADD COLUMN client_id TEXT") } catch (_) { /* column already exists */ }
+  try { await db.execute("ALTER TABLE google_account ADD COLUMN client_secret TEXT") } catch (_) { /* column already exists */ }
 }

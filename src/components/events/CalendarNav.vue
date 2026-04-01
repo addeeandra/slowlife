@@ -6,12 +6,15 @@ const props = defineProps<{
   month: number
   viewMode: 'month' | 'week' | 'list'
   weekLabel?: string
+  syncLabel: string
+  syncDisabled?: boolean
 }>()
 
 const emit = defineEmits<{
   navigate: [direction: -1 | 0 | 1]
   setView: [mode: 'month' | 'week' | 'list']
   create: []
+  syncGoogle: []
 }>()
 
 function label(): string {
@@ -29,6 +32,9 @@ function label(): string {
       <span class="cn-label">{{ label() }}</span>
     </div>
     <div class="cn-right">
+      <div class="cn-sync">
+        <button class="cn-btn" :disabled="syncDisabled" @click="emit('syncGoogle')">{{ syncLabel }}</button>
+      </div>
       <div class="cn-modes">
         <button
           v-for="m in (['month', 'week', 'list'] as const)"
@@ -66,6 +72,11 @@ function label(): string {
   gap: 8px;
 }
 
+.cn-sync {
+  display: flex;
+  gap: 4px;
+}
+
 .cn-btn {
   font-family: var(--mono);
   font-size: 0.68rem;
@@ -80,6 +91,18 @@ function label(): string {
 .cn-btn:hover {
   color: var(--text);
   border-color: var(--accent);
+}
+
+.cn-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+.cn-btn:disabled:hover {
+  color: var(--text-dim);
+  border-color: var(--border);
 }
 
 .cn-label {

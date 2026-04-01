@@ -37,6 +37,12 @@ export interface Event {
   recurrence_rule: string | null
   google_id: string | null
   source: EventSource
+  external_calendar_id: string | null
+  external_url: string | null
+  external_status: string | null
+  is_readonly: number
+  sync_updated_at: string | null
+  external_event_type: string | null
   created_at: string
 }
 
@@ -44,6 +50,76 @@ export interface EventOccurrence extends Event {
   occurrence_date: string
   is_recurring_instance: boolean
   parent_id: number | null
+}
+
+export interface GoogleAccount {
+  id: number
+  client_id: string | null
+  client_secret: string | null
+  email: string | null
+  access_token: string | null
+  refresh_token: string | null
+  expires_at: string | null
+  connected: number
+  created_at: string
+}
+
+export interface GoogleCalendar {
+  calendar_id: string
+  summary: string
+  primary: number
+  selected: number
+  background_color: string | null
+  foreground_color: string | null
+  access_role: string | null
+  created_at: string
+}
+
+export interface GoogleCalendarSyncState {
+  calendar_id: string
+  next_sync_token: string | null
+  last_synced_at: string | null
+  last_error: string | null
+}
+
+export interface GoogleCalendarListResponse {
+  items?: GoogleCalendarListEntry[]
+  nextPageToken?: string
+}
+
+export interface GoogleCalendarListEntry {
+  id: string
+  summary?: string
+  primary?: boolean
+  backgroundColor?: string
+  foregroundColor?: string
+  accessRole?: string
+}
+
+export interface GoogleEventsListResponse {
+  items?: GoogleCalendarEvent[]
+  nextPageToken?: string
+  nextSyncToken?: string
+}
+
+export interface GoogleCalendarEvent {
+  id: string
+  status?: string
+  summary?: string
+  description?: string
+  htmlLink?: string
+  eventType?: string
+  updated?: string
+  start?: {
+    date?: string
+    dateTime?: string
+    timeZone?: string
+  }
+  end?: {
+    date?: string
+    dateTime?: string
+    timeZone?: string
+  }
 }
 
 export interface Account {

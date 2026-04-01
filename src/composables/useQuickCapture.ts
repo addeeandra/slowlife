@@ -3,6 +3,7 @@ import { listen, type UnlistenFn } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useSpaces } from './useSpaces'
 import { useJournal } from './useJournal'
+import type { MoodKey } from '../core/types'
 
 const STORAGE_KEY = 'slowlife.quickcapture.defaults'
 
@@ -43,7 +44,7 @@ function persistDefaults() {
 }
 
 export function useQuickCapture() {
-  const { spaces, categories, projects } = useSpaces()
+  const { categories, projects } = useSpaces()
   const { saveEntry } = useJournal()
 
   const spaceCategories = computed(() =>
