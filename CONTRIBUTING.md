@@ -47,6 +47,7 @@ slowlife-app/
       useEvents.ts        # events CRUD, date grouping
       useGoogleCalendarSync.ts # Google Calendar auth, selection, sync state
       useFinances.ts      # accounts, transactions, subscriptions
+      useTodos.ts         # todos CRUD, status workflow, priority filtering
       usePinned.ts        # pinned items with resolved metadata
       useKeyboard.ts      # global ctrl+key shortcuts
     styles/tokens.css     # design tokens
@@ -56,12 +57,13 @@ slowlife-app/
       PageHeader.vue      # shared title + breadcrumb
       sidebar/            # SpaceTabs, CategoryTree, StreakFooter
       dashboard/          # NudgeCard, SignalRow, ActivityHeatmap, PinnedProjects,
-                          # UpcomingEvents, SubscriptionsCard, MoodWeek, RecentEntries
+                          # UpcomingEvents, TodoFocus, SubscriptionsCard, MoodWeek, RecentEntries
       journal/            # DateBar, MoodPicker, WritingPrompt, EntryEditor, TagRow,
                           # TimelineEntry
       events/             # EventRow, EventForm, Google sync/detail modals
+      todos/              # TodoRow, TodoForm
       finances/           # FinanceSummary, AccountRow, SubscriptionRow, TransactionRow
-    views/                # DashboardView, JournalView, EventsView, FinancesView
+    views/                # DashboardView, JournalView, EventsView, TodosView, FinancesView
   src-tauri/              # Rust backend (Tauri)
     src/lib.rs            # plugin registration + desktop OAuth callback
     src/main.rs           # desktop entry point
@@ -213,6 +215,7 @@ Components are organized by feature area:
 - `components/dashboard/` — dashboard cards and widgets
 - `components/journal/` — journal editor and timeline components
 - `components/events/` — event display components
+- `components/todos/` — todo row and form components
 - `components/finances/` — finance display components
 - `components/` — shared components (PageHeader, AppFab, AppSidebar)
 

@@ -17,11 +17,11 @@ Migrate the validated prototype into a real application.
 - [x] Build finances view (accounts, subscriptions, transactions)
 - [x] SQLite schema and migrations (journal_entries, events, accounts, transactions, subscriptions, spaces, categories, projects, pinned)
 - [x] CRUD operations for all entities
-- [x] Keyboard shortcuts (Ctrl+1/2/3, Ctrl+N, Ctrl+S)
+- [x] Keyboard shortcuts (Ctrl+1/2/3/4, Ctrl+N, Ctrl+S)
 - [x] Floating shortcut help panel
 - [x] Breadcrumb navigation with clickable segments
 - [x] Activity heatmap (20-week contribution grid)
-- [x] Signal cards on dashboard (streak, weekly activity, mood, net worth, sub burn)
+- [x] Signal cards on dashboard (streak, weekly activity, mood, net worth, sub burn, open todos)
 - [x] Pinned projects on dashboard with last-entry and weekly signals
 - [x] Mood trend (7-day visual)
 - [x] Quiet-day nudge (time-aware prompt when no entries today)
@@ -65,18 +65,18 @@ Build out the events system into a proper calendar.
 - [x] Subscription renewal dates shown on calendar
 - [x] Google Calendar sync (read)
 
-## Phase 5 — Todos & Task Tracking
+## Phase 5 — Todos & Task Tracking ✓
 
 A personal task system with priority and complexity scoring.
 
-- [ ] Create/edit/delete todos
-- [ ] Priority levels (P0-P4) and complexity levels (C0-C4)
-- [ ] Assign todos to space/category/project
-- [ ] Status workflow (open, in progress, done, cancelled)
-- [ ] Due dates with overdue detection
-- [ ] Todos view with status grouping, filtering, and sorting
-- [ ] Dashboard: open todos signal card + focus list (top priority items)
-- [ ] Sidebar navigation and keyboard shortcut (Ctrl+4)
+- [x] Create/edit/delete todos
+- [x] Priority levels (P0-P4) and complexity levels (C0-C4)
+- [x] Assign todos to space/category/project
+- [x] Status workflow (open, in progress, done, cancelled)
+- [x] Due dates with overdue detection
+- [x] Todos view with status grouping, filtering, and sorting
+- [x] Dashboard: open todos signal card + focus list (top priority items)
+- [x] Sidebar navigation and keyboard shortcut (Ctrl+4)
 
 ## Phase 6 — Financial Tracking
 
