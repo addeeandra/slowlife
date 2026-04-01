@@ -2,9 +2,11 @@ import Database from '@tauri-apps/plugin-sql'
 
 let db: Database | null = null
 
+const DB_NAME = import.meta.env.DEV ? 'slowlife-dev.db' : 'slowlife.db'
+
 export async function getDb(): Promise<Database> {
   if (!db) {
-    db = await Database.load('sqlite:slowlife.db')
+    db = await Database.load(`sqlite:${DB_NAME}`)
     await migrate(db)
   }
   return db

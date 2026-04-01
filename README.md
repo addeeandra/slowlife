@@ -33,7 +33,9 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 ### Events
 - Meetings, agendas, holidays
 - Grouped by date with type badges
-- Calendar sync support planned
+- List view shows upcoming events from today forward
+- Google Calendar sync is available as a one-way, read-only mirror
+- Synced Google events open a read-only detail view and link back to the original event
 
 ### Finances
 - **Accounts** with balances
@@ -45,7 +47,7 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 - Native app via Tauri (~5MB, not Electron)
 - SQLite database — fast, reliable, local
 - Keyboard shortcuts (Ctrl+1/2/3 for navigation, Ctrl+N for quick capture)
-- System tray support planned
+- System tray support
 
 ## Roadmap Preview
 
@@ -53,7 +55,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 
 - [x] Global quick capture (system-wide shortcut)
 - [x] Calendar views and event CRUD
-- [x] Calendar sync (Google Calendar)
+- [x] Calendar sync (Google Calendar, read-only)
 - [ ] Financial CRUD and budget tracking
 - [ ] Full-text search and command palette
 - [ ] cr-sqlite for cross-device sync
@@ -89,8 +91,15 @@ pnpm install
 ### Development
 
 ```bash
-pnpm tauri dev
+pnpm tauri:dev
 ```
+
+Dev and production are intentionally isolated:
+
+- dev app identifier: `com.addeeandra.slowlife.dev`
+- prod app identifier: `com.addeeandra.slowlife`
+- dev database: `slowlife-dev.db`
+- prod database: `slowlife.db`
 
 ### Build
 

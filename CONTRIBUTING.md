@@ -15,8 +15,17 @@ Thanks for your interest in contributing. This document covers the essentials.
 git clone https://github.com/addeeandra/slowlife.git
 cd slowlife-app
 pnpm install
-pnpm tauri dev
+pnpm tauri:dev
 ```
+
+Development and production app identities are intentionally isolated:
+
+- dev Tauri config: `src-tauri/tauri.dev.conf.json`
+- prod Tauri config: `src-tauri/tauri.conf.json`
+- dev identifier: `com.addeeandra.slowlife.dev`
+- prod identifier: `com.addeeandra.slowlife`
+- dev database: `slowlife-dev.db`
+- prod database: `slowlife.db`
 
 ## Project Structure
 
@@ -36,6 +45,7 @@ slowlife-app/
       useSpaces.ts        # spaces/categories/projects tree + CRUD
       useJournal.ts       # journal entries CRUD, streak, heatmap, mood stats
       useEvents.ts        # events CRUD, date grouping
+      useGoogleCalendarSync.ts # Google Calendar auth, selection, sync state
       useFinances.ts      # accounts, transactions, subscriptions
       usePinned.ts        # pinned items with resolved metadata
       useKeyboard.ts      # global ctrl+key shortcuts
@@ -49,15 +59,18 @@ slowlife-app/
                           # UpcomingEvents, SubscriptionsCard, MoodWeek, RecentEntries
       journal/            # DateBar, MoodPicker, WritingPrompt, EntryEditor, TagRow,
                           # TimelineEntry
-      events/             # EventRow
+      events/             # EventRow, EventForm, Google sync/detail modals
       finances/           # FinanceSummary, AccountRow, SubscriptionRow, TransactionRow
     views/                # DashboardView, JournalView, EventsView, FinancesView
   src-tauri/              # Rust backend (Tauri)
-    src/lib.rs            # plugin registration
+    src/lib.rs            # plugin registration + desktop OAuth callback
     src/main.rs           # desktop entry point
     Cargo.toml            # Rust dependencies
-    tauri.conf.json       # Tauri app config
+    tauri.conf.json       # production Tauri app config
+    tauri.dev.conf.json   # development-only Tauri app config
     capabilities/         # permission grants
+  .github/workflows/
+    ci.yml                # test/typecheck/rust check
 ```
 
 ## Development Workflow
@@ -83,7 +96,7 @@ remove unused greet command from rust backend
 
 **Frontend (Vue + TypeScript):**
 - Vue 3 `<script setup lang="ts">` composition API
-- Scoped CSS — no global styles outside `tokens.css`
+- Scoped CSS for feature-specific styles; shared global atoms/utilities belong in `tokens.css`
 - Keep components small and focused
 - Use design tokens from `tokens.css` — don't hardcode colors or fonts
 - Composables use module-scoped refs (singleton pattern) — no Pinia
@@ -170,6 +183,7 @@ Tests run automatically on every push and pull request via GitHub Actions. The C
 - **Test**: runs all tests with coverage, uploads to Codecov
 - **Typecheck**: runs `vue-tsc --noEmit`
 - **Rust Check**: runs `cargo check` on the Tauri backend
+- **Release macOS**: tag-triggered draft macOS release build via GitHub Actions
 
 All checks must pass before merging.
 
