@@ -15,6 +15,11 @@ const calendar: GoogleCalendar = {
 
 describe('googleCalendarApi', () => {
   it('normalizes timed google events into readonly local rows', () => {
+    const expectedStart = new Date('2026-04-10T09:30:00+07:00')
+    const expectedEnd = new Date('2026-04-10T10:15:00+07:00')
+    const expectedTime = `${String(expectedStart.getHours()).padStart(2, '0')}:${String(expectedStart.getMinutes()).padStart(2, '0')}`
+    const expectedEndTime = `${String(expectedEnd.getHours()).padStart(2, '0')}:${String(expectedEnd.getMinutes()).padStart(2, '0')}`
+
     const event: GoogleCalendarEvent = {
       id: 'evt-1',
       summary: 'Design review',
@@ -29,8 +34,8 @@ describe('googleCalendarApi', () => {
 
     expect(normalized.title).toBe('Design review')
     expect(normalized.date).toBe('2026-04-10')
-    expect(normalized.time).toBe('09:30')
-    expect(normalized.end_time).toBe('10:15')
+    expect(normalized.time).toBe(expectedTime)
+    expect(normalized.end_time).toBe(expectedEndTime)
     expect(normalized.type).toBe('meeting')
     expect(normalized.source).toBe('google')
     expect(normalized.is_readonly).toBe(1)
