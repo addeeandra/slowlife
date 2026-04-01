@@ -42,23 +42,6 @@ const { accounts, subscriptions, transactions, totalSubsMonthly } = useFinances(
   max-width: 580px;
 }
 
-.c {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-}
-
-.c-t {
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .sub-total {
   font-weight: 400;
   color: var(--text-dim);

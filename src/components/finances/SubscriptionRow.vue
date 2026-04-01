@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import type { Subscription } from '../../core/types'
-import { formatCurrency } from '../../core/constants'
+import { formatCurrency, renewalLabel } from '../../core/constants'
 
-const props = defineProps<{ subscription: Subscription }>()
-
-function renewalLabel(): string {
-  const nd = new Date(props.subscription.next_date + 'T00:00:00')
-  const diff = Math.ceil((nd.getTime() - new Date().getTime()) / 864e5)
-  if (diff <= 0) return 'today'
-  if (diff === 1) return 'tomorrow'
-  return `in ${diff}d`
-}
+defineProps<{ subscription: Subscription }>()
 </script>
 
 <template>
@@ -18,7 +10,7 @@ function renewalLabel(): string {
     <div class="sr-info">
       <span class="sr-dot" :style="{ background: subscription.color }"></span>
       <span class="sr-name">{{ subscription.name }}</span>
-      <span class="sr-when">{{ renewalLabel() }}</span>
+      <span class="sr-when">{{ renewalLabel(subscription.next_date) }}</span>
     </div>
     <span class="sr-amt">{{ formatCurrency(subscription.amount) }}</span>
   </div>

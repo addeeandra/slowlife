@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { getDb } from '../core/db'
 import type { JournalEntry, MoodKey } from '../core/types'
-import { MOODS, DAY_ABBR } from '../core/constants'
+import { MOODS, DAY_ABBR, MONTH_ABBR } from '../core/constants'
 
 const entries = ref<JournalEntry[]>([])
 
@@ -108,12 +108,17 @@ export function useJournal() {
     return entries.value.slice(0, count)
   }
 
-  function heatmapData(): { level: number; isToday: boolean; isFuture: boolean }[] {
+  function heatmapRange() {
     const now = new Date()
     now.setHours(0, 0, 0, 0)
     const weeks = 20
     const totalDays = weeks * 7
     const start = new Date(now.getTime() - (totalDays - 1 + now.getDay()) * 864e5)
+    return { now, totalDays, start }
+  }
+
+  function heatmapData(): { level: number; isToday: boolean; isFuture: boolean }[] {
+    const { now, totalDays, start } = heatmapRange()
 
     const dayCounts: Record<string, number> = {}
     entries.value.forEach(e => {
@@ -139,14 +144,9 @@ export function useJournal() {
   }
 
   function heatmapMonths(): string[] {
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
-    const weeks = 20
-    const totalDays = weeks * 7
-    const start = new Date(now.getTime() - (totalDays - 1 + now.getDay()) * 864e5)
+    const { totalDays, start } = heatmapRange()
 
     const months: string[] = []
-    const MONTH_ABBR = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
     let lastMonth = -1
     for (let i = 0; i < totalDays; i++) {
       const d = new Date(start.getTime() + i * 864e5)

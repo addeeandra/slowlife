@@ -21,22 +21,8 @@ const days = computed(() => moodByDay())
 </template>
 
 <style scoped>
-.c {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-}
-
 .s3 {
   grid-column: span 3;
-}
-
-.c-t {
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  margin-bottom: 6px;
 }
 
 .mw {

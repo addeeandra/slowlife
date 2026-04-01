@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useFinances } from '../../composables/useFinances'
-import { formatCurrency } from '../../core/constants'
+import { formatCurrency, renewalLabel } from '../../core/constants'
 
 const { sortedSubscriptions } = useFinances()
 
 const subs = computed(() => sortedSubscriptions.value.slice(0, 4))
-
-function renewalLabel(nextDate: string): string {
-  const nd = new Date(nextDate + 'T00:00:00')
-  const diff = Math.ceil((nd.getTime() - new Date().getTime()) / 864e5)
-  if (diff <= 0) return 'today'
-  if (diff === 1) return 'tmrw'
-  return `${diff}d`
-}
 </script>
 
 <template>
@@ -34,35 +26,8 @@ function renewalLabel(nextDate: string): string {
 </template>
 
 <style scoped>
-.c {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-}
-
 .s5 {
   grid-column: span 5;
-}
-
-.c-t {
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.c-t a {
-  color: var(--text-dim);
-  text-decoration: none;
-  font-size: 0.55rem;
-}
-
-.c-t a:hover {
-  color: var(--accent);
 }
 
 .sub-row {

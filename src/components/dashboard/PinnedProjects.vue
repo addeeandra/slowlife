@@ -41,25 +41,8 @@ function navigate(p: { spaceId: string; category_id: string; item_id: string | n
 </template>
 
 <style scoped>
-.c {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-}
-
 .s5 {
   grid-column: span 5;
-}
-
-.c-t {
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .pin-list {

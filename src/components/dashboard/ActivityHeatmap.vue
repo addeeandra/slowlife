@@ -41,22 +41,8 @@ const months = computed(() => heatmapMonths())
 </template>
 
 <style scoped>
-.c {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  padding: 10px 12px;
-}
-
 .s7 {
   grid-column: span 7;
-}
-
-.c-t {
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  margin-bottom: 6px;
 }
 
 .hm-months {

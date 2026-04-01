@@ -35,6 +35,14 @@ export const MOODS: Record<MoodKey, string> = {
 export const MONTH_ABBR = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 export const DAY_ABBR = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
+export function renewalLabel(nextDate: string): string {
+  const nd = new Date(nextDate + 'T00:00:00')
+  const diff = Math.ceil((nd.getTime() - new Date().getTime()) / 864e5)
+  if (diff <= 0) return 'today'
+  if (diff === 1) return 'tomorrow'
+  return `in ${diff}d`
+}
+
 export function formatCurrency(n: number): string {
   const a = Math.abs(n)
   if (a >= 1e6) return (n < 0 ? '-' : '') + 'Rp' + (a / 1e6).toFixed(1) + 'M'
