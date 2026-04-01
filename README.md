@@ -47,23 +47,12 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 - Keyboard shortcuts (Ctrl+1/2/3 for navigation, Ctrl+N for quick capture)
 - System tray support planned
 
-## Current Status
-
-Phase 1 (Foundation) is complete. Phase 2 (Core Experience) polish is now shipped:
-
-- [x] Pin/unpin projects from the sidebar (CategoryTree) with live dashboard sync
-- [x] Drag-to-reorder pinned projects on the dashboard (sortable with persistence)
-- [x] Edit/delete journal entries inline on the timeline
-- [x] Edit/delete categories and projects inline in the sidebar (with confirmations)
-- [x] Animation/transition tokens applied across UI (durations/easing centralized)
-- [x] All Phase 1 foundations (views, SQLite persistence, shortcuts, responsive layout)
-
 ## Roadmap Preview
 
 See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 
 - [x] Global quick capture (system-wide shortcut)
-- [ ] Calendar views and event CRUD
+- [x] Calendar views and event CRUD
 - [ ] Calendar sync (Google Calendar)
 - [ ] Financial CRUD and budget tracking
 - [ ] Full-text search and command palette
