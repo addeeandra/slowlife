@@ -152,6 +152,23 @@ async function migrate(db: Database) {
     )
   `)
 
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS todos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      description TEXT,
+      status TEXT NOT NULL DEFAULT 'open',
+      priority TEXT NOT NULL DEFAULT 'P2',
+      complexity TEXT NOT NULL DEFAULT 'C2',
+      space_id TEXT,
+      category_id TEXT,
+      project_id TEXT,
+      due_date TEXT,
+      completed_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
   await migrateEvents(db)
 }
 

@@ -1,4 +1,4 @@
-import type { MoodKey, EventType, RecurrenceRule } from './types'
+import type { MoodKey, EventType, RecurrenceRule, TodoPriority, TodoComplexity, TodoStatus } from './types'
 
 export const TAGS: Record<string, string[]> = {
   casual: ['gratitude', 'reflection', 'memory', 'idea', 'dream', 'vent', 'milestone'],
@@ -47,6 +47,29 @@ export const RECURRENCE_PRESETS: { label: string; value: RecurrenceRule | null }
   { label: 'monthly', value: { freq: 'monthly', interval: 1 } },
   { label: 'yearly', value: { freq: 'yearly', interval: 1 } },
 ]
+
+export const TODO_PRIORITIES: Record<TodoPriority, { label: string; color: string; dimColor: string }> = {
+  P0: { label: 'critical', color: '#c46a6a', dimColor: '#3d1f1f' },
+  P1: { label: 'high',     color: '#c4956a', dimColor: '#3d2e1f' },
+  P2: { label: 'medium',   color: '#c4c46a', dimColor: '#3d3d1f' },
+  P3: { label: 'low',      color: '#6a9ec4', dimColor: '#1f2e3d' },
+  P4: { label: 'someday',  color: '#8a8a8a', dimColor: '#2a2a2a' },
+}
+
+export const TODO_COMPLEXITIES: Record<TodoComplexity, { label: string }> = {
+  C0: { label: 'trivial' },
+  C1: { label: 'small' },
+  C2: { label: 'medium' },
+  C3: { label: 'large' },
+  C4: { label: 'epic' },
+}
+
+export const TODO_STATUSES: Record<TodoStatus, { label: string }> = {
+  open:        { label: 'open' },
+  in_progress: { label: 'in progress' },
+  done:        { label: 'done' },
+  cancelled:   { label: 'cancelled' },
+}
 
 export const MONTH_ABBR = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
 export const DAY_ABBR = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']

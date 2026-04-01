@@ -53,6 +53,13 @@ export async function seedIfEmpty(db: Database) {
     await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color) VALUES ('chatgpt plus', 320000, 'IDR', 'monthly', '2026-04-20', '#10a37f')")
     await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color) VALUES ('github pro', 60000, 'IDR', 'monthly', '2026-04-12', '#333333')")
 
+    // todos
+    await db.execute("INSERT INTO todos (title, description, priority, complexity, space_id, category_id, project_id, due_date) VALUES ('fix login redirect bug', 'users get stuck on callback page after oauth', 'P1', 'C1', 'work', 'company-x', 'project-alpha', '2026-04-04')")
+    await db.execute("INSERT INTO todos (title, priority, complexity, space_id, category_id, project_id) VALUES ('write unit tests for auth module', 'P2', 'C2', 'work', 'company-x', 'project-alpha')")
+    await db.execute("INSERT INTO todos (title, priority, complexity, space_id, category_id) VALUES ('read rust book ch3', 'P3', 'C2', 'casual', 'education')")
+    await db.execute("INSERT INTO todos (title, description, priority, complexity, due_date) VALUES ('renew passport', 'check embassy website for appointment slots', 'P1', 'C1', '2026-04-15')")
+    await db.execute("INSERT INTO todos (title, priority, complexity, status) VALUES ('update resume', 'P4', 'C1', 'done')")
+
     // transactions
     await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (1, 'salary', 8500000, 'income', '2026-03-31')")
     await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (1, 'groceries', -285000, 'expense', '2026-03-30')")

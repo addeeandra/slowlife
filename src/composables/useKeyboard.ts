@@ -26,6 +26,10 @@ export function useKeyboard() {
           e.preventDefault()
           router.push('/finances')
           break
+        case '4':
+          e.preventDefault()
+          router.push('/todos')
+          break
         case 'n':
           e.preventDefault()
           router.push('/journal/casual')

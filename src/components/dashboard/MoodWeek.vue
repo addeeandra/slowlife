@@ -21,10 +21,6 @@ const days = computed(() => moodByDay())
 </template>
 
 <style scoped>
-.s3 {
-  grid-column: span 3;
-}
-
 .mw {
   display: flex;
   gap: 3px;
@@ -50,11 +46,5 @@ const days = computed(() => moodByDay())
   height: 12px;
   background: var(--border);
   margin: 0 auto;
-}
-
-@media (max-width: 1024px) {
-  .s3 {
-    grid-column: span 12;
-  }
 }
 </style>

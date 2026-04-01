@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useJournal } from '../../composables/useJournal'
 import { useFinances } from '../../composables/useFinances'
+import { useTodos } from '../../composables/useTodos'
 import { MOODS } from '../../core/constants'
 import { formatCurrency } from '../../core/constants'
 
 const { streak, daysActiveThisWeek, dominantMoodThisWeek } = useJournal()
 const { netWorth, totalSubsMonthly, accounts, subscriptions } = useFinances()
+const { openCount, overdueTodos } = useTodos()
 </script>
 
 <template>
@@ -35,13 +37,18 @@ const { netWorth, totalSubsMonthly, accounts, subscriptions } = useFinances()
       <div class="s-v">{{ formatCurrency(totalSubsMonthly) }}</div>
       <div class="s-c">{{ subscriptions.length }} active</div>
     </div>
+    <div class="sig">
+      <div class="s-l">todos</div>
+      <div class="s-v">{{ openCount }}</div>
+      <div class="s-c">{{ overdueTodos.length ? `${overdueTodos.length} overdue` : 'open' }}</div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .sig-row {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 10px;
   grid-column: span 12;
 }

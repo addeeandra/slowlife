@@ -8,6 +8,7 @@ import UpcomingEvents from '../components/dashboard/UpcomingEvents.vue'
 import SubscriptionsCard from '../components/dashboard/SubscriptionsCard.vue'
 import MoodWeek from '../components/dashboard/MoodWeek.vue'
 import RecentEntries from '../components/dashboard/RecentEntries.vue'
+import TodoFocus from '../components/dashboard/TodoFocus.vue'
 </script>
 
 <template>
@@ -18,6 +19,7 @@ import RecentEntries from '../components/dashboard/RecentEntries.vue'
       <SignalRow />
       <ActivityHeatmap />
       <PinnedProjects />
+      <TodoFocus />
       <UpcomingEvents />
       <SubscriptionsCard />
       <MoodWeek />

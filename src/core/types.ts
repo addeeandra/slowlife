@@ -184,3 +184,22 @@ export interface CategoryNode {
   category: Category
   projects: Project[]
 }
+
+export type TodoStatus = 'open' | 'in_progress' | 'done' | 'cancelled'
+export type TodoPriority = 'P0' | 'P1' | 'P2' | 'P3' | 'P4'
+export type TodoComplexity = 'C0' | 'C1' | 'C2' | 'C3' | 'C4'
+
+export interface Todo {
+  id: number
+  title: string
+  description: string | null
+  status: TodoStatus
+  priority: TodoPriority
+  complexity: TodoComplexity
+  space_id: string | null
+  category_id: string | null
+  project_id: string | null
+  due_date: string | null
+  completed_at: string | null
+  created_at: string
+}

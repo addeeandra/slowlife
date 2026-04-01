@@ -21,6 +21,7 @@ function triggerQuickCapture() {
     <div class="sc-r"><span class="sc-l">dashboard</span><span class="sc-k">ctrl+1</span></div>
     <div class="sc-r"><span class="sc-l">events</span><span class="sc-k">ctrl+2</span></div>
     <div class="sc-r"><span class="sc-l">finances</span><span class="sc-k">ctrl+3</span></div>
+    <div class="sc-r"><span class="sc-l">todos</span><span class="sc-k">ctrl+4</span></div>
     <div class="sc-r"><span class="sc-l">new entry</span><span class="sc-k">ctrl+n</span></div>
     <div class="sc-r"><span class="sc-l">toggle sidebar</span><span class="sc-k">ctrl+s</span></div>
     <div class="sc-r">

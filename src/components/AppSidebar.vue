@@ -48,6 +48,14 @@ function navigateTo(path: string) {
         finances
         <span class="sb-k">ctrl+3</span>
       </button>
+      <button
+        class="sb-item"
+        :class="{ active: isActive('todos') }"
+        @click="navigateTo('/todos')"
+      >
+        todos
+        <span class="sb-k">ctrl+4</span>
+      </button>
     </nav>
 
     <div class="sb-sep"></div>

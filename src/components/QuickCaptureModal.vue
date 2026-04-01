@@ -112,7 +112,7 @@ function pickProject(id: string | null) {
         ></textarea>
         <div class="editor-ft">
           <div class="meta">
-            <span class="wc">{{ text.trim().length ? text.trim().split(/\\s+/).length : 0 }} words</span>
+            <span class="wc">{{ text.trim().length ? text.trim().split(/\s+/).length : 0 }} words</span>
             <span class="sp">{{ selectedMood ? 'mood ' + selectedMood : 'no mood' }}</span>
           </div>
           <div class="actions">

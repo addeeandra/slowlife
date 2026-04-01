@@ -9,7 +9,7 @@ const months = computed(() => heatmapMonths())
 </script>
 
 <template>
-  <div class="c s7">
+  <div class="c s4">
     <div class="c-t">activity</div>
     <div class="hm-months">
       <span v-for="m in months" :key="m">{{ m }}</span>
@@ -41,10 +41,6 @@ const months = computed(() => heatmapMonths())
 </template>
 
 <style scoped>
-.s7 {
-  grid-column: span 7;
-}
-
 .hm-months {
   display: flex;
   justify-content: space-between;
@@ -86,11 +82,5 @@ const months = computed(() => heatmapMonths())
 .hm-leg .h {
   width: 7px;
   height: 7px;
-}
-
-@media (max-width: 1024px) {
-  .s7 {
-    grid-column: span 12;
-  }
 }
 </style>

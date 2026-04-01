@@ -9,6 +9,7 @@ import { useJournal } from './composables/useJournal'
 import { useEvents } from './composables/useEvents'
 import { useFinances } from './composables/useFinances'
 import { usePinned } from './composables/usePinned'
+import { useTodos } from './composables/useTodos'
 import { useSidebar } from './composables/useSidebar'
 import { useQuickCapture } from './composables/useQuickCapture'
 
@@ -28,6 +29,7 @@ onMounted(async () => {
     useEvents().load(),
     useFinances().load(),
     usePinned().load(),
+    useTodos().load(),
   ])
 })
 

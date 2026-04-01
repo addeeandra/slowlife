@@ -26,10 +26,6 @@ const subs = computed(() => sortedSubscriptions.value.slice(0, 4))
 </template>
 
 <style scoped>
-.s5 {
-  grid-column: span 5;
-}
-
 .sub-row {
   display: flex;
   align-items: center;
@@ -61,11 +57,5 @@ const subs = computed(() => sortedSubscriptions.value.slice(0, 4))
 .sr-amt {
   font-size: 0.72rem;
   color: var(--text-mid);
-}
-
-@media (max-width: 1024px) {
-  .s5 {
-    grid-column: span 12;
-  }
 }
 </style>

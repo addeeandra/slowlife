@@ -40,10 +40,6 @@ function dateLabel(dateStr: string): string {
 </template>
 
 <style scoped>
-.s4 {
-  grid-column: span 4;
-}
-
 .ev-list {
   display: flex;
   flex-direction: column;
@@ -103,11 +99,5 @@ function dateLabel(dateStr: string): string {
   padding: 0 4px;
   border: 1px solid var(--accent);
   color: var(--accent);
-}
-
-@media (max-width: 1024px) {
-  .s4 {
-    grid-column: span 12;
-  }
 }
 </style>

@@ -24,11 +24,11 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 - **Tags**: per-space tag sets for quick categorization
 
 ### Dashboard
-- **Signal cards**: streak, weekly activity, dominant mood, net worth, subscription burn
+- **Signal cards**: streak, weekly activity, dominant mood, net worth, subscription burn, open todos
 - **Activity heatmap**: 20-week contribution-style grid
 - **Pinned projects**: quick access to what matters most, with last-entry and weekly activity signals
 - **Mood trend**: 7-day visual
-- **Upcoming events** and **subscription renewals** at a glance
+- **Upcoming events**, **subscription renewals**, and **focus todos** at a glance
 
 ### Events
 - Meetings, agendas, holidays
@@ -36,6 +36,14 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 - List view shows upcoming events from today forward
 - Google Calendar sync is available as a one-way, read-only mirror
 - Synced Google events open a read-only detail view and link back to the original event
+
+### Todos
+- **Priority scoring**: P0 (critical) through P4 (someday)
+- **Complexity scoring**: C0 (trivial) through C4 (epic)
+- **Status workflow**: open, in progress, done, cancelled
+- **Assignable** to any space/category/project
+- **Due dates** with overdue detection
+- **Filtered views**: group by status, filter by priority, sort by due date
 
 ### Finances
 - **Accounts** with balances
@@ -46,7 +54,7 @@ slowlife is a desktop-first journaling, events, and financial tracking app built
 ### Desktop Experience
 - Native app via Tauri (~5MB, not Electron)
 - SQLite database — fast, reliable, local
-- Keyboard shortcuts (Ctrl+1/2/3 for navigation, Ctrl+N for quick capture)
+- Keyboard shortcuts (Ctrl+1/2/3/4 for navigation, Ctrl+N for quick capture)
 - System tray support
 
 ## Roadmap Preview
@@ -56,6 +64,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 - [x] Global quick capture (system-wide shortcut)
 - [x] Calendar views and event CRUD
 - [x] Calendar sync (Google Calendar, read-only)
+- [ ] Todos with priority/complexity scoring
 - [ ] Financial CRUD and budget tracking
 - [ ] Full-text search and command palette
 - [ ] cr-sqlite for cross-device sync

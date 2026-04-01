@@ -94,3 +94,26 @@ body {
 .b-close:active {
   transform: translateY(1px);
 }
+
+/* span */
+.s3 {
+  grid-column: span 3;
+}
+.s4 {
+  grid-column: span 4;
+}
+.s5 {
+  grid-column: span 5;
+}
+.s7 {
+  grid-column: span 7;
+}
+.s12 {
+  grid-column: span 12;
+}
+
+@media (max-width: 1024px) {
+  .s3, .s4, .s5, .s7 {
+    grid-column: span 12;
+  }
+}

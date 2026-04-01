@@ -65,7 +65,20 @@ Build out the events system into a proper calendar.
 - [x] Subscription renewal dates shown on calendar
 - [x] Google Calendar sync (read)
 
-## Phase 5 — Financial Tracking
+## Phase 5 — Todos & Task Tracking
+
+A personal task system with priority and complexity scoring.
+
+- [ ] Create/edit/delete todos
+- [ ] Priority levels (P0-P4) and complexity levels (C0-C4)
+- [ ] Assign todos to space/category/project
+- [ ] Status workflow (open, in progress, done, cancelled)
+- [ ] Due dates with overdue detection
+- [ ] Todos view with status grouping, filtering, and sorting
+- [ ] Dashboard: open todos signal card + focus list (top priority items)
+- [ ] Sidebar navigation and keyboard shortcut (Ctrl+4)
+
+## Phase 6 — Financial Tracking
 
 Expand finances beyond basic tracking.
 
@@ -78,7 +91,7 @@ Expand finances beyond basic tracking.
 - [ ] Net worth over time chart
 - [ ] Multi-currency support (IDR, USD, SGD, CNY)
 
-## Phase 6 — Search & Insights
+## Phase 7 — Search & Insights
 
 Help users find and understand their data.
 
@@ -90,7 +103,7 @@ Help users find and understand their data.
 - [ ] Writing frequency analytics
 - [ ] Spending pattern insights
 
-## Phase 7 — Data Portability
+## Phase 8 — Data Portability
 
 Users own their data. Make it easy to move.
 
@@ -99,7 +112,7 @@ Users own their data. Make it easy to move.
 - [ ] Database backup/restore
 - [ ] Import from other journaling apps (Day One, Obsidian)
 
-## Phase 8 — Cross-Device Sync
+## Phase 9 — Cross-Device Sync
 
 Sync data across devices without a traditional backend.
 
@@ -109,7 +122,7 @@ Sync data across devices without a traditional backend.
 - [ ] Sync status indicator
 - [ ] Selective sync (choose which spaces to sync)
 
-## Phase 9 — Mobile
+## Phase 10 — Mobile
 
 Take slowlife on the go via Tauri v2 mobile support.
 
@@ -119,7 +132,7 @@ Take slowlife on the go via Tauri v2 mobile support.
 - [ ] Mobile-optimized quick capture
 - [ ] Push notifications for events/reminders
 
-## Phase 10 — Extensibility
+## Phase 11 — Extensibility
 
 Open up the platform for personal customization.
 

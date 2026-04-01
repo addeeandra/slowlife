@@ -13,6 +13,7 @@ const props = defineProps<{
   calendars: GoogleCalendar[]
   lastSyncedAt: string | null
   lastError: string | null
+  dataConfirmDisconnect: boolean | null
 }>()
 
 const emit = defineEmits<{

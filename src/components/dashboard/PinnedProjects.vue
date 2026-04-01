@@ -32,7 +32,7 @@ async function persistOrder() {
 </script>
 
 <template>
-  <div class="c s5">
+  <div class="c s4">
     <div class="c-t">pinned</div>
 
     <div v-if="!localPins.length" class="empty">nothing pinned</div>
@@ -67,10 +67,6 @@ async function persistOrder() {
 </template>
 
 <style scoped>
-.s5 {
-  grid-column: span 5;
-}
-
 .empty {
   font-size: 0.68rem;
   color: var(--text-dim);
@@ -134,10 +130,6 @@ async function persistOrder() {
 
 .pin:hover .p-x { opacity: 1; }
 .p-x:hover { color: var(--red); }
-
-@media (max-width: 1024px) {
-  .s5 { grid-column: span 12; }
-}
 </style>
 
 <!-- SortableJS fallback classes are injected outside scoped context -->

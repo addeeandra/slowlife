@@ -67,10 +67,6 @@ function navigate(entry: JournalEntry) {
 </template>
 
 <style scoped>
-.s12 {
-  grid-column: span 12;
-}
-
 .rec {
   display: flex;
   flex-direction: column;
