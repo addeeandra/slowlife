@@ -56,13 +56,13 @@ Reduce friction for capturing thoughts.
 
 Build out the events system into a proper calendar.
 
-- [ ] Calendar month view
-- [ ] Calendar week view
-- [ ] Create/edit/delete events
-- [ ] Event types: meeting, agenda, holiday, reminder
-- [ ] Event categories: assign space/category to an event
-- [ ] Recurring events
-- [ ] Subscription renewal dates shown on calendar
+- [x] Calendar month view
+- [x] Calendar week view
+- [x] Create/edit/delete events
+- [x] Event types: meeting, agenda, holiday, reminder
+- [x] Event categories: assign space/category to an event
+- [x] Recurring events
+- [x] Subscription renewal dates shown on calendar
 - [ ] Google Calendar sync (read)
 - [ ] Calendar sync conflict handling
 
