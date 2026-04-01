@@ -131,7 +131,9 @@ export function useJournal() {
     now.setHours(0, 0, 0, 0)
     const weeks = 20
     const totalDays = weeks * 7
-    const start = new Date(now.getTime() - (totalDays - 1 + now.getDay()) * 864e5)
+    // Mon=0 … Sun=6; anchors start to Monday of the current week so today is always in range
+    const daysFromMonday = (now.getDay() + 6) % 7
+    const start = new Date(now.getTime() - (daysFromMonday + (weeks - 1) * 7) * 864e5)
     return { now, totalDays, start }
   }
 

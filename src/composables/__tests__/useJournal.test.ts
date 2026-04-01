@@ -141,5 +141,80 @@ describe('useJournal', () => {
     expect(mockDb.execute).toHaveBeenCalledWith('DELETE FROM journal_entries WHERE id = $1', [1])
     expect(journal.entries.value).toHaveLength(1)
   })
+
+  describe('heatmapData', () => {
+    // Fake time: Wednesday 2026-04-01 (getDay() = 3, daysFromMonday = 2)
+    // start = 2026-04-01 - 135 days = 2025-11-17 (Monday)
+    // range: 2025-11-17 → 2026-04-05 (140 cells, 4 future days)
+
+    it('returns exactly 140 cells', async () => {
+      const { heatmapData } = await loadJournal([])
+      expect(heatmapData()).toHaveLength(140)
+    })
+
+    it('marks today (cell 135) as isToday', async () => {
+      const { heatmapData } = await loadJournal([])
+      const cells = heatmapData()
+      expect(cells[135].isToday).toBe(true)
+    })
+
+    it('marks 4 trailing cells as isFuture (Thu–Sun of current week)', async () => {
+      const { heatmapData } = await loadJournal([])
+      const cells = heatmapData()
+      const futureCells = cells.filter(c => c.isFuture)
+      expect(futureCells).toHaveLength(4)
+    })
+
+    it('assigns correct activity level for an entry logged today', async () => {
+      const { heatmapData } = await loadJournal([
+        makeEntry({ created_at: '2026-04-01T10:00:00' }),
+      ])
+      const cells = heatmapData()
+      expect(cells[135].level).toBe(1)
+    })
+
+    it('assigns level 4 for 4+ entries on the same day', async () => {
+      const { heatmapData } = await loadJournal([
+        makeEntry({ created_at: '2026-04-01T08:00:00' }),
+        makeEntry({ created_at: '2026-04-01T10:00:00' }),
+        makeEntry({ created_at: '2026-04-01T12:00:00' }),
+        makeEntry({ created_at: '2026-04-01T14:00:00' }),
+      ])
+      expect(heatmapData()[135].level).toBe(4)
+    })
+
+    it('gives level 0 to past days with no entries', async () => {
+      const { heatmapData } = await loadJournal([])
+      const cells = heatmapData()
+      // All past cells (0–134) should be level 0
+      expect(cells.slice(0, 135).every(c => c.level === 0)).toBe(true)
+    })
+
+    it('gives level 0 to future cells regardless of entries', async () => {
+      const { heatmapData } = await loadJournal([
+        makeEntry({ created_at: '2026-04-03T10:00:00' }), // Friday (future)
+      ])
+      const cells = heatmapData()
+      const futureCells = cells.slice(136)
+      expect(futureCells.every(c => c.level === 0)).toBe(true)
+    })
+  })
+
+  describe('heatmapMonths', () => {
+    it('returns an array of month abbreviation strings', async () => {
+      const { heatmapMonths } = await loadJournal([])
+      const months = heatmapMonths()
+      expect(Array.isArray(months)).toBe(true)
+      expect(months.length).toBeGreaterThan(0)
+      months.forEach(m => expect(typeof m).toBe('string'))
+    })
+
+    it('contains nov and apr given the 2026-04-01 fake time window', async () => {
+      const { heatmapMonths } = await loadJournal([])
+      const months = heatmapMonths()
+      expect(months).toContain('nov')
+      expect(months).toContain('apr')
+    })
+  })
 })
 
