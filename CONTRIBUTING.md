@@ -185,7 +185,6 @@ Tests run automatically on every push and pull request via GitHub Actions. The C
 - **Test**: runs all tests with coverage, uploads to Codecov
 - **Typecheck**: runs `vue-tsc --noEmit`
 - **Rust Check**: runs `cargo check` on the Tauri backend
-- **Release macOS**: tag-triggered draft macOS release build via GitHub Actions
 
 All checks must pass before merging.
 
