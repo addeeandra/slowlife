@@ -3,10 +3,14 @@ import type { Transaction } from '../../core/types'
 import { formatCurrency } from '../../core/constants'
 
 defineProps<{ transaction: Transaction }>()
+
+const emit = defineEmits<{
+  edit: [transaction: Transaction]
+}>()
 </script>
 
 <template>
-  <div class="fin-row">
+  <button type="button" class="fin-row" @click="emit('edit', transaction)">
     <span class="f-n">
       {{ transaction.description }}
       <span class="f-date">{{ transaction.date }}</span>
@@ -17,7 +21,7 @@ defineProps<{ transaction: Transaction }>()
     >
       {{ transaction.type === 'income' ? '+' : '' }}{{ formatCurrency(transaction.amount) }}
     </span>
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -25,12 +29,24 @@ defineProps<{ transaction: Transaction }>()
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 3px 0;
   border-bottom: 1px solid var(--border);
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  cursor: pointer;
+  text-align: left;
 }
 
 .fin-row:last-child {
   border-bottom: none;
+}
+
+.fin-row:hover .f-n,
+.fin-row:hover .f-date {
+  color: var(--text);
 }
 
 .f-n {

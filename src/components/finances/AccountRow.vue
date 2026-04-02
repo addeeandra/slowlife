@@ -3,13 +3,17 @@ import type { Account } from '../../core/types'
 import { formatCurrency } from '../../core/constants'
 
 defineProps<{ account: Account }>()
+
+const emit = defineEmits<{
+  edit: [account: Account]
+}>()
 </script>
 
 <template>
-  <div class="fin-row">
+  <button type="button" class="fin-row" @click="emit('edit', account)">
     <span class="f-n">{{ account.name }}</span>
     <span class="f-v">{{ formatCurrency(account.balance) }}</span>
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -17,12 +21,24 @@ defineProps<{ account: Account }>()
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   padding: 3px 0;
   border-bottom: 1px solid var(--border);
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  cursor: pointer;
+  text-align: left;
 }
 
 .fin-row:last-child {
   border-bottom: none;
+}
+
+.fin-row:hover .f-n,
+.fin-row:hover .f-v {
+  color: var(--text);
 }
 
 .f-n {
