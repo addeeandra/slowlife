@@ -49,11 +49,14 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 - **Due dates**: with overdue detection
 - **Views**: group, filter, and sort
 
-### Finances (TBA)
-- **Accounts**: balance tracking
-- **Subscriptions**: renewals and monthly total
-- **Transactions**: income and expenses
-- **Currency**: local-first (IDR)
+### Finances
+- **Accounts**: ledger-based balances from initial balance + transactions
+- **Adjustments**: reconcile account balance with automatic diff transactions
+- **Transactions**: income, expenses, categories, and account filters
+- **Budgeting**: monthly category budgets with over-budget signals
+- **Reports**: income vs expense trend and net worth history
+- **Subscriptions**: active/cancelled tracking, grouped by billing cycle
+- **Currency**: base-currency totals with manual local exchange rates (IDR, USD, SGD, CNY)
 
 ### Desktop Experience
 - **Runtime**: native app via Tauri
@@ -69,7 +72,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 - [x] Calendar views and event CRUD
 - [x] Calendar sync (Google Calendar, read-only)
 - [x] Todos with priority/complexity scoring
-- [x] Financial CRUD and budget tracking
+- [x] Financial CRUD, reporting, and multi-currency tracking
 - [ ] cr-sqlite for cross-device sync
 - [ ] Mobile support via Tauri v2
 

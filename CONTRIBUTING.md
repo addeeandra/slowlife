@@ -38,7 +38,7 @@ slowlife-app/
     core/
       db.ts               # SQLite abstraction + migrations
       types.ts            # TypeScript interfaces for all entities
-      constants.ts        # tags, prompts, moods, currency formatter
+      constants.ts        # tags, prompts, moods, date helpers, money formatters
       seed.ts             # first-run sample data
     composables/
       useSidebar.ts       # sidebar open/close state
@@ -46,7 +46,7 @@ slowlife-app/
       useJournal.ts       # journal entries CRUD, streak, heatmap, mood stats
       useEvents.ts        # events CRUD, date grouping
       useGoogleCalendarSync.ts # Google Calendar auth, selection, sync state
-      useFinances.ts      # accounts, transactions, subscriptions
+      useFinances.ts      # ledger balances, transactions, subscriptions, categories, reports, exchange rates
       useTodos.ts         # todos CRUD, status workflow, priority filtering
       usePinned.ts        # pinned items with resolved metadata
       useKeyboard.ts      # global ctrl+key shortcuts
@@ -62,7 +62,10 @@ slowlife-app/
                           # TimelineEntry
       events/             # EventRow, EventForm, Google sync/detail modals
       todos/              # TodoRow, TodoForm
-      finances/           # FinanceSummary, AccountRow, SubscriptionRow, TransactionRow
+      finances/           # FinanceSummary, AccountRow, TransactionRow, SubscriptionRow,
+                          # BudgetOverview, IncomeExpenseTrend, NetWorthTrend,
+                          # AccountForm, TransactionForm, SubscriptionForm,
+                          # TransactionCategoryForm, ExchangeRateForm
     views/                # DashboardView, JournalView, EventsView, TodosView, FinancesView
   src-tauri/              # Rust backend (Tauri)
     src/lib.rs            # plugin registration + desktop OAuth callback
@@ -103,6 +106,7 @@ remove unused greet command from rust backend
 - Use design tokens from `tokens.css` — don't hardcode colors or fonts
 - Composables use module-scoped refs (singleton pattern) — no Pinia
 - New entity types go in `core/types.ts`, constants in `core/constants.ts`
+- Finance balances are ledger-derived: prefer `initial_balance` + transactions over mutable current-balance fields
 
 **Backend (Rust):**
 - Follow standard Rust conventions
@@ -175,6 +179,7 @@ Use `vi.resetModules()` in `beforeEach` to ensure module-level refs are fresh be
 1. Create `src/composables/__tests__/useMyComposable.test.ts`
 2. Import `mockDb` from the shared mock
 3. Set up mock return values for each DB call your composable makes in `load()`
+   `useFinances()` loads accounts, transactions, subscriptions, categories, settings, rates, and snapshots, so queue enough `mockResolvedValueOnce(...)` calls when testing it.
 4. Use dynamic imports (`await import(...)`) after `vi.resetModules()` to get fresh module state
 5. Use `vi.useFakeTimers()` if your composable depends on the current date/time
 
