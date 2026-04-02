@@ -82,14 +82,14 @@ A personal task system with priority and complexity scoring.
 
 Expand finances beyond basic tracking.
 
-- [ ] Create/edit/delete accounts
-- [ ] Create/edit/delete transactions
-- [ ] Transaction categories
-- [ ] Monthly budget overview
-- [ ] Income vs expense trend chart
-- [ ] Subscription management (add, edit, cancel tracking)
-- [ ] Net worth over time chart
-- [ ] Multi-currency support (IDR, USD, SGD, CNY)
+- [x] Create/edit/delete accounts
+- [x] Create/edit/delete transactions
+- [x] Transaction categories
+- [x] Monthly budget overview
+- [x] Income vs expense trend chart
+- [x] Subscription management (add, edit, cancel tracking)
+- [x] Net worth over time chart
+- [x] Multi-currency support (IDR, USD, SGD, CNY)
 
 ## Phase 7 — Search & Insights
 

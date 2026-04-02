@@ -125,18 +125,35 @@ export interface GoogleCalendarEvent {
 export interface Account {
   id: number
   name: string
-  balance: number
+  initial_balance: number
   currency: string
   created_at: string
 }
+
+export type TransactionType = 'income' | 'expense'
+export type TransactionEntryMode = 'manual' | 'adjustment'
 
 export interface Transaction {
   id: number
   account_id: number
   description: string
   amount: number
-  type: string
+  type: TransactionType
   date: string
+  category_id: number | null
+  entry_mode: TransactionEntryMode
+  created_at: string
+}
+
+export type TransactionCategoryKind = 'income' | 'expense'
+
+export interface TransactionCategory {
+  id: number
+  label: string
+  kind: TransactionCategoryKind
+  color: string
+  monthly_budget: number | null
+  sort_order: number
   created_at: string
 }
 
@@ -148,6 +165,29 @@ export interface Subscription {
   cycle: string
   next_date: string
   color: string
+  cancelled_at: string | null
+  created_at: string
+}
+
+export interface FinanceSettings {
+  id: number
+  base_currency: string
+}
+
+export interface ExchangeRate {
+  id: number
+  from_currency: string
+  to_currency: string
+  rate: number
+  effective_date: string
+  created_at: string
+}
+
+export interface NetWorthSnapshot {
+  id: number
+  snapshot_date: string
+  net_worth: number
+  base_currency: string
   created_at: string
 }
 

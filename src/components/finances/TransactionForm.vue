@@ -9,18 +9,19 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  save: [data: { account_id: number; description: string; amount: number; type: 'income' | 'expense'; date: string }]
+  save: [data: { account_id: number; description: string; amount: number; type: 'income' | 'expense'; date: string; category_id: number | null }]
   delete: [id: number]
   close: []
 }>()
 
-const { accounts } = useFinances()
+const { accounts, expenseCategories, incomeCategories } = useFinances()
 
 const accountId = ref<number | null>(null)
 const description = ref('')
 const amount = ref('')
 const type = ref<'income' | 'expense'>('expense')
 const date = ref('')
+const categoryId = ref<number | null>(null)
 const confirmDelete = ref(false)
 
 const isEdit = computed(() => !!props.transaction)
@@ -28,6 +29,10 @@ const canSave = computed(() => {
   const numericAmount = Number(amount.value)
   return description.value.trim().length > 0 && !!accountId.value && date.value.length > 0 && numericAmount > 0
 })
+
+const visibleCategories = computed(() =>
+  type.value === 'income' ? incomeCategories.value : expenseCategories.value
+)
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') emit('close')
@@ -43,12 +48,14 @@ watch(() => props.open, (open) => {
       amount.value = String(Math.abs(props.transaction.amount))
       type.value = props.transaction.type === 'income' ? 'income' : 'expense'
       date.value = props.transaction.date
+      categoryId.value = props.transaction.category_id
     } else {
       accountId.value = accounts.value[0]?.id ?? null
       description.value = ''
       amount.value = ''
       type.value = 'expense'
       date.value = new Date().toISOString().slice(0, 10)
+      categoryId.value = null
     }
   } else {
     document.removeEventListener('keydown', onKeydown)
@@ -65,8 +72,15 @@ function handleSave() {
     amount: Number(amount.value),
     type: type.value,
     date: date.value,
+    category_id: categoryId.value,
   })
 }
+
+watch(type, () => {
+  if (!visibleCategories.value.find(category => category.id === categoryId.value)) {
+    categoryId.value = null
+  }
+})
 
 function handleDelete() {
   if (!props.transaction) return
@@ -125,6 +139,16 @@ function handleDelete() {
             income
           </button>
         </div>
+      </div>
+
+      <div class="ff-field">
+        <label class="ff-label">category</label>
+        <select v-model="categoryId" class="ff-input">
+          <option :value="null">uncategorized</option>
+          <option v-for="category in visibleCategories" :key="category.id" :value="category.id">
+            {{ category.label }}
+          </option>
+        </select>
       </div>
 
       <div class="ff-row">

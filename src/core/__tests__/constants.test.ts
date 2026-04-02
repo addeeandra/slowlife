@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { formatCurrency, renewalLabel, TAGS, MOODS, MONTH_ABBR, DAY_ABBR } from '../constants'
+import { formatCurrency, formatMoney, renewalLabel, TAGS, MOODS, MONTH_ABBR, DAY_ABBR } from '../constants'
 
 describe('formatCurrency', () => {
   it('formats millions', () => {
-    expect(formatCurrency(1_500_000)).toBe('Rp1.5M')
-    expect(formatCurrency(10_000_000)).toBe('Rp10.0M')
+    expect(formatCurrency(1_500_000)).toBe('Rp1.50M')
+    expect(formatCurrency(10_000_000)).toBe('Rp10.00M')
+    expect(formatCurrency(1_250_000)).toBe('Rp1.25M')
   })
 
   it('formats thousands', () => {
@@ -18,11 +19,19 @@ describe('formatCurrency', () => {
   })
 
   it('formats negative millions', () => {
-    expect(formatCurrency(-2_000_000)).toBe('-Rp2.0M')
+    expect(formatCurrency(-2_000_000)).toBe('-Rp2.00M')
   })
 
   it('formats negative thousands', () => {
     expect(formatCurrency(-5_000)).toBe('-Rp5K')
+  })
+})
+
+describe('formatMoney', () => {
+  it('formats usd and sgd values', () => {
+    expect(formatMoney(20, 'USD')).toBe('$20')
+    expect(formatMoney(2_500, 'SGD')).toBe('S$3K')
+    expect(formatMoney(12_576_000, 'USD')).toBe('$12.58M')
   })
 })
 

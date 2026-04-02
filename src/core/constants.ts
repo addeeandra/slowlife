@@ -95,9 +95,21 @@ export function renewalLabel(nextDate: string): string {
   return `in ${diff}d`
 }
 
-export function formatCurrency(n: number): string {
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  IDR: 'Rp',
+  USD: '$',
+  SGD: 'S$',
+  CNY: 'CN¥',
+}
+
+export function formatMoney(n: number, currency: string = 'IDR'): string {
+  const symbol = CURRENCY_SYMBOLS[currency] || `${currency} `
   const a = Math.abs(n)
-  if (a >= 1e6) return (n < 0 ? '-' : '') + 'Rp' + (a / 1e6).toFixed(1) + 'M'
-  if (a >= 1e3) return (n < 0 ? '-' : '') + 'Rp' + (a / 1e3).toFixed(0) + 'K'
-  return 'Rp' + n.toLocaleString()
+  if (a >= 1e6) return (n < 0 ? '-' : '') + symbol + (a / 1e6).toFixed(2) + 'M'
+  if (a >= 1e3) return (n < 0 ? '-' : '') + symbol + (a / 1e3).toFixed(0) + 'K'
+  return symbol + n.toLocaleString()
+}
+
+export function formatCurrency(n: number): string {
+  return formatMoney(n, 'IDR')
 }

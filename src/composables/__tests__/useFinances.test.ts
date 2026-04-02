@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockDb } from '../../__mocks__/@tauri-apps/plugin-sql'
-import type { Account, Transaction, Subscription } from '../../core/types'
+import type { Account, Transaction, Subscription, TransactionCategory, FinanceSettings, ExchangeRate, NetWorthSnapshot } from '../../core/types'
 
 describe('useFinances', () => {
   beforeEach(async () => {
@@ -12,11 +12,19 @@ describe('useFinances', () => {
     accounts: Account[] = [],
     transactions: Transaction[] = [],
     subscriptions: Subscription[] = [],
+    categories: TransactionCategory[] = [],
+    settings: FinanceSettings[] = [{ id: 1, base_currency: 'IDR' }],
+    rates: ExchangeRate[] = [],
+    snapshots: NetWorthSnapshot[] = [],
   ) {
     mockDb.select
       .mockResolvedValueOnce(accounts)
       .mockResolvedValueOnce(transactions)
       .mockResolvedValueOnce(subscriptions)
+      .mockResolvedValueOnce(categories)
+      .mockResolvedValueOnce(settings)
+      .mockResolvedValueOnce(rates)
+      .mockResolvedValueOnce(snapshots)
 
     const { useFinances } = await import('../useFinances')
     const finances = useFinances()
@@ -26,8 +34,8 @@ describe('useFinances', () => {
 
   it('calculates net worth from accounts', async () => {
     const { netWorth } = await loadFinances([
-      { id: 1, name: 'Bank A', balance: 5_000_000, currency: 'IDR', created_at: '2026-01-01' },
-      { id: 2, name: 'Bank B', balance: 3_000_000, currency: 'IDR', created_at: '2026-01-01' },
+      { id: 1, name: 'Bank A', initial_balance: 5_000_000, currency: 'IDR', created_at: '2026-01-01' },
+      { id: 2, name: 'Bank B', initial_balance: 3_000_000, currency: 'IDR', created_at: '2026-01-01' },
     ])
 
     expect(netWorth.value).toBe(8_000_000)
@@ -37,9 +45,9 @@ describe('useFinances', () => {
     const { totalIncome, totalExpenses } = await loadFinances(
       [],
       [
-        { id: 1, account_id: 1, description: 'Salary', amount: 10_000_000, type: 'income', date: '2026-03-01', created_at: '2026-03-01' },
-        { id: 2, account_id: 1, description: 'Rent', amount: -2_000_000, type: 'expense', date: '2026-03-05', created_at: '2026-03-05' },
-        { id: 3, account_id: 1, description: 'Food', amount: -500_000, type: 'expense', date: '2026-03-10', created_at: '2026-03-10' },
+        { id: 1, account_id: 1, description: 'Salary', amount: 10_000_000, type: 'income', date: '2026-03-01', category_id: null, entry_mode: 'manual', created_at: '2026-03-01' },
+        { id: 2, account_id: 1, description: 'Rent', amount: -2_000_000, type: 'expense', date: '2026-03-05', category_id: null, entry_mode: 'manual', created_at: '2026-03-05' },
+        { id: 3, account_id: 1, description: 'Food', amount: -500_000, type: 'expense', date: '2026-03-10', category_id: null, entry_mode: 'manual', created_at: '2026-03-10' },
       ],
     )
 
@@ -49,8 +57,8 @@ describe('useFinances', () => {
 
   it('calculates total monthly subscriptions', async () => {
     const subs: Subscription[] = [
-      { id: 1, name: 'Spotify', amount: 55_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-15', color: '#fff', created_at: '2026-01-01' },
-      { id: 2, name: 'Netflix', amount: 120_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-20', color: '#fff', created_at: '2026-01-01' },
+      { id: 1, name: 'Spotify', amount: 55_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-15', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
+      { id: 2, name: 'Netflix', amount: 120_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-20', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
     ]
 
     const { totalSubsMonthly } = await loadFinances([], [], subs)
@@ -60,8 +68,8 @@ describe('useFinances', () => {
 
   it('sorts subscriptions by next_date', async () => {
     const subs: Subscription[] = [
-      { id: 1, name: 'Netflix', amount: 120_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-20', color: '#fff', created_at: '2026-01-01' },
-      { id: 2, name: 'Spotify', amount: 55_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-10', color: '#fff', created_at: '2026-01-01' },
+      { id: 1, name: 'Netflix', amount: 120_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-20', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
+      { id: 2, name: 'Spotify', amount: 55_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-10', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
     ]
 
     const { sortedSubscriptions } = await loadFinances([], [], subs)
@@ -76,33 +84,41 @@ describe('useFinances', () => {
     const { useFinances } = await import('../useFinances')
     const finances = useFinances()
 
-    await finances.createAccount({ name: 'Cash', balance: 250_000, currency: 'IDR' })
+    await finances.createAccount({ name: 'Cash', initial_balance: 250_000, currency: 'IDR' })
 
     expect(mockDb.execute).toHaveBeenCalledWith(
-      'INSERT INTO accounts (name, balance, currency) VALUES ($1, $2, $3)',
+      'INSERT INTO accounts (name, initial_balance, currency) VALUES ($1, $2, $3)',
       ['Cash', 250_000, 'IDR']
     )
-    expect(mockDb.select).toHaveBeenCalledTimes(3)
+    expect(mockDb.select).toHaveBeenCalledTimes(8)
   })
 
   it('updates an account and reloads finances', async () => {
     mockDb.select
       .mockResolvedValueOnce([
-        { id: 1, name: 'Bank A', balance: 5_000_000, currency: 'IDR', created_at: '2026-01-01' },
+        { id: 1, name: 'Bank A', initial_balance: 5_000_000, currency: 'IDR', created_at: '2026-01-01' },
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: 1, base_currency: 'IDR' }])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: 1, base_currency: 'IDR' }])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
 
     const { useFinances } = await import('../useFinances')
     const finances = useFinances()
     await finances.load()
-    await finances.updateAccount(1, { name: 'Main Bank', balance: 6_000_000 })
+    await finances.updateAccount(1, { name: 'Main Bank', initial_balance: 6_000_000 })
 
     expect(mockDb.execute).toHaveBeenCalledWith(
-      'UPDATE accounts SET name = $1, balance = $2 WHERE id = $3',
+      'UPDATE accounts SET name = $1, initial_balance = $2 WHERE id = $3',
       ['Main Bank', 6_000_000, 1]
     )
   })
@@ -129,12 +145,13 @@ describe('useFinances', () => {
       amount: 50_000,
       type: 'expense',
       date: '2026-04-02',
+      category_id: null,
     })
 
     expect(mockDb.execute).toHaveBeenCalledWith(
-      `INSERT INTO transactions (account_id, description, amount, type, date)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [1, 'Lunch', -50_000, 'expense', '2026-04-02']
+      `INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [1, 'Lunch', -50_000, 'expense', '2026-04-02', null, 'manual']
     )
   })
 
@@ -149,12 +166,13 @@ describe('useFinances', () => {
       amount: 5_000_000,
       type: 'income',
       date: '2026-04-02',
+      category_id: null,
     })
 
     expect(mockDb.execute).toHaveBeenCalledWith(
-      `INSERT INTO transactions (account_id, description, amount, type, date)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [1, 'Salary', 5_000_000, 'income', '2026-04-02']
+      `INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [1, 'Salary', 5_000_000, 'income', '2026-04-02', null, 'manual']
     )
   })
 
@@ -162,10 +180,17 @@ describe('useFinances', () => {
     mockDb.select
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { id: 4, account_id: 1, description: 'Taxi', amount: -30_000, type: 'expense', date: '2026-04-01', created_at: '2026-04-01' },
+        { id: 4, account_id: 1, description: 'Taxi', amount: -30_000, type: 'expense', date: '2026-04-01', category_id: null, entry_mode: 'manual', created_at: '2026-04-01' },
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: 1, base_currency: 'IDR' }])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([{ id: 1, base_currency: 'IDR' }])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
 
@@ -188,6 +213,64 @@ describe('useFinances', () => {
     await finances.deleteTransaction(7)
 
     expect(mockDb.execute).toHaveBeenCalledWith('DELETE FROM transactions WHERE id = $1', [7])
-    expect(mockDb.select).toHaveBeenCalledTimes(3)
+    expect(mockDb.select).toHaveBeenCalledTimes(8)
+  })
+
+  it('derives account balances from initial balance and transactions', async () => {
+    const { accountBalances } = await loadFinances(
+      [{ id: 1, name: 'Wallet', initial_balance: 100_000, currency: 'IDR', created_at: '2026-01-01' }],
+      [
+        { id: 1, account_id: 1, description: 'Lunch', amount: -30_000, type: 'expense', date: '2026-04-01', category_id: null, entry_mode: 'manual', created_at: '2026-04-01' },
+        { id: 2, account_id: 1, description: 'Refund', amount: 10_000, type: 'income', date: '2026-04-02', category_id: null, entry_mode: 'manual', created_at: '2026-04-02' },
+      ]
+    )
+
+    expect(accountBalances.value[0].current_balance).toBe(80_000)
+  })
+
+  it('calculates budget rows by category', async () => {
+    const { monthlyBudgetRows } = await loadFinances(
+      [{ id: 1, name: 'Bank', initial_balance: 1_000_000, currency: 'IDR', created_at: '2026-01-01' }],
+      [
+        { id: 1, account_id: 1, description: 'Groceries', amount: -200_000, type: 'expense', date: '2026-04-02', category_id: 3, entry_mode: 'manual', created_at: '2026-04-02' },
+      ],
+      [],
+      [
+        { id: 3, label: 'food', kind: 'expense', color: '#c4956a', monthly_budget: 500_000, sort_order: 0, created_at: '2026-01-01' },
+      ]
+    )
+
+    expect(monthlyBudgetRows('2026-04')[0].spent).toBe(200_000)
+    expect(monthlyBudgetRows('2026-04')[0].remaining).toBe(300_000)
+  })
+
+  it('calculates income expense trend in base currency', async () => {
+    const { incomeExpenseTrend } = await loadFinances(
+      [{ id: 1, name: 'USD acct', initial_balance: 0, currency: 'USD', created_at: '2026-01-01' }],
+      [
+        { id: 1, account_id: 1, description: 'Pay', amount: 100, type: 'income', date: '2026-04-01', category_id: null, entry_mode: 'manual', created_at: '2026-04-01' },
+        { id: 2, account_id: 1, description: 'Tool', amount: -20, type: 'expense', date: '2026-04-02', category_id: null, entry_mode: 'manual', created_at: '2026-04-02' },
+      ],
+      [],
+      [],
+      [{ id: 1, base_currency: 'IDR' }],
+      [{ id: 1, from_currency: 'USD', to_currency: 'IDR', rate: 16_000, effective_date: '2026-04-01', created_at: '2026-04-01' }],
+    )
+
+    expect(incomeExpenseTrend(1)[0].income).toBe(1_600_000)
+    expect(incomeExpenseTrend(1)[0].expenses).toBe(320_000)
+  })
+
+  it('ignores cancelled subscriptions from active totals', async () => {
+    const subs: Subscription[] = [
+      { id: 1, name: 'Spotify', amount: 55_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-15', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
+      { id: 2, name: 'Old service', amount: 120_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-20', color: '#fff', cancelled_at: '2026-04-01', created_at: '2026-01-01' },
+    ]
+
+    const { totalSubsMonthly, activeSubscriptions, cancelledSubscriptions } = await loadFinances([], [], subs)
+
+    expect(totalSubsMonthly.value).toBe(55_000)
+    expect(activeSubscriptions.value).toHaveLength(1)
+    expect(cancelledSubscriptions.value).toHaveLength(1)
   })
 })

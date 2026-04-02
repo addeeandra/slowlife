@@ -75,6 +75,46 @@ async function migrate(db: Database) {
   `)
 
   await db.execute(`
+    CREATE TABLE IF NOT EXISTS transaction_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      label TEXT NOT NULL,
+      kind TEXT NOT NULL DEFAULT 'expense',
+      color TEXT NOT NULL DEFAULT '#c4956a',
+      monthly_budget REAL,
+      sort_order INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS finance_settings (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      base_currency TEXT NOT NULL DEFAULT 'IDR'
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS exchange_rates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      from_currency TEXT NOT NULL,
+      to_currency TEXT NOT NULL,
+      rate REAL NOT NULL,
+      effective_date TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS net_worth_snapshots (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      snapshot_date TEXT NOT NULL UNIQUE,
+      net_worth REAL NOT NULL,
+      base_currency TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
+  await db.execute(`
     CREATE TABLE IF NOT EXISTS spaces (
       id TEXT PRIMARY KEY,
       label TEXT NOT NULL,
@@ -169,7 +209,30 @@ async function migrate(db: Database) {
     )
   `)
 
+  await db.execute("INSERT OR IGNORE INTO finance_settings (id, base_currency) VALUES (1, 'IDR')")
+
+  await migrateFinances(db)
   await migrateEvents(db)
+}
+
+async function migrateFinances(db: Database) {
+  try { await db.execute('ALTER TABLE accounts ADD COLUMN initial_balance REAL') } catch (_) { /* column already exists */ }
+  try { await db.execute('ALTER TABLE transactions ADD COLUMN category_id INTEGER') } catch (_) { /* column already exists */ }
+  try { await db.execute("ALTER TABLE transactions ADD COLUMN entry_mode TEXT DEFAULT 'manual'") } catch (_) { /* column already exists */ }
+  try { await db.execute('ALTER TABLE subscriptions ADD COLUMN cancelled_at TEXT') } catch (_) { /* column already exists */ }
+
+  await db.execute(`
+    UPDATE accounts
+    SET initial_balance = balance - COALESCE((
+      SELECT SUM(amount)
+      FROM transactions
+      WHERE transactions.account_id = accounts.id
+    ), 0)
+    WHERE initial_balance IS NULL
+  `)
+
+  await db.execute('UPDATE accounts SET initial_balance = COALESCE(initial_balance, 0)')
+  await db.execute("UPDATE transactions SET entry_mode = 'manual' WHERE entry_mode IS NULL")
 }
 
 async function migrateEvents(db: Database) {

@@ -5,21 +5,29 @@ import type { Account } from '../../core/types'
 const props = defineProps<{
   open: boolean
   account?: Account | null
+  currentBalance?: number
 }>()
 
 const emit = defineEmits<{
-  save: [data: { name: string; balance: number; currency: string }]
+  save: [data: { name: string; initial_balance: number; currency: string }]
+  adjust: [data: { target_balance: number; date: string; description: string | null }]
   delete: [id: number]
   close: []
 }>()
 
 const name = ref('')
-const balance = ref('0')
+const initialBalance = ref('0')
 const currency = ref('IDR')
+const adjustmentBalance = ref('')
+const adjustmentDate = ref('')
+const adjustmentDescription = ref('')
 const confirmDelete = ref(false)
 
 const isEdit = computed(() => !!props.account)
-const canSave = computed(() => name.value.trim().length > 0 && Number.isFinite(Number(balance.value)))
+const canSave = computed(() => name.value.trim().length > 0 && Number.isFinite(Number(initialBalance.value)))
+const canAdjust = computed(() =>
+  !!props.account && adjustmentDate.value.length > 0 && Number.isFinite(Number(adjustmentBalance.value))
+)
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') emit('close')
@@ -31,12 +39,18 @@ watch(() => props.open, (open) => {
     confirmDelete.value = false
     if (props.account) {
       name.value = props.account.name
-      balance.value = String(props.account.balance)
+      initialBalance.value = String(props.account.initial_balance)
       currency.value = props.account.currency
+      adjustmentBalance.value = String(props.currentBalance ?? 0)
+      adjustmentDate.value = new Date().toISOString().slice(0, 10)
+      adjustmentDescription.value = ''
     } else {
       name.value = ''
-      balance.value = '0'
+      initialBalance.value = '0'
       currency.value = 'IDR'
+      adjustmentBalance.value = ''
+      adjustmentDate.value = new Date().toISOString().slice(0, 10)
+      adjustmentDescription.value = ''
     }
   } else {
     document.removeEventListener('keydown', onKeydown)
@@ -49,8 +63,17 @@ function handleSave() {
   if (!canSave.value) return
   emit('save', {
     name: name.value.trim(),
-    balance: Number(balance.value),
+    initial_balance: Number(initialBalance.value),
     currency: currency.value.trim().toUpperCase() || 'IDR',
+  })
+}
+
+function handleAdjust() {
+  if (!canAdjust.value) return
+  emit('adjust', {
+    target_balance: Number(adjustmentBalance.value),
+    date: adjustmentDate.value,
+    description: adjustmentDescription.value.trim() || null,
   })
 }
 
@@ -85,13 +108,35 @@ function handleDelete() {
 
       <div class="ff-row">
         <div class="ff-field">
-          <label class="ff-label">balance</label>
-          <input v-model="balance" type="number" step="0.01" class="ff-input ff-sm" />
+          <label class="ff-label">initial balance</label>
+          <input v-model="initialBalance" type="number" step="0.01" class="ff-input ff-sm" />
         </div>
         <div class="ff-field">
           <label class="ff-label">currency</label>
           <input v-model="currency" type="text" maxlength="3" class="ff-input ff-sm ff-upper" />
         </div>
+      </div>
+
+      <div v-if="isEdit" class="ff-adjust">
+        <div class="ff-adjust-head">balance adjustment</div>
+        <div class="ff-adjust-copy">
+          current computed balance: {{ currentBalance }}
+        </div>
+        <div class="ff-row">
+          <div class="ff-field">
+            <label class="ff-label">actual balance</label>
+            <input v-model="adjustmentBalance" type="number" step="0.01" class="ff-input ff-sm" />
+          </div>
+          <div class="ff-field">
+            <label class="ff-label">adjustment date</label>
+            <input v-model="adjustmentDate" type="date" class="ff-input ff-sm" />
+          </div>
+        </div>
+        <div class="ff-field">
+          <label class="ff-label">note (optional)</label>
+          <input v-model="adjustmentDescription" type="text" class="ff-input" placeholder="balance adjustment" />
+        </div>
+        <button class="btn" :disabled="!canAdjust" @click="handleAdjust">apply adjustment</button>
       </div>
 
       <div class="ff-footer">
@@ -190,6 +235,28 @@ function handleDelete() {
   justify-content: space-between;
   margin-top: 12px;
   gap: 8px;
+}
+
+.ff-adjust {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
+}
+
+.ff-adjust-head {
+  font-size: 0.62rem;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+
+.ff-adjust-copy {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
 }
 
 .ff-left,

@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import { useFinances } from '../../composables/useFinances'
-import { formatCurrency } from '../../core/constants'
+import { formatMoney } from '../../core/constants'
 
-const { netWorth, totalIncome, totalExpenses } = useFinances()
+const { netWorth, totalIncome, totalExpenses, financeSettings } = useFinances()
 </script>
 
 <template>
   <div class="fin-sum">
     <div class="fs">
       <div class="fs-l">net worth</div>
-      <div class="fs-v">{{ formatCurrency(netWorth) }}</div>
+      <div class="fs-v">{{ formatMoney(netWorth, financeSettings.base_currency) }}</div>
     </div>
     <div class="fs">
       <div class="fs-l">income</div>
-      <div class="fs-v inc">+{{ formatCurrency(totalIncome) }}</div>
+      <div class="fs-v inc">+{{ formatMoney(totalIncome, financeSettings.base_currency) }}</div>
     </div>
     <div class="fs">
       <div class="fs-l">expenses</div>
-      <div class="fs-v exp">-{{ formatCurrency(totalExpenses) }}</div>
+      <div class="fs-v exp">-{{ formatMoney(totalExpenses, financeSettings.base_currency) }}</div>
     </div>
   </div>
 </template>

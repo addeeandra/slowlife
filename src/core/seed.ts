@@ -43,15 +43,29 @@ export async function seedIfEmpty(db: Database) {
     await db.execute("INSERT INTO events (title, date, time, type, color, description) VALUES ('submit tax docs', '2026-04-10', '09:00', 'reminder', '#c46a6a', 'deadline for annual tax filing')")
 
     // accounts
-    await db.execute("INSERT INTO accounts (name, balance, currency) VALUES ('main account', 4250000, 'IDR')")
-    await db.execute("INSERT INTO accounts (name, balance, currency) VALUES ('savings', 12800000, 'IDR')")
-    await db.execute("INSERT INTO accounts (name, balance, currency) VALUES ('cash', 350000, 'IDR')")
+    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency) VALUES ('main account', 4250000, -6410010, 'IDR')")
+    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency) VALUES ('savings', 12800000, 12800000, 'IDR')")
+    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency) VALUES ('cash', 350000, 385000, 'IDR')")
+
+    await db.execute("INSERT OR IGNORE INTO finance_settings (id, base_currency) VALUES (1, 'IDR')")
+
+    // transaction categories
+    await db.execute("INSERT INTO transaction_categories (label, kind, color, monthly_budget, sort_order) VALUES ('salary', 'income', '#6aaa7a', NULL, 0)")
+    await db.execute("INSERT INTO transaction_categories (label, kind, color, monthly_budget, sort_order) VALUES ('freelance', 'income', '#6a9ec4', NULL, 1)")
+    await db.execute("INSERT INTO transaction_categories (label, kind, color, monthly_budget, sort_order) VALUES ('food', 'expense', '#c4956a', 1500000, 0)")
+    await db.execute("INSERT INTO transaction_categories (label, kind, color, monthly_budget, sort_order) VALUES ('transport', 'expense', '#c46a6a', 500000, 1)")
+    await db.execute("INSERT INTO transaction_categories (label, kind, color, monthly_budget, sort_order) VALUES ('software', 'expense', '#8f7bd6', 400000, 2)")
+
+    // exchange rates
+    await db.execute("INSERT INTO exchange_rates (from_currency, to_currency, rate, effective_date) VALUES ('USD', 'IDR', 16000, '2026-04-01')")
+    await db.execute("INSERT INTO exchange_rates (from_currency, to_currency, rate, effective_date) VALUES ('SGD', 'IDR', 11800, '2026-04-01')")
+    await db.execute("INSERT INTO exchange_rates (from_currency, to_currency, rate, effective_date) VALUES ('CNY', 'IDR', 2200, '2026-04-01')")
 
     // subscriptions
-    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color) VALUES ('spotify', 54990, 'IDR', 'monthly', '2026-04-15', '#1DB954')")
-    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color) VALUES ('icloud+', 45000, 'IDR', 'monthly', '2026-04-08', '#007AFF')")
-    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color) VALUES ('chatgpt plus', 320000, 'IDR', 'monthly', '2026-04-20', '#10a37f')")
-    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color) VALUES ('github pro', 60000, 'IDR', 'monthly', '2026-04-12', '#333333')")
+    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color, cancelled_at) VALUES ('spotify', 54990, 'IDR', 'monthly', '2026-04-15', '#1DB954', NULL)")
+    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color, cancelled_at) VALUES ('icloud+', 45000, 'IDR', 'monthly', '2026-04-08', '#007AFF', NULL)")
+    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color, cancelled_at) VALUES ('chatgpt plus', 20, 'USD', 'monthly', '2026-04-20', '#10a37f', NULL)")
+    await db.execute("INSERT INTO subscriptions (name, amount, currency, cycle, next_date, color, cancelled_at) VALUES ('github pro', 4, 'USD', 'monthly', '2026-04-12', '#333333', NULL)")
 
     // todos
     await db.execute("INSERT INTO todos (title, description, priority, complexity, space_id, category_id, project_id, due_date) VALUES ('fix login redirect bug', 'users get stuck on callback page after oauth', 'P1', 'C1', 'work', 'company-x', 'project-alpha', '2026-04-04')")
@@ -61,10 +75,16 @@ export async function seedIfEmpty(db: Database) {
     await db.execute("INSERT INTO todos (title, priority, complexity, status) VALUES ('update resume', 'P4', 'C1', 'done')")
 
     // transactions
-    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (1, 'salary', 8500000, 'income', '2026-03-31')")
-    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (1, 'groceries', -285000, 'expense', '2026-03-30')")
-    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (3, 'grab ride', -35000, 'expense', '2026-03-29')")
-    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (1, 'freelance payment', 2500000, 'income', '2026-03-28')")
-    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date) VALUES (1, 'coffee', -54990, 'expense', '2026-03-27')")
+    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (1, 'salary', 8500000, 'income', '2026-03-31', 1, 'manual')")
+    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (1, 'groceries', -285000, 'expense', '2026-03-30', 3, 'manual')")
+    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (3, 'grab ride', -35000, 'expense', '2026-03-29', 4, 'manual')")
+    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (1, 'freelance payment', 2500000, 'income', '2026-03-28', 2, 'manual')")
+    await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (1, 'coffee', -54990, 'expense', '2026-03-27', 3, 'manual')")
+
+    await db.execute("INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency) VALUES ('2026-03-27', 12745010, 'IDR')")
+    await db.execute("INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency) VALUES ('2026-03-28', 15245010, 'IDR')")
+    await db.execute("INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency) VALUES ('2026-03-29', 15210010, 'IDR')")
+    await db.execute("INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency) VALUES ('2026-03-30', 14925010, 'IDR')")
+    await db.execute("INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency) VALUES ('2026-03-31', 23425010, 'IDR')")
   }
 }

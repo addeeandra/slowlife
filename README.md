@@ -69,7 +69,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 - [x] Calendar views and event CRUD
 - [x] Calendar sync (Google Calendar, read-only)
 - [x] Todos with priority/complexity scoring
-- [ ] Financial CRUD and budget tracking
+- [x] Financial CRUD and budget tracking
 - [ ] cr-sqlite for cross-device sync
 - [ ] Mobile support via Tauri v2
 

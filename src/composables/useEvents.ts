@@ -226,12 +226,12 @@ export function useEvents() {
   }
 
   function subscriptionEvents(year: number, month: number): EventOccurrence[] {
-    const { subscriptions } = useFinances()
+    const { activeSubscriptions } = useFinances()
     const rangeStart = `${year}-${String(month + 1).padStart(2, '0')}-01`
     const lastDay = new Date(year, month + 1, 0).getDate()
     const rangeEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
 
-    return subscriptions.value
+    return activeSubscriptions.value
       .filter(s => s.next_date >= rangeStart && s.next_date <= rangeEnd)
       .map(s => ({
         id: -(s.id + 1000),

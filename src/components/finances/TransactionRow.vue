@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { Transaction } from '../../core/types'
-import { formatCurrency } from '../../core/constants'
+import { formatMoney } from '../../core/constants'
 
-defineProps<{ transaction: Transaction }>()
+defineProps<{
+  transaction: Transaction & { account_currency?: string; account_name?: string; category_label?: string | null }
+}>()
 
 const emit = defineEmits<{
   edit: [transaction: Transaction]
@@ -13,13 +15,16 @@ const emit = defineEmits<{
   <button type="button" class="fin-row" @click="emit('edit', transaction)">
     <span class="f-n">
       {{ transaction.description }}
+      <span v-if="transaction.account_name" class="f-cat">{{ transaction.account_name }}</span>
+      <span v-if="transaction.category_label" class="f-cat">{{ transaction.category_label }}</span>
+      <span v-if="transaction.entry_mode === 'adjustment'" class="f-cat">adjustment</span>
       <span class="f-date">{{ transaction.date }}</span>
     </span>
     <span
       class="f-v"
       :class="{ inc: transaction.type === 'income', exp: transaction.type === 'expense' }"
     >
-      {{ transaction.type === 'income' ? '+' : '' }}{{ formatCurrency(transaction.amount) }}
+      {{ transaction.type === 'income' ? '+' : '' }}{{ formatMoney(transaction.amount, transaction.account_currency || 'IDR') }}
     </span>
   </button>
 </template>
@@ -50,6 +55,9 @@ const emit = defineEmits<{
 }
 
 .f-n {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
   font-size: 0.72rem;
   color: var(--text-mid);
 }
@@ -57,6 +65,14 @@ const emit = defineEmits<{
 .f-date {
   font-size: 0.55rem;
   color: var(--text-dim);
+}
+
+.f-cat {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.52rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
 }
 
 .f-v {

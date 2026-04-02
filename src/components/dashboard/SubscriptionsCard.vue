@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useFinances } from '../../composables/useFinances'
-import { formatCurrency, renewalLabel } from '../../core/constants'
+import { formatMoney, renewalLabel } from '../../core/constants'
 
 const { sortedSubscriptions } = useFinances()
 
@@ -20,7 +20,7 @@ const subs = computed(() => sortedSubscriptions.value.slice(0, 4))
         <span class="sr-name">{{ sub.name }}</span>
         <span class="sr-when">{{ renewalLabel(sub.next_date) }}</span>
       </div>
-      <span class="sr-amt">{{ formatCurrency(sub.amount) }}</span>
+      <span class="sr-amt">{{ formatMoney(sub.amount, sub.currency) }}</span>
     </div>
   </div>
 </template>
