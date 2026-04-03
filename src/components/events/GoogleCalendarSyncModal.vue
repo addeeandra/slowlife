@@ -338,13 +338,6 @@ function toggle(calendarId: string) {
 }
 
 .btn {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 5px 12px;
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: var(--bg);
-  cursor: pointer;
   transition: all var(--dur-base) var(--ease);
 }
 
@@ -365,25 +358,7 @@ function toggle(calendarId: string) {
   background: var(--bg-card);
 }
 
-.btn.ghost {
-  background: transparent;
-  color: var(--text);
-}
-
 .btn.ghost:hover:not(:disabled) {
   background: var(--bg-hover);
-  color: var(--text);
-}
-
-.btn.danger {
-  border-color: var(--red);
-  background: transparent;
-  color: var(--red);
-}
-
-.btn.danger:hover:not(:disabled) {
-  background: var(--red);
-  color: var(--bg);
-  border-color: var(--red);
 }
 </style>

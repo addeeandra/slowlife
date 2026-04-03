@@ -95,6 +95,41 @@ body {
   transform: translateY(1px);
 }
 
+.btn {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  padding: 5px 12px;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--bg);
+  cursor: pointer;
+}
+
+.btn:hover {
+  opacity: 0.85;
+}
+
+.btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--text);
+}
+
+.btn.danger {
+  border-color: var(--red);
+  background: transparent;
+  color: var(--red);
+}
+
+.btn.danger:hover {
+  background: var(--red);
+  color: var(--bg);
+}
+
 /* span */
 .s3 {
   grid-column: span 3;
@@ -105,15 +140,12 @@ body {
 .s5 {
   grid-column: span 5;
 }
-.s7 {
-  grid-column: span 7;
-}
 .s12 {
   grid-column: span 12;
 }
 
 @media (max-width: 1024px) {
-  .s3, .s4, .s5, .s7 {
+  .s3, .s4, .s5 {
     grid-column: span 12;
   }
 }

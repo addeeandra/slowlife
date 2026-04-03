@@ -87,7 +87,7 @@ function handleSave() {
 
 <style scoped>
 .ff-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 120; }
-.ff-modal { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: min(480px, 96vw); background: var(--bg); border: 1px solid var(--border); z-index: 130; padding: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+.ff-modal { position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: min(480px, 96vw); max-height: 88vh; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); z-index: 130; padding: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
 .ff-head, .ff-footer, .ff-row { display: flex; gap: 8px; }
 .ff-head, .ff-footer { align-items: center; justify-content: space-between; }
 .ff-head { margin-bottom: 12px; }
@@ -95,13 +95,11 @@ function handleSave() {
 .ff-field { margin-bottom: 10px; flex: 1; }
 .ff-label { display: block; font-size: 0.58rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
 .ff-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.78rem; padding: 8px 10px; }
+.ff-input:focus { outline: none; border-color: var(--accent); }
 .ff-sm { min-width: 0; }
 .pill-list { display: flex; gap: 8px; flex-wrap: wrap; }
 .pill { border: 1px solid var(--border); background: transparent; color: var(--text-mid); font-family: var(--mono); font-size: 0.68rem; padding: 6px 10px; }
 .pill.active { color: var(--text); border-color: var(--text); }
 .ff-left, .ff-actions { display: flex; gap: 8px; }
-.btn { border: 1px solid var(--border); background: var(--bg-hover); color: var(--text); font-family: var(--mono); font-size: 0.72rem; padding: 7px 10px; }
-.btn.ghost { background: transparent; }
-.btn.danger { color: var(--red); border-color: var(--red); }
-.b-close { border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-family: var(--mono); font-size: 0.68rem; padding: 4px 6px; }
+@media (max-width: 768px) { .ff-row, .ff-footer { flex-direction: column; align-items: stretch; } }
 </style>

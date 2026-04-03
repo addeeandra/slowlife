@@ -187,23 +187,4 @@ async function openOriginal() {
   border-top: 1px solid var(--border);
 }
 
-.btn {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 5px 12px;
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: var(--bg);
-  cursor: pointer;
-}
-
-.btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--text);
-}
 </style>

@@ -273,31 +273,6 @@ function pickProject(id: string | null) {
   gap: 8px;
 }
 
-.btn {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 5px 12px;
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: var(--bg);
-  cursor: pointer;
-  transition: opacity var(--dur-base) var(--ease);
-}
-
-.btn:hover {
-  opacity: 0.85;
-}
-
-.btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--text);
-}
-
 .c {
   margin-top: 10px;
 }

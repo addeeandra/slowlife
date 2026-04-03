@@ -191,6 +191,8 @@ function handleDelete() {
   left: 50%;
   transform: translateX(-50%);
   width: min(520px, 96vw);
+  max-height: 88vh;
+  overflow-y: auto;
   background: var(--bg);
   border: 1px solid var(--border);
   z-index: 130;
@@ -241,7 +243,7 @@ function handleDelete() {
 
 .ff-input:focus {
   outline: none;
-  border-color: var(--text);
+  border-color: var(--accent);
 }
 
 .ff-sm {
@@ -288,38 +290,6 @@ function handleDelete() {
 .ff-actions {
   display: flex;
   gap: 8px;
-}
-
-.btn {
-  border: 1px solid var(--border);
-  background: var(--bg-hover);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 7px 10px;
-}
-
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.btn.ghost {
-  background: transparent;
-}
-
-.btn.danger {
-  color: var(--red);
-  border-color: var(--red);
-}
-
-.b-close {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 4px 6px;
 }
 
 @media (max-width: 768px) {

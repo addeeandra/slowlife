@@ -206,29 +206,4 @@ async function remove() {
   margin-top: 14px;
 }
 
-.btn {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 5px 12px;
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: var(--bg);
-  cursor: pointer;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--text);
-}
-
-.btn.danger {
-  border-color: var(--red);
-  background: transparent;
-  color: var(--red);
-}
-
-.btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
 </style>

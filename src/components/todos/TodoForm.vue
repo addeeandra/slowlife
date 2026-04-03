@@ -426,42 +426,6 @@ function handleDelete() {
   gap: 8px;
 }
 
-.btn {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  padding: 5px 12px;
-  border: 1px solid var(--text);
-  background: var(--text);
-  color: var(--bg);
-  cursor: pointer;
-  transition: opacity var(--dur-base) var(--ease);
-}
-
-.btn:hover {
-  opacity: 0.85;
-}
-
-.btn:disabled {
-  opacity: 0.25;
-  cursor: default;
-}
-
-.btn.ghost {
-  background: transparent;
-  color: var(--text);
-}
-
-.btn.danger {
-  border-color: var(--red);
-  background: transparent;
-  color: var(--red);
-}
-
-.btn.danger:hover {
-  background: var(--red);
-  color: var(--bg);
-}
-
 .b-close {
   font-family: var(--mono);
   font-size: 0.6rem;
