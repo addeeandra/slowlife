@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { JournalEntry, MoodKey } from '../../core/types'
 import { MOODS, MONTH_ABBR } from '../../core/constants'
 import { useJournal } from '../../composables/useJournal'
+import { renderMarkdown } from '../../core/markdown'
 import MoodPicker from './MoodPicker.vue'
 import TagRow from './TagRow.vue'
 
@@ -25,6 +26,8 @@ function formatDate(dateStr: string): string {
 function parseTags(tags: string): string[] {
   try { return JSON.parse(tags) } catch { return [] }
 }
+
+const renderedText = computed(() => renderMarkdown(props.entry.text))
 
 function toggleExpand() {
   isExpanded.value = !isExpanded.value
@@ -77,7 +80,7 @@ async function confirmDelete() {
         <button class="tl-act tl-act-dim" @click="cancelEdit">cancel</button>
       </div>
     </div>
-    <textarea class="tl-edit-area" v-model="editText" rows="5" />
+    <textarea class="tl-edit-area" v-model="editText" rows="16" />
     <MoodPicker v-model="editMood" />
     <TagRow :space="space" v-model="editTags" />
   </div>
@@ -96,7 +99,7 @@ async function confirmDelete() {
   </div>
 
   <!-- Read mode -->
-  <div v-else class="tl-entry" @click="toggleExpand">
+  <div v-else class="tl-entry" @click="toggleExpand" @dblclick.stop="startEdit">
     <div class="tl-hdr">
       <span class="tl-date">{{ formatDate(entry.created_at) }}</span>
       <div class="tl-hdr-acts">
@@ -104,11 +107,11 @@ async function confirmDelete() {
         <span v-if="entry.mood" class="tl-mood">{{ MOODS[entry.mood as MoodKey] }}</span>
       </div>
     </div>
-    <div class="tl-text" :class="{ expanded: isExpanded }">{{ entry.text }}</div>
+    <div class="tl-text" :class="{ expanded: isExpanded }" v-html="renderedText" />
     <div v-if="parseTags(entry.tags).length" class="tl-tags">
       <span v-for="tag in parseTags(entry.tags)" :key="tag" class="tl-tag">{{ tag }}</span>
     </div>
-    <div class="tl-edit-hint">{{ isExpanded ? 'click to collapse' : 'click to expand' }}</div>
+    <div class="tl-edit-hint">{{ isExpanded ? 'click to collapse' : 'click to expand' }} / double click to edit </div>
   </div>
 </template>
 
@@ -189,7 +192,7 @@ async function confirmDelete() {
   border: 1px solid var(--border);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   padding: 8px;
   resize: vertical;
   outline: none;
@@ -211,6 +214,13 @@ async function confirmDelete() {
   -webkit-line-clamp: unset;
   overflow: visible;
 }
+
+.tl-text :deep(p) { margin: 0 0 4px; }
+.tl-text :deep(p:last-child) { margin-bottom: 0; }
+.tl-text :deep(ul), .tl-text :deep(ol) { padding-left: 16px; margin: 0; }
+.tl-text :deep(code) { font-family: var(--mono); font-size: 0.85em; background: var(--bg-hover); padding: 0 3px; }
+.tl-text :deep(strong) { color: var(--text); }
+.tl-text :deep(h1), .tl-text :deep(h2), .tl-text :deep(h3) { font-size: 0.85rem; color: var(--text); margin: 0 0 4px; font-weight: 600; }
 
 .tl-tags {
   display: flex;

@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useJournal } from '../../composables/useJournal'
 import { useSpaces } from '../../composables/useSpaces'
 import { MOODS, MONTH_ABBR } from '../../core/constants'
+import { renderMarkdown } from '../../core/markdown'
 import type { JournalEntry, MoodKey } from '../../core/types'
 
 const router = useRouter()
@@ -11,6 +12,9 @@ const { recentEntries } = useJournal()
 const { spaces, categories, projects } = useSpaces()
 
 const recent = computed(() => recentEntries(4))
+const renderedTexts = computed(() =>
+  Object.fromEntries(recent.value.map(e => [e.id, renderMarkdown(e.text)]))
+)
 
 function entryMeta(entry: JournalEntry): { dateStr: string; location: string; color: string } {
   const d = new Date(entry.created_at)
@@ -58,7 +62,7 @@ function navigate(entry: JournalEntry) {
         <span class="ri-d" :style="{ background: entryMeta(entry).color }"></span>
         <div class="ri-b">
           <div class="ri-m">{{ entryMeta(entry).dateStr }} / {{ entryMeta(entry).location }}</div>
-          <div class="ri-t">{{ entry.text }}</div>
+          <div class="ri-t" v-html="renderedTexts[entry.id]" />
         </div>
         <span v-if="entry.mood" class="ri-e">{{ MOODS[entry.mood as MoodKey] }}</span>
       </div>
@@ -116,6 +120,9 @@ function navigate(entry: JournalEntry) {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.ri-t :deep(p) { margin: 0; display: inline; }
+.ri-t :deep(strong) { color: var(--text); }
 
 .ri-e {
   font-size: 0.7rem;

@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import type { JournalEntry, MoodKey } from '../../core/types'
 import { MONTH_ABBR, MOODS } from '../../core/constants'
 import { useJournal } from '../../composables/useJournal'
+import { renderMarkdown } from '../../core/markdown'
 import MoodPicker from './MoodPicker.vue'
 import TagRow from './TagRow.vue'
 
@@ -22,6 +23,8 @@ const confirmDelete = ref(false)
 const text = ref('')
 const mood = ref<MoodKey | null>(null)
 const tags = ref<Set<string>>(new Set())
+
+const renderedText = computed(() => props.entry ? renderMarkdown(props.entry.text) : '')
 
 const title = computed(() => {
   if (!props.entry) return ''
@@ -96,7 +99,7 @@ async function remove() {
         <TagRow :space="entry.space" v-model="tags" />
       </template>
       <template v-else>
-        <div class="jp-text">{{ entry.text }}</div>
+        <div class="jp-text" v-html="renderedText" />
         <div v-if="parseTags(entry.tags).length" class="jp-tags">
           <span v-for="tag in parseTags(entry.tags)" :key="tag" class="jp-tag">{{ tag }}</span>
         </div>
@@ -173,11 +176,21 @@ async function remove() {
   font-size: 0.76rem;
   line-height: 1.7;
   color: var(--text);
-  white-space: pre-wrap;
   background: var(--bg-card);
   border: 1px solid var(--border);
   padding: 12px;
 }
+
+.jp-text :deep(p) { margin: 0 0 6px; }
+.jp-text :deep(p:last-child) { margin-bottom: 0; }
+.jp-text :deep(ul), .jp-text :deep(ol) { padding-left: 18px; margin: 0 0 6px; }
+.jp-text :deep(li) { margin-bottom: 2px; }
+.jp-text :deep(code) { font-family: var(--mono); font-size: 0.85em; background: var(--bg-hover); padding: 0 4px; }
+.jp-text :deep(pre) { background: var(--bg-hover); padding: 8px; overflow-x: auto; margin: 0 0 6px; }
+.jp-text :deep(pre code) { background: none; padding: 0; }
+.jp-text :deep(strong) { color: var(--text); font-weight: 600; }
+.jp-text :deep(h1), .jp-text :deep(h2), .jp-text :deep(h3) { font-size: 0.9rem; color: var(--text); margin: 0 0 6px; font-weight: 600; }
+.jp-text :deep(blockquote) { border-left: 2px solid var(--border); margin: 0 0 6px; padding-left: 10px; color: var(--text-dim); }
 
 .jp-textarea {
   width: 100%;
