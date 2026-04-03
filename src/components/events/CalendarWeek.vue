@@ -97,6 +97,7 @@ const columns = computed<DayColumn[]>(() => {
 <style scoped>
 .cw {
   display: grid;
+  min-height: 80vh;
   grid-template-columns: repeat(7, 1fr);
   gap: 1px;
   background: var(--border);
@@ -157,11 +158,15 @@ const columns = computed<DayColumn[]>(() => {
 }
 
 .cw-ev:hover {
-  background: var(--bg-hover);
+  background: var(--bg-item-hover);
 }
 
 .cw-ev.allday {
   background: var(--bg-card);
+}
+
+.cw-ev.allday:hover {
+  background: var(--bg-item-hover);
 }
 
 .cw-ev-time {

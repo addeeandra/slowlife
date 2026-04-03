@@ -225,9 +225,10 @@ function updateBaseCurrency(value: string | number | null) {
           </div>
           <div class="tx-head">
             <span>recent transactions</span>
-            <button v-if="selectedAccountIds.length" class="mini-btn" @click="selectedAccountIds = []">clear filters</button>
+            <router-link v-if="selectedAccountIds.length" @click="selectedAccountIds = []" to="#">[x] clear filters</router-link>
           </div>
           <TransactionRow v-for="tx in decoratedTransactions" :key="tx.id" :transaction="tx" @edit="selectedTransaction = tx; transactionFormOpen = true" />
+          <div class="empty" v-if="decoratedTransactions.length === 0">no transactions</div>
         </div>
 
         <div class="c" style="margin-bottom: 10px">
@@ -502,6 +503,22 @@ function updateBaseCurrency(value: string | number | null) {
   gap: 8px;
   margin-bottom: 4px;
   font-size: 0.68rem;
+  color: var(--text-dim);
+}
+
+.tx-head a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.55rem;
+}
+
+.tx-head a:hover {
+  color: var(--accent);
+}
+
+.empty {
+  margin-top: 6px;
+  font-size: 0.55rem;
   color: var(--text-dim);
 }
 

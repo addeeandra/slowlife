@@ -63,6 +63,10 @@ const months = computed(() => heatmapMonths())
   min-width: 0;
 }
 
+.hm-c:hover {
+  opacity: 0.5;
+}
+
 .hm-c.l1 { background: #3d2e1f; }
 .hm-c.l2 { background: #5a4530; }
 .hm-c.l3 { background: #8a6a45; }
@@ -82,5 +86,9 @@ const months = computed(() => heatmapMonths())
 .hm-leg .h {
   width: 7px;
   height: 7px;
+}
+
+.hm-leg .h:hover {
+  transform: scale(1.4);
 }
 </style>

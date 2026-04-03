@@ -8,7 +8,7 @@ const { highPriorityOpen } = useTodos()
 <template>
   <div class="c s4">
     <div class="c-t">
-      focus
+      todo focus
       <router-link to="/todos">all</router-link>
     </div>
     <div class="tf-list">

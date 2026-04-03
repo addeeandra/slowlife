@@ -120,6 +120,7 @@ const cells = computed<DayCell[]>(() => {
 
 .cm-grid {
   display: grid;
+  min-height: 80vh;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
   background: var(--border);

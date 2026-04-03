@@ -33,6 +33,10 @@ const subs = computed(() => sortedSubscriptions.value.slice(0, 4))
   padding: 3px 0;
 }
 
+.sub-row:hover {
+  background: var(--bg-hover);
+}
+
 .sr-info {
   display: flex;
   align-items: center;

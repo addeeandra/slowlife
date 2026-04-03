@@ -53,6 +53,10 @@ function dateLabel(dateStr: string): string {
   padding: 3px 0;
 }
 
+.ev:hover {
+  background: var(--bg-hover);
+}
+
 .ev-t {
   font-size: 0.6rem;
   color: var(--text-dim);

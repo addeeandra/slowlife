@@ -46,6 +46,7 @@ function handleEdit(e: MouseEvent) {
   min-height: 88px;
   padding: 10px;
   border: 1px solid var(--border);
+  box-sizing: border-box;
   background: transparent;
   cursor: pointer;
   text-align: left;

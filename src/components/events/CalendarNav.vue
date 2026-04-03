@@ -130,10 +130,6 @@ function label(): string {
   transition: all var(--dur-base) var(--ease);
 }
 
-.cn-mode + .cn-mode {
-  border-left: none;
-}
-
 .cn-mode:hover {
   color: var(--text-mid);
 }
