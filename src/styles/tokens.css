@@ -111,7 +111,7 @@ body {
 
 .btn:disabled {
   opacity: 0.25;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 .btn.ghost {
@@ -128,6 +128,22 @@ body {
 .btn.danger:hover {
   background: var(--red);
   color: var(--bg);
+}
+
+.mini-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  padding: 3px 6px;
+  text-transform: lowercase;
+  cursor: pointer;
+}
+
+.mini-btn:hover {
+  color: var(--text);
+  border-color: var(--text);
 }
 
 /* span */

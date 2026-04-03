@@ -52,14 +52,14 @@ watch(censorFinance, value => {
       <button type="button" class="s-v s-toggle" @click="censorFinance = !censorFinance">
         {{ censorFinance ? '••••••' : formatMoney(netWorth, financeSettings.base_currency) }}
       </button>
-      <div class="s-c">{{ accounts.length }} accts · tap to {{ censorFinance ? 'reveal' : 'hide' }}</div>
+      <div class="s-c">{{ accounts.length }} accts · {{ censorFinance ? 'hide' : 'reveal' }}</div>
     </div>
     <div class="sig">
       <div class="s-l">subs/mo</div>
       <button type="button" class="s-v s-toggle" @click="censorFinance = !censorFinance">
         {{ censorFinance ? '••••••' : formatMoney(totalSubsMonthly, financeSettings.base_currency) }}
       </button>
-      <div class="s-c">{{ activeSubscriptions.length }} active · tap to {{ censorFinance ? 'reveal' : 'hide' }}</div>
+      <div class="s-c">{{ activeSubscriptions.length }} active · {{ censorFinance ? 'hide' : 'reveal' }}</div>
     </div>
     <div class="sig">
       <div class="s-l">todos</div>

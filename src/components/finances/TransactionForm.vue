@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import Select from '../Select.vue'
 import type { Transaction } from '../../core/types'
 import { useFinances } from '../../composables/useFinances'
 
@@ -33,6 +34,20 @@ const canSave = computed(() => {
 const visibleCategories = computed(() =>
   type.value === 'income' ? incomeCategories.value : expenseCategories.value
 )
+
+const accountOptions = computed(() => accounts.value.map(account => ({
+  value: account.id,
+  label: account.name,
+})))
+
+const categoryOptions = computed(() => [
+  { value: null, label: 'uncategorized' },
+  ...visibleCategories.value.map(category => ({
+    value: category.id,
+    label: category.label,
+    color: category.color,
+  })),
+])
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') emit('close')
@@ -113,12 +128,11 @@ function handleDelete() {
 
       <div class="ff-field">
         <label class="ff-label">account</label>
-        <select v-model="accountId" class="ff-input">
-          <option :value="null" disabled>select account</option>
-          <option v-for="account in accounts" :key="account.id" :value="account.id">
-            {{ account.name }}
-          </option>
-        </select>
+        <Select
+          v-model="accountId"
+          :options="accountOptions"
+          placeholder="select account"
+        />
       </div>
 
       <div class="ff-field">
@@ -143,12 +157,11 @@ function handleDelete() {
 
       <div class="ff-field">
         <label class="ff-label">category</label>
-        <select v-model="categoryId" class="ff-input">
-          <option :value="null">uncategorized</option>
-          <option v-for="category in visibleCategories" :key="category.id" :value="category.id">
-            {{ category.label }}
-          </option>
-        </select>
+        <Select
+          v-model="categoryId"
+          :options="categoryOptions"
+          placeholder="select category"
+        />
       </div>
 
       <div class="ff-row">

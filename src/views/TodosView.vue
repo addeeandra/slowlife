@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
+import Select from '../components/Select.vue'
 import TodoRow from '../components/todos/TodoRow.vue'
 import { useTodos } from '../composables/useTodos'
 import { useTodoDialog } from '../composables/useTodoDialog'
@@ -26,6 +27,19 @@ const collapsed = ref<Record<string, boolean>>({
 
 const statusOrder: TodoStatus[] = ['open', 'in_progress', 'done', 'cancelled']
 const priorityKeys = Object.keys(TODO_PRIORITIES) as TodoPriority[]
+const statusOptions = [
+  { value: 'all', label: 'all' },
+  ...statusOrder.map(status => ({ value: status, label: TODO_STATUSES[status].label })),
+]
+const priorityOptions = [
+  { value: 'all', label: 'all' },
+  ...priorityKeys.map(priority => ({ value: priority, label: `${priority} ${TODO_PRIORITIES[priority].label}` })),
+]
+const sortOptions = [
+  { value: 'priority', label: 'priority' },
+  { value: 'due_date', label: 'due date' },
+  { value: 'created_at', label: 'newest' },
+]
 
 const groups = computed(() => {
   const byStatus = todosByStatus()
@@ -64,25 +78,21 @@ function toggleCollapse(status: string) {
     <div class="td-filters">
       <div class="td-filter">
         <span class="td-fl">status</span>
-        <select v-model="filterStatus" class="td-sel">
-          <option value="all">all</option>
-          <option v-for="s in statusOrder" :key="s" :value="s">{{ TODO_STATUSES[s].label }}</option>
-        </select>
+        <div class="td-sel-wrap">
+          <Select v-model="filterStatus" :options="statusOptions" compact />
+        </div>
       </div>
       <div class="td-filter">
         <span class="td-fl">priority</span>
-        <select v-model="filterPriority" class="td-sel">
-          <option value="all">all</option>
-          <option v-for="p in priorityKeys" :key="p" :value="p">{{ p }} {{ TODO_PRIORITIES[p].label }}</option>
-        </select>
+        <div class="td-sel-wrap td-sel-wide">
+          <Select v-model="filterPriority" :options="priorityOptions" compact />
+        </div>
       </div>
       <div class="td-filter">
         <span class="td-fl">sort</span>
-        <select v-model="sortBy" class="td-sel">
-          <option value="priority">priority</option>
-          <option value="due_date">due date</option>
-          <option value="created_at">newest</option>
-        </select>
+        <div class="td-sel-wrap">
+          <Select v-model="sortBy" :options="sortOptions" compact />
+        </div>
       </div>
     </div>
     <button class="td-new" @click="openNew">+ new</button>
@@ -139,19 +149,12 @@ function toggleCollapse(status: string) {
   letter-spacing: 0.06em;
 }
 
-.td-sel {
-  font-family: var(--mono);
-  font-size: 0.72rem;
-  padding: 3px 6px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
-  outline: none;
-  cursor: pointer;
+.td-sel-wrap {
+  min-width: 108px;
 }
 
-.td-sel:focus {
-  border-color: var(--accent);
+.td-sel-wide {
+  min-width: 138px;
 }
 
 .td-new {

@@ -56,7 +56,7 @@ slowlife-app/
       useEventDialog.ts   # shared event form/detail dialog state
       useTodoDialog.ts    # shared todo form dialog state
       useJournalPreviewDialog.ts # shared journal entry preview dialog state
-    styles/tokens.css     # design tokens
+    styles/tokens.css     # design tokens + shared utility classes (.c, .btn, .b-close)
     components/
       AppSidebar.vue      # sidebar with nav, space tabs, category tree
       AppFab.vue          # floating shortcut help button
@@ -111,7 +111,7 @@ remove unused greet command from rust backend
 
 **Frontend (Vue + TypeScript):**
 - Vue 3 `<script setup lang="ts">` composition API
-- Scoped CSS for feature-specific styles; shared global atoms/utilities belong in `tokens.css`
+- Scoped CSS for feature-specific styles; shared global classes (`.btn`, `.b-close`, `.c`) belong in `tokens.css`
 - Keep components small and focused
 - Use design tokens from `tokens.css` — don't hardcode colors or fonts
 - Composables use module-scoped refs (singleton pattern) — no Pinia
@@ -251,9 +251,24 @@ Components are organized by feature area:
 
 Each component should be self-contained with scoped styles, but use global styles for atomic/molecule component if available. Use composables for data access — don't call `getDb()` directly from components.
 
+## Adding a New Modal / Dialog
+
+All modals follow the same structural conventions. When adding a new one:
+
+1. Use `<Teleport to="body">` with a backdrop div (`position: fixed; inset: 0`) and a modal div
+2. Use global `.btn`, `.btn.ghost`, `.btn.danger`, and `.b-close` from `tokens.css` — do not redefine them in scoped styles
+3. Set `max-height: 88vh; overflow-y: auto` on the modal container so it scrolls on small viewports
+4. Set `top: 8%; left: 50%; transform: translateX(-50%)` for consistent vertical placement
+5. Add `.ff-input:focus { outline: none; border-color: var(--accent) }` for form inputs
+6. Add a `@media (max-width: 768px)` breakpoint that stacks flex rows and footers vertically
+7. Handle Escape key via a `keydown` listener added on open and removed on close/unmount
+
 ## Common Mistakes / Avoid
 
-- DO NOT use `window.prompt()` and create a dialog instead
+- DO NOT use `window.prompt()` — create a dialog instead
+- DO NOT redefine `.btn` or `.b-close` in scoped styles — use the global classes from `tokens.css`
+- DO NOT forget `max-height` + `overflow-y: auto` on modals — forms can overflow the viewport
+- DO NOT forget `:focus` styles on form inputs or `@media` responsive breakpoints for flex rows
 
 ## Questions?
 

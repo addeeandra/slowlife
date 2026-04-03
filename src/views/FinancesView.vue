@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
+import Select from '../components/Select.vue'
 import FinanceSummary from '../components/finances/FinanceSummary.vue'
 import AccountRow from '../components/finances/AccountRow.vue'
 import SubscriptionRow from '../components/finances/SubscriptionRow.vue'
@@ -65,6 +66,12 @@ const selectedSubscription = ref<Subscription | null>(null)
 const selectedCategory = ref<TransactionCategory | null>(null)
 const selectedRate = ref<ExchangeRate | null>(null)
 const selectedAccountIds = ref<number[]>([])
+const baseCurrencyOptions = [
+  { value: 'IDR', label: 'IDR' },
+  { value: 'USD', label: 'USD' },
+  { value: 'SGD', label: 'SGD' },
+  { value: 'CNY', label: 'CNY' },
+]
 
 const groupedSubscriptions = computed(() => ({
   monthly: activeSubscriptions.value.filter(sub => sub.cycle === 'monthly'),
@@ -176,6 +183,11 @@ function toggleAccountFilter(account: Account) {
   }
   selectedAccountIds.value = [...selectedAccountIds.value, account.id]
 }
+
+function updateBaseCurrency(value: string | number | null) {
+  if (typeof value !== 'string') return
+  setBaseCurrency(value)
+}
 </script>
 
 <template>
@@ -260,12 +272,14 @@ function toggleAccountFilter(account: Account) {
           </div>
           <div class="setting-row">
             <label class="setting-label">base currency</label>
-            <select class="setting-select" :value="financeSettings.base_currency" @change="setBaseCurrency(($event.target as HTMLSelectElement).value)">
-              <option value="IDR">IDR</option>
-              <option value="USD">USD</option>
-              <option value="SGD">SGD</option>
-              <option value="CNY">CNY</option>
-            </select>
+            <div class="setting-select-wrap">
+              <Select
+                compact
+                :model-value="financeSettings.base_currency"
+                :options="baseCurrencyOptions"
+                @update:model-value="updateBaseCurrency"
+              />
+            </div>
           </div>
           <div class="rate-list">
             <button v-for="rate in exchangeRates" :key="rate.id" type="button" class="rate-row" @click="selectedRate = rate; rateFormOpen = true">
@@ -358,6 +372,12 @@ function toggleAccountFilter(account: Account) {
   font-size: 0.66rem;
   padding: 6px 10px;
   text-transform: lowercase;
+  cursor: pointer;
+}
+
+.fin-tab:hover {
+  color: var(--text);
+  border-color: var(--text);
 }
 
 .fin-tab.active {
@@ -372,21 +392,6 @@ function toggleAccountFilter(account: Account) {
   justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-.mini-btn {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 0.64rem;
-  padding: 3px 6px;
-  text-transform: lowercase;
-}
-
-.mini-btn:hover {
-  color: var(--text);
-  border-color: var(--text);
 }
 
 .sub-total,
@@ -418,6 +423,12 @@ function toggleAccountFilter(account: Account) {
   font-family: var(--mono);
   font-size: 0.7rem;
   text-align: left;
+}
+
+.simple-row:hover,
+.rate-row:hover {
+  cursor: pointer;
+  background: var(--bg-hover);
 }
 
 .simple-row:last-child,
@@ -460,6 +471,10 @@ function toggleAccountFilter(account: Account) {
   font-family: var(--mono);
   font-size: 0.72rem;
   padding: 6px 8px;
+}
+
+.setting-select-wrap {
+  width: 110px;
 }
 
 .rate-list {

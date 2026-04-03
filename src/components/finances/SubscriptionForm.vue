@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import Select from '../Select.vue'
 import type { Subscription } from '../../core/types'
 
 const props = defineProps<{
@@ -24,6 +25,11 @@ const color = ref('#c4956a')
 
 const isEdit = computed(() => !!props.subscription)
 const canSave = computed(() => name.value.trim().length > 0 && Number(amount.value) > 0 && nextDate.value.length > 0)
+const cycleOptions = [
+  { value: 'monthly', label: 'monthly' },
+  { value: 'quarterly', label: 'quarterly' },
+  { value: 'yearly', label: 'yearly' },
+]
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') emit('close')
@@ -83,11 +89,7 @@ function handleSave() {
       <div class="ff-row">
         <div class="ff-field">
           <label class="ff-label">cycle</label>
-          <select v-model="cycle" class="ff-input ff-sm">
-            <option value="monthly">monthly</option>
-            <option value="quarterly">quarterly</option>
-            <option value="yearly">yearly</option>
-          </select>
+          <Select v-model="cycle" :options="cycleOptions" />
         </div>
         <div class="ff-field"><label class="ff-label">next date</label><input v-model="nextDate" type="date" class="ff-input ff-sm" /></div>
       </div>

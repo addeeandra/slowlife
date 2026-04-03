@@ -12,7 +12,7 @@ import TodoFocus from '../components/dashboard/TodoFocus.vue'
 </script>
 
 <template>
-  <div>
+  <div class="no-pointer no-select">
     <PageHeader title="dashboard" meta="signal, not noise" />
     <div class="dg">
       <NudgeCard />
@@ -29,6 +29,13 @@ import TodoFocus from '../components/dashboard/TodoFocus.vue'
 </template>
 
 <style scoped>
+.no-pointer {
+  cursor: default;
+}
+.no-select {
+  user-select: none;
+}
+
 .dg {
   display: grid;
   grid-template-columns: repeat(12, 1fr);

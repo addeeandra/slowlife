@@ -14,11 +14,11 @@ const emit = defineEmits<{
 <template>
   <button type="button" class="fin-row" @click="emit('edit', transaction)">
     <span class="f-n">
+      <span v-if="transaction.account_name" class="f-acct">[{{ transaction.account_name }}]</span>
+      <span class="f-date">[{{ transaction.date }}]</span>
       {{ transaction.description }}
-      <span v-if="transaction.account_name" class="f-cat">{{ transaction.account_name }}</span>
       <span v-if="transaction.category_label" class="f-cat">{{ transaction.category_label }}</span>
       <span v-if="transaction.entry_mode === 'adjustment'" class="f-cat">adjustment</span>
-      <span class="f-date">{{ transaction.date }}</span>
     </span>
     <span
       class="f-v"
@@ -64,6 +64,13 @@ const emit = defineEmits<{
 
 .f-date {
   font-size: 0.55rem;
+  color: var(--text-dim);
+}
+
+.f-acct {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.52rem;
   color: var(--text-dim);
 }
 
