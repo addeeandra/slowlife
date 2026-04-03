@@ -1,0 +1,254 @@
+#!/bin/zsh
+
+set -euo pipefail
+
+SCRIPT_DIR=${0:A:h}
+REPO_ROOT="$SCRIPT_DIR"
+PACKAGE_JSON="$REPO_ROOT/package.json"
+TAURI_CONFIG="$REPO_ROOT/src-tauri/tauri.conf.json"
+CARGO_TOML="$REPO_ROOT/src-tauri/Cargo.toml"
+DMG_DIR="$REPO_ROOT/src-tauri/target/release/bundle/dmg"
+RELEASE_NOTES=$'Development build for early testers.\n\nThis build is not notarized yet, so macOS may block it on first open. If that happens, right-click the app and choose Open, or allow it in Privacy & Security.'
+
+TAG=""
+VERSION=""
+DO_PUSH=0
+AUTO_COMMIT=0
+AUTO_COMMIT_CREATED=0
+DMG_PATH=""
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./local-release v0.0.1-dev
+  ./local-release v0.0.1-dev --push
+  ./local-release v0.0.1-dev --push --auto
+
+Options:
+  --push   Create git tag, push it, create a GitHub prerelease, and upload the DMG
+  --auto   With --push, auto-commit managed release version changes if needed
+EOF
+}
+
+fail() {
+  print -u2 -- "$1"
+  exit 1
+}
+
+require_cmd() {
+  local cmd="$1"
+  command -v "$cmd" >/dev/null 2>&1 || fail "Missing required command: $cmd"
+}
+
+confirm() {
+  local prompt="$1"
+  local answer
+  printf "%s [y/N] " "$prompt"
+  read -r answer
+  [[ "$answer" == "y" || "$answer" == "Y" ]]
+}
+
+parse_args() {
+  [[ $# -ge 1 ]] || {
+    usage
+    exit 1
+  }
+
+  if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    usage
+    exit 0
+  fi
+
+  TAG="$1"
+  shift
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --push)
+        DO_PUSH=1
+        ;;
+      --auto)
+        AUTO_COMMIT=1
+        ;;
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      *)
+        usage
+        fail "Unknown argument: $1"
+        ;;
+    esac
+    shift
+  done
+
+  if [[ $AUTO_COMMIT -eq 1 && $DO_PUSH -eq 0 ]]; then
+    fail "--auto can only be used together with --push"
+  fi
+}
+
+validate_tag() {
+  [[ "$TAG" =~ '^v([0-9]+\.[0-9]+\.[0-9]+)-dev$' ]] || fail "Tag must match vX.Y.Z-dev"
+  VERSION="${match[1]}"
+}
+
+check_platform() {
+  [[ "$(uname -s)" == "Darwin" ]] || fail "local-release only supports macOS"
+}
+
+check_requirements() {
+  require_cmd git
+  require_cmd gh
+  require_cmd pnpm
+  require_cmd node
+}
+
+check_gh_auth() {
+  gh auth status >/dev/null 2>&1 || fail "GitHub CLI is not authenticated. Run: gh auth login"
+}
+
+check_tag_does_not_exist() {
+  git rev-parse --verify --quiet "refs/tags/$TAG" >/dev/null && fail "Tag already exists locally: $TAG"
+
+  if git ls-remote --tags origin "refs/tags/$TAG" | grep -q .; then
+    fail "Tag already exists on origin: $TAG"
+  fi
+}
+
+update_versions() {
+  node - "$PACKAGE_JSON" "$TAURI_CONFIG" "$CARGO_TOML" "$VERSION" <<'EOF'
+const fs = require('fs')
+
+const [packageJsonPath, tauriConfigPath, cargoTomlPath, version] = process.argv.slice(2)
+
+const updateJsonVersion = (filePath) => {
+  const json = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+  json.version = version
+  fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n')
+}
+
+const updateCargoVersion = (filePath) => {
+  const contents = fs.readFileSync(filePath, 'utf8')
+  const updated = contents.replace(/^(version\s*=\s*")[^"]+("\s*)$/m, `$1${version}$2`)
+
+  if (updated === contents) {
+    throw new Error(`Could not update version in ${filePath}`)
+  }
+
+  fs.writeFileSync(filePath, updated)
+}
+
+updateJsonVersion(packageJsonPath)
+updateJsonVersion(tauriConfigPath)
+updateCargoVersion(cargoTomlPath)
+EOF
+}
+
+build_release() {
+  (cd "$REPO_ROOT" && pnpm tauri build)
+}
+
+find_dmg() {
+  [[ -d "$DMG_DIR" ]] || fail "DMG output directory not found: $DMG_DIR"
+
+  local dmg_files
+  dmg_files=("$DMG_DIR"/*.dmg(N))
+
+  [[ ${#dmg_files[@]} -gt 0 ]] || fail "No DMG artifact found in $DMG_DIR"
+
+  DMG_PATH="${dmg_files[1]}"
+}
+
+print_dirty_status() {
+  git -C "$REPO_ROOT" status --short
+}
+
+collect_dirty_files() {
+  git -C "$REPO_ROOT" status --porcelain | awk '{print $2}'
+}
+
+contains_only_managed_dirty_files() {
+  local files
+  files=(${(@f)$(collect_dirty_files)})
+
+  [[ ${#files[@]} -gt 0 ]] || return 0
+
+  local file
+  for file in "${files[@]}"; do
+    case "$file" in
+      package.json|src-tauri/tauri.conf.json|src-tauri/Cargo.toml)
+        ;;
+      *)
+        return 1
+        ;;
+    esac
+  done
+
+  return 0
+}
+
+handle_dirty_tree_for_push() {
+  if [[ -z "$(git -C "$REPO_ROOT" status --porcelain)" ]]; then
+    return
+  fi
+
+  print "Working tree has uncommitted changes:"
+  print_dirty_status
+
+  if [[ $AUTO_COMMIT -eq 1 ]]; then
+    contains_only_managed_dirty_files || fail "--auto only supports dirty changes in package.json, src-tauri/tauri.conf.json, and src-tauri/Cargo.toml"
+
+    git -C "$REPO_ROOT" add package.json src-tauri/tauri.conf.json src-tauri/Cargo.toml
+    git -C "$REPO_ROOT" commit -m "release ${TAG#v}"
+    AUTO_COMMIT_CREATED=1
+    return
+  fi
+
+  confirm "Continuing will publish a release from local state that is not fully represented by the pushed git history. Continue?" || fail "Release aborted"
+}
+
+create_and_push_tag() {
+  git -C "$REPO_ROOT" tag "$TAG"
+
+  if [[ $AUTO_COMMIT_CREATED -eq 1 ]]; then
+    git -C "$REPO_ROOT" push origin HEAD
+  fi
+
+  git -C "$REPO_ROOT" push origin "$TAG"
+}
+
+create_github_release() {
+  (cd "$REPO_ROOT" && gh release create "$TAG" "$DMG_PATH" --prerelease --title "$TAG" --notes "$RELEASE_NOTES")
+}
+
+main() {
+  parse_args "$@"
+  validate_tag
+  check_platform
+  check_requirements
+
+  if [[ $DO_PUSH -eq 1 ]]; then
+    check_gh_auth
+    check_tag_does_not_exist
+  fi
+
+  update_versions
+  build_release
+  find_dmg
+
+  if [[ $DO_PUSH -eq 0 ]]; then
+    print -- "Built DMG: $DMG_PATH"
+    exit 0
+  fi
+
+  handle_dirty_tree_for_push
+  create_and_push_tag
+
+  local release_url
+  release_url=$(create_github_release)
+
+  print -- "Built DMG: $DMG_PATH"
+  print -- "Release URL: $release_url"
+}
+
+main "$@"
