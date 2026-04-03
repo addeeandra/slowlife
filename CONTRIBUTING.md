@@ -39,6 +39,7 @@ slowlife-app/
       db.ts               # SQLite abstraction + migrations
       types.ts            # TypeScript interfaces for all entities
       constants.ts        # tags, prompts, moods, date helpers, money formatters
+      search.ts           # FTS index helpers and search queries
       seed.ts             # first-run sample data
     composables/
       useSidebar.ts       # sidebar open/close state
@@ -50,17 +51,26 @@ slowlife-app/
       useTodos.ts         # todos CRUD, status workflow, priority filtering
       usePinned.ts        # pinned items with resolved metadata
       useKeyboard.ts      # global ctrl+key shortcuts
+      useQuickCapture.ts  # quick capture modal state
+      useCommandPalette.ts # command palette search + navigation
+      useEventDialog.ts   # shared event form/detail dialog state
+      useTodoDialog.ts    # shared todo form dialog state
+      useJournalPreviewDialog.ts # shared journal entry preview dialog state
     styles/tokens.css     # design tokens
     components/
       AppSidebar.vue      # sidebar with nav, space tabs, category tree
       AppFab.vue          # floating shortcut help button
+      CommandPalette.vue  # global search + navigation modal
+      InputDialog.vue     # reusable text input dialog
       PageHeader.vue      # shared title + breadcrumb
+      QuickCaptureModal.vue # quick capture modal
       sidebar/            # SpaceTabs, CategoryTree, StreakFooter
       dashboard/          # NudgeCard, SignalRow, ActivityHeatmap, PinnedProjects,
                           # UpcomingEvents, TodoFocus, SubscriptionsCard, MoodWeek, RecentEntries
       journal/            # DateBar, MoodPicker, WritingPrompt, EntryEditor, TagRow,
-                          # TimelineEntry
-      events/             # EventRow, EventForm, Google sync/detail modals
+                          # TimelineEntry, JournalEntryPreviewDialog
+      events/             # EventRow, EventForm, CalendarMonth, CalendarWeek, CalendarNav,
+                          # DayDetail, GoogleCalendarSyncModal, GoogleEventDetail
       todos/              # TodoRow, TodoForm
       finances/           # FinanceSummary, AccountRow, TransactionRow, SubscriptionRow,
                           # BudgetOverview, IncomeExpenseTrend, NetWorthTrend,

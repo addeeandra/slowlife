@@ -61,6 +61,7 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 ### Desktop Experience
 - **Runtime**: native app via Tauri
 - **Database**: local SQLite
+- **Command palette**: Ctrl+K for global search and navigation
 - **Shortcuts**: navigation and quick capture
 - **System tray**: supported
 
@@ -73,6 +74,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 - [x] Calendar sync (Google Calendar, read-only)
 - [x] Todos with priority/complexity scoring
 - [x] Financial CRUD, reporting, and multi-currency tracking
+- [x] Full-text search and command palette (Ctrl+K)
 - [ ] cr-sqlite for cross-device sync
 - [ ] Mobile support via Tauri v2
 

@@ -33,7 +33,7 @@ Migrate the validated prototype into a real application.
 - [x] First-run seed data (spaces, categories, projects, events, accounts, subscriptions, transactions)
 - [x] Mobile-responsive sidebar (overlay + toggle on small screens)
 
-## Phase 2 — Core Experience
+## Phase 2 — Core Experience ✓
 
 Polish the daily-use experience. Make it feel right.
 
@@ -43,7 +43,7 @@ Polish the daily-use experience. Make it feel right.
 - [x] Drag-to-reorder pinned projects (dashboard, sortable + persistence)
 - [x] Smooth animations and transitions (centralized tokens)
 
-## Phase 3 — Quick Capture
+## Phase 3 — Quick Capture ���
 
 Reduce friction for capturing thoughts.
 
@@ -52,7 +52,7 @@ Reduce friction for capturing thoughts.
 - [x] System tray icon with quick capture trigger
 - [x] Auto-focus editor on capture
 
-## Phase 4 — Events & Calendar
+## Phase 4 — Events & Calendar ✓
 
 Build out the events system into a proper calendar.
 
@@ -78,7 +78,7 @@ A personal task system with priority and complexity scoring.
 - [x] Dashboard: open todos signal card + focus list (top priority items)
 - [x] Sidebar navigation and keyboard shortcut (Ctrl+4)
 
-## Phase 6 — Financial Tracking
+## Phase 6 — Financial Tracking ✓
 
 Expand finances beyond basic tracking.
 
