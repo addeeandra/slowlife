@@ -11,6 +11,7 @@ const props = defineProps<{ entry: JournalEntry; space: string }>()
 const { updateEntry, deleteEntry } = useJournal()
 
 const isEditing = ref(false)
+const isExpanded = ref(false)
 const showConfirmDelete = ref(false)
 const editText = ref('')
 const editMood = ref<MoodKey | null>(null)
@@ -23,6 +24,10 @@ function formatDate(dateStr: string): string {
 
 function parseTags(tags: string): string[] {
   try { return JSON.parse(tags) } catch { return [] }
+}
+
+function toggleExpand() {
+  isExpanded.value = !isExpanded.value
 }
 
 function startEdit() {
@@ -67,9 +72,9 @@ async function confirmDelete() {
     <div class="tl-hdr">
       <span class="tl-date">{{ formatDate(entry.created_at) }}</span>
       <div class="tl-hdr-acts">
+        <button class="tl-act tl-act-del" @click="promptDelete">delete</button>
         <button class="tl-act" @click="saveEdit">save</button>
         <button class="tl-act tl-act-dim" @click="cancelEdit">cancel</button>
-        <button class="tl-act tl-act-del" @click="promptDelete">delete</button>
       </div>
     </div>
     <textarea class="tl-edit-area" v-model="editText" rows="5" />
@@ -91,16 +96,19 @@ async function confirmDelete() {
   </div>
 
   <!-- Read mode -->
-  <div v-else class="tl-entry" @click="startEdit">
+  <div v-else class="tl-entry" @click="toggleExpand">
     <div class="tl-hdr">
       <span class="tl-date">{{ formatDate(entry.created_at) }}</span>
-      <span v-if="entry.mood" class="tl-mood">{{ MOODS[entry.mood as MoodKey] }}</span>
+      <div class="tl-hdr-acts">
+        <button v-if="isExpanded" class="tl-act" @click.stop="startEdit">✎</button>
+        <span v-if="entry.mood" class="tl-mood">{{ MOODS[entry.mood as MoodKey] }}</span>
+      </div>
     </div>
-    <div class="tl-text">{{ entry.text }}</div>
+    <div class="tl-text" :class="{ expanded: isExpanded }">{{ entry.text }}</div>
     <div v-if="parseTags(entry.tags).length" class="tl-tags">
       <span v-for="tag in parseTags(entry.tags)" :key="tag" class="tl-tag">{{ tag }}</span>
     </div>
-    <div class="tl-edit-hint">click to edit</div>
+    <div class="tl-edit-hint">{{ isExpanded ? 'click to collapse' : 'click to expand' }}</div>
   </div>
 </template>
 
@@ -197,6 +205,11 @@ async function confirmDelete() {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.tl-text.expanded {
+  -webkit-line-clamp: unset;
+  overflow: visible;
 }
 
 .tl-tags {
