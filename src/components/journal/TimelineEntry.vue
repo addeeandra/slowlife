@@ -18,7 +18,7 @@ const editTags = ref<Set<string>>(new Set())
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr)
-  return `${MONTH_ABBR[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`
+  return `${MONTH_ABBR[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()} - ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`
 }
 
 function parseTags(tags: string): string[] {

@@ -6,12 +6,22 @@ import { MOODS, DAY_ABBR, MONTH_ABBR } from '../core/constants'
 
 const entries = ref<JournalEntry[]>([])
 
+// SQLite datetime('now') stores UTC without a timezone marker: 'YYYY-MM-DD HH:MM:SS'
+// WebKit parses this ambiguous format as local time, causing off-by-one-day bugs for
+// users in positive UTC offsets (e.g. GMT+7) when writing after midnight local time.
+// Appending 'Z' makes new Date() always treat the value as UTC.
+function normalizeDate(s: string): string {
+  if (s.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(s)) return s
+  return s.replace(' ', 'T') + 'Z'
+}
+
 export function useJournal() {
   async function load() {
     const db = await getDb()
-    entries.value = await db.select<JournalEntry[]>(
+    const rows = await db.select<JournalEntry[]>(
       'SELECT * FROM journal_entries ORDER BY created_at DESC'
     )
+    entries.value = rows.map(e => ({ ...e, created_at: normalizeDate(e.created_at) }))
   }
 
   async function saveEntry(
@@ -24,8 +34,8 @@ export function useJournal() {
   ) {
     const db = await getDb()
     await db.execute(
-      'INSERT INTO journal_entries (space, category, item, text, mood, tags) VALUES ($1, $2, $3, $4, $5, $6)',
-      [space, category, item, text, mood, JSON.stringify(tags)]
+      'INSERT INTO journal_entries (space, category, item, text, mood, tags, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [space, category, item, text, mood, JSON.stringify(tags), new Date().toISOString()]
     )
     const rows = await db.select<{ id: number }[]>('SELECT last_insert_rowid() AS id')
     if (rows[0]?.id) {
