@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { getDb } from '../core/db'
+import { deleteTodoSearchIndex, upsertTodoSearchIndex } from '../core/search'
 import type { Todo, TodoStatus, TodoPriority, TodoComplexity } from '../core/types'
 import { toISO } from '../core/constants'
 
@@ -38,6 +39,10 @@ export function useTodos() {
         input.due_date ?? null,
       ]
     )
+    const rows = await db.select<{ id: number }[]>('SELECT last_insert_rowid() AS id')
+    if (rows[0]?.id) {
+      await upsertTodoSearchIndex(rows[0].id)
+    }
     await load()
   }
 
@@ -58,12 +63,14 @@ export function useTodos() {
 
     values.push(id)
     await db.execute(`UPDATE todos SET ${fields.join(', ')} WHERE id = $${idx}`, values)
+    await upsertTodoSearchIndex(id)
     await load()
   }
 
   async function deleteTodo(id: number) {
     const db = await getDb()
     await db.execute('DELETE FROM todos WHERE id = $1', [id])
+    await deleteTodoSearchIndex(id)
     await load()
   }
 

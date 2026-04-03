@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { getDb } from '../core/db'
+import { deleteJournalSearchIndex, upsertJournalSearchIndex } from '../core/search'
 import type { JournalEntry, MoodKey } from '../core/types'
 import { MOODS, DAY_ABBR, MONTH_ABBR } from '../core/constants'
 
@@ -26,6 +27,10 @@ export function useJournal() {
       'INSERT INTO journal_entries (space, category, item, text, mood, tags) VALUES ($1, $2, $3, $4, $5, $6)',
       [space, category, item, text, mood, JSON.stringify(tags)]
     )
+    const rows = await db.select<{ id: number }[]>('SELECT last_insert_rowid() AS id')
+    if (rows[0]?.id) {
+      await upsertJournalSearchIndex(rows[0].id)
+    }
     await load()
   }
 
@@ -38,12 +43,14 @@ export function useJournal() {
       'UPDATE journal_entries SET text = $1, mood = $2, tags = $3 WHERE id = $4',
       [patch.text, patch.mood, JSON.stringify(patch.tags), id]
     )
+    await upsertJournalSearchIndex(id)
     await load()
   }
 
   async function deleteEntry(id: number) {
     const db = await getDb()
     await db.execute('DELETE FROM journal_entries WHERE id = $1', [id])
+    await deleteJournalSearchIndex(id)
     await load()
   }
 

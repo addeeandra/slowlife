@@ -11,6 +11,7 @@ import {
   fetchGoogleEventsPage,
   normalizeGoogleEvent,
 } from '../core/googleCalendarApi'
+import { upsertEventSearchIndex } from '../core/search'
 import type { GoogleAccount, GoogleCalendar, GoogleCalendarSyncState } from '../core/types'
 import { useEvents } from './useEvents'
 
@@ -151,9 +152,9 @@ async function upsertMirroredEvent(calendar: GoogleCalendar, payload: ReturnType
     ['google', calendar.calendar_id, payload.google_id]
   )
 
-  if (existing[0]?.id) {
-    await db.execute(
-      `UPDATE events SET
+        if (existing[0]?.id) {
+          await db.execute(
+            `UPDATE events SET
          title = $1,
          date = $2,
          time = $3,
@@ -167,7 +168,7 @@ async function upsertMirroredEvent(calendar: GoogleCalendar, payload: ReturnType
          sync_updated_at = $11,
          external_event_type = $12
        WHERE id = $13`,
-      [
+        [
         payload.title,
         payload.date,
         payload.time,
@@ -183,6 +184,7 @@ async function upsertMirroredEvent(calendar: GoogleCalendar, payload: ReturnType
         existing[0].id,
       ]
     )
+    await upsertEventSearchIndex(existing[0].id)
     return
   }
 
@@ -213,6 +215,10 @@ async function upsertMirroredEvent(calendar: GoogleCalendar, payload: ReturnType
       payload.external_event_type,
     ]
   )
+  const rows = await db.select<{ id: number }[]>('SELECT last_insert_rowid() AS id')
+  if (rows[0]?.id) {
+    await upsertEventSearchIndex(rows[0].id)
+  }
 }
 
 async function syncCalendar(calendar: GoogleCalendar) {
@@ -231,8 +237,12 @@ async function syncCalendar(calendar: GoogleCalendar) {
       })
 
       for (const item of response.items || []) {
+        const db = await getDb()
         if (item.status === 'cancelled') {
-          const db = await getDb()
+          await db.execute(
+            'DELETE FROM events_fts WHERE rowid IN (SELECT id FROM events WHERE source = $1 AND external_calendar_id = $2 AND google_id = $3)',
+            ['google', calendar.calendar_id, item.id]
+          )
           await db.execute(
             'DELETE FROM events WHERE source = $1 AND external_calendar_id = $2 AND google_id = $3',
             ['google', calendar.calendar_id, item.id]

@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { getDb } from '../core/db'
+import { deleteEventSearchIndex, upsertEventSearchIndex } from '../core/search'
 import type { Event, EventOccurrence, EventType, RecurrenceRule } from '../core/types'
 import { MONTH_ABBR, DAY_ABBR, EVENT_TYPES, toISO, sortByDateTime } from '../core/constants'
 import { useFinances } from './useFinances'
@@ -152,6 +153,10 @@ export function useEvents() {
         data.recurrence_rule || null,
       ]
     )
+    const rows = await db.select<{ id: number }[]>('SELECT last_insert_rowid() AS id')
+    if (rows[0]?.id) {
+      await upsertEventSearchIndex(rows[0].id)
+    }
     await load()
   }
 
@@ -176,6 +181,7 @@ export function useEvents() {
     if (!fields.length) return
     values.push(id)
     await db.execute(`UPDATE events SET ${fields.join(', ')} WHERE id = $${idx}`, values)
+    await upsertEventSearchIndex(id)
     await load()
   }
 
@@ -185,6 +191,7 @@ export function useEvents() {
 
     const db = await getDb()
     await db.execute('DELETE FROM events WHERE id = $1', [id])
+    await deleteEventSearchIndex(id)
     await load()
   }
 

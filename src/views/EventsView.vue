@@ -5,22 +5,18 @@ import CalendarNav from '../components/events/CalendarNav.vue'
 import CalendarMonth from '../components/events/CalendarMonth.vue'
 import CalendarWeek from '../components/events/CalendarWeek.vue'
 import DayDetail from '../components/events/DayDetail.vue'
-import EventForm from '../components/events/EventForm.vue'
 import EventRow from '../components/events/EventRow.vue'
-import GoogleEventDetail from '../components/events/GoogleEventDetail.vue'
 import GoogleCalendarSyncModal from '../components/events/GoogleCalendarSyncModal.vue'
 import { useEvents } from '../composables/useEvents'
+import { useEventDialog } from '../composables/useEventDialog'
 import { useGoogleCalendarSync } from '../composables/useGoogleCalendarSync'
-import type { Event, EventOccurrence } from '../core/types'
+import type { EventOccurrence } from '../core/types'
 import { MONTH_ABBR, toISO } from '../core/constants'
 
 const {
   eventsForMonth,
   eventsForWeek,
   groupedByDate,
-  createEvent,
-  updateEvent,
-  deleteEvent,
 } = useEvents()
 
 const {
@@ -42,14 +38,15 @@ const currentYear = ref(new Date().getFullYear())
 const currentMonth = ref(new Date().getMonth())
 const weekStart = ref(getWeekStart(new Date()))
 const selectedDate = ref<string | null>(null)
-const formOpen = ref(false)
-const editingEvent = ref<Event | null>(null)
-const prefillDate = ref<string | null>(null)
-const googleEvent = ref<EventOccurrence | null>(null)
 const googleSyncOpen = ref(false)
 const googleClientId = ref('')
 const googleClientSecret = ref('')
 const confirmGoogleDisconnect = ref(false)
+
+const {
+  openEvent,
+  openCreate,
+} = useEventDialog()
 
 function getWeekStart(d: Date): string {
   const date = new Date(d)
@@ -104,36 +101,8 @@ function onSelectDate(date: string) {
   selectedDate.value = selectedDate.value === date ? null : date
 }
 
-function openEvent(ev: Event | EventOccurrence) {
-  if (ev.id < 0) return
-  if (ev.source === 'google') {
-    googleEvent.value = ev as EventOccurrence
-    return
-  }
-  editingEvent.value = ev
-  formOpen.value = true
-}
-
-function openCreate() {
-  editingEvent.value = null
-  prefillDate.value = selectedDate.value
-  formOpen.value = true
-}
-
-async function onSave(data: Parameters<typeof createEvent>[0]) {
-  if (editingEvent.value) {
-    await updateEvent(editingEvent.value.id, data)
-  } else {
-    await createEvent(data)
-  }
-  formOpen.value = false
-  editingEvent.value = null
-}
-
-async function onDelete(id: number) {
-  await deleteEvent(id)
-  formOpen.value = false
-  editingEvent.value = null
+function openCreateFromView() {
+  openCreate(selectedDate.value)
 }
 
 async function openGoogleConnect() {
@@ -186,7 +155,7 @@ const syncLabel = computed(() => {
       :sync-disabled="isConnecting || isSyncing"
       @navigate="navigate"
       @set-view="setView"
-      @create="openCreate"
+      @create="openCreateFromView"
       @sync-google="handleGoogleSync"
     />
 
@@ -198,14 +167,14 @@ const syncLabel = computed(() => {
         @select-date="onSelectDate"
         @select-event="openEvent"
       />
-      <DayDetail
-        v-if="selectedDate"
-        :date="selectedDate"
-        :occurrences="monthOccurrences"
-        @select-event="openEvent"
-        @create="openCreate"
-        @close="selectedDate = null"
-      />
+        <DayDetail
+          v-if="selectedDate"
+          :date="selectedDate"
+          :occurrences="monthOccurrences"
+          @select-event="openEvent"
+          @create="openCreateFromView"
+          @close="selectedDate = null"
+        />
     </div>
 
     <div v-else-if="viewMode === 'week'" class="cal-area">
@@ -215,14 +184,14 @@ const syncLabel = computed(() => {
         @select-date="onSelectDate"
         @select-event="openEvent"
       />
-      <DayDetail
-        v-if="selectedDate"
-        :date="selectedDate"
-        :occurrences="weekOccurrences"
-        @select-event="openEvent"
-        @create="openCreate"
-        @close="selectedDate = null"
-      />
+        <DayDetail
+          v-if="selectedDate"
+          :date="selectedDate"
+          :occurrences="weekOccurrences"
+          @select-event="openEvent"
+          @create="openCreateFromView"
+          @close="selectedDate = null"
+        />
     </div>
 
     <div v-else class="list-area">
@@ -239,23 +208,6 @@ const syncLabel = computed(() => {
       </template>
       <div v-if="!groups.length" class="empty">no events</div>
     </div>
-
-    <EventForm
-      :open="formOpen"
-      :event="editingEvent"
-      :prefill-date="prefillDate"
-      @save="onSave"
-      @delete="onDelete"
-      @close="formOpen = false"
-    />
-
-    <GoogleEventDetail
-      :open="!!googleEvent"
-      :event="googleEvent"
-      :calendars="calendars"
-      @close="googleEvent = null"
-    />
-
     <GoogleCalendarSyncModal
       :open="googleSyncOpen"
       :connected="!!account?.connected"

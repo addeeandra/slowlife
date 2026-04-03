@@ -130,8 +130,9 @@ describe('useFinances', () => {
     const finances = useFinances()
     await finances.deleteAccount(3)
 
-    expect(mockDb.execute).toHaveBeenNthCalledWith(1, 'DELETE FROM transactions WHERE account_id = $1', [3])
-    expect(mockDb.execute).toHaveBeenNthCalledWith(2, 'DELETE FROM accounts WHERE id = $1', [3])
+    expect(mockDb.execute).toHaveBeenNthCalledWith(1, 'DELETE FROM transactions_fts WHERE rowid IN (SELECT id FROM transactions WHERE account_id = $1)', [3])
+    expect(mockDb.execute).toHaveBeenNthCalledWith(2, 'DELETE FROM transactions WHERE account_id = $1', [3])
+    expect(mockDb.execute).toHaveBeenNthCalledWith(3, 'DELETE FROM accounts WHERE id = $1', [3])
   })
 
   it('creates expense transactions as negative amounts', async () => {

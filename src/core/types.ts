@@ -243,3 +243,64 @@ export interface Todo {
   completed_at: string | null
   created_at: string
 }
+
+export interface CommandPaletteNavigationResult {
+  type: 'navigation'
+  id: string
+  label: string
+  meta: string
+  route: string
+}
+
+export interface CommandPaletteJournalTargetResult {
+  type: 'journal_target'
+  id: string
+  label: string
+  meta: string
+  route: string
+}
+
+export interface CommandPaletteJournalEntryResult {
+  type: 'journal_entry'
+  id: string
+  label: string
+  meta: string
+  entry: JournalEntry
+}
+
+export interface CommandPaletteEventResult {
+  type: 'event'
+  id: string
+  label: string
+  meta: string
+  event: EventOccurrence | Event
+}
+
+export interface CommandPaletteTransactionResult {
+  type: 'transaction'
+  id: string
+  label: string
+  meta: string
+  transaction: Transaction
+  detail: {
+    account_name: string
+    account_currency: string
+    category_label: string | null
+  }
+}
+
+export interface CommandPaletteTodoResult {
+  type: 'todo'
+  id: string
+  label: string
+  meta: string
+  todo: Todo
+}
+
+export type CommandPaletteResult =
+  | CommandPaletteNavigationResult
+  | CommandPaletteJournalTargetResult
+  | CommandPaletteJournalEntryResult
+  | CommandPaletteEventResult
+  | CommandPaletteTransactionResult
+  | CommandPaletteTodoResult

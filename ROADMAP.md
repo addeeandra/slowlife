@@ -95,11 +95,9 @@ Expand finances beyond basic tracking.
 
 Help users find and understand their data.
 
-- [ ] Full-text search across all journal entries
-- [ ] Search across events and transactions
-- [ ] Command palette (Ctrl+K) for quick navigation and search
-- [ ] Weekly reflection summary ("you wrote about X a lot this week")
-- [ ] Mood insights (patterns, triggers)
+- [x] Full-text search across all journal entries
+- [x] Search across events and transactions
+- [x] Command palette (Ctrl+K) for quick navigation and search
 - [ ] Writing frequency analytics
 - [ ] Spending pattern insights
 

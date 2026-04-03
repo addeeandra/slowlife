@@ -24,6 +24,7 @@ function triggerQuickCapture() {
     <div class="sc-r"><span class="sc-l">todos</span><span class="sc-k">ctrl+4</span></div>
     <div class="sc-r"><span class="sc-l">new entry</span><span class="sc-k">ctrl+n</span></div>
     <div class="sc-r"><span class="sc-l">toggle sidebar</span><span class="sc-k">ctrl+s</span></div>
+    <div class="sc-r"><span class="sc-l">command palette</span><span class="sc-k">ctrl+k</span></div>
     <div class="sc-r">
       <span class="sc-l">quick capture</span>
       <span class="sc-k">ctrl+shift+k</span>

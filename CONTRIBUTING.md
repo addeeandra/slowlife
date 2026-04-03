@@ -211,6 +211,22 @@ All checks must pass before merging.
 5. Create a composable in `src/composables/` for CRUD and derived state
 6. Document the schema in your PR description
 
+## Maintaining Search Indexes
+
+The app uses SQLite FTS indexes for global search and the command palette. Searchable content is maintained explicitly in migrations and write paths, not implicitly by components.
+
+When you change searchable fields or add a new searchable entity, update all of the following:
+
+1. FTS schema and backfill migration in `src/core/db.ts`
+2. Search helpers in `src/core/search.ts`
+3. CRUD or sync paths that create, update, or delete indexed records
+4. Related rename/delete flows that change derived indexed text
+5. Tests covering both search results and index maintenance
+
+Pay extra attention to flows that bypass the usual composable CRUD functions, such as sync/import jobs, and to indexes that depend on joined labels like account names or category labels.
+
+Do not add searchable content without also updating the index maintenance logic.
+
 ## Adding a New Component
 
 Components are organized by feature area:

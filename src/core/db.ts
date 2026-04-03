@@ -1,4 +1,10 @@
 import Database from '@tauri-apps/plugin-sql'
+import {
+  rebuildEventsSearchIndex,
+  rebuildJournalSearchIndex,
+  rebuildTodosSearchIndex,
+  rebuildTransactionsSearchIndex,
+} from './search'
 
 let db: Database | null = null
 
@@ -213,6 +219,7 @@ async function migrate(db: Database) {
 
   await migrateFinances(db)
   await migrateEvents(db)
+  await migrateSearch(db)
 }
 
 async function migrateFinances(db: Database) {
@@ -257,4 +264,53 @@ async function migrateEvents(db: Database) {
 
   try { await db.execute("ALTER TABLE google_account ADD COLUMN client_id TEXT") } catch (_) { /* column already exists */ }
   try { await db.execute("ALTER TABLE google_account ADD COLUMN client_secret TEXT") } catch (_) { /* column already exists */ }
+}
+
+async function migrateSearch(db: Database) {
+  await db.execute(`
+    CREATE VIRTUAL TABLE IF NOT EXISTS journal_entries_fts USING fts5(
+      text,
+      tags,
+      space,
+      category,
+      item
+    )
+  `)
+
+  await db.execute(`
+    CREATE VIRTUAL TABLE IF NOT EXISTS events_fts USING fts5(
+      title,
+      description,
+      type,
+      space_id,
+      category_id,
+      source
+    )
+  `)
+
+  await db.execute(`
+    CREATE VIRTUAL TABLE IF NOT EXISTS transactions_fts USING fts5(
+      description,
+      account_name,
+      category_label,
+      type
+    )
+  `)
+
+  await db.execute(`
+    CREATE VIRTUAL TABLE IF NOT EXISTS todos_fts USING fts5(
+      title,
+      description,
+      status,
+      priority,
+      space_id,
+      category_id,
+      project_id
+    )
+  `)
+
+  await rebuildJournalSearchIndex()
+  await rebuildEventsSearchIndex()
+  await rebuildTransactionsSearchIndex()
+  await rebuildTodosSearchIndex()
 }

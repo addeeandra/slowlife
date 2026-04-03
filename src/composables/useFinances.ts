@@ -1,5 +1,10 @@
 import { ref, computed } from 'vue'
 import { getDb } from '../core/db'
+import {
+  deleteTransactionSearchIndex,
+  rebuildTransactionsSearchIndex,
+  upsertTransactionSearchIndex,
+} from '../core/search'
 import type {
   Account,
   Transaction,
@@ -199,6 +204,7 @@ export function useFinances() {
     values.push(id)
     await db.execute(`UPDATE accounts SET ${fields.join(', ')} WHERE id = $${idx}`, values)
     await load()
+    await rebuildTransactionsSearchIndex()
     await refreshSnapshot()
   }
 
@@ -220,6 +226,7 @@ export function useFinances() {
 
   async function deleteAccount(id: number) {
     const db = await getDb()
+    await db.execute('DELETE FROM transactions_fts WHERE rowid IN (SELECT id FROM transactions WHERE account_id = $1)', [id])
     await db.execute('DELETE FROM transactions WHERE account_id = $1', [id])
     await db.execute('DELETE FROM accounts WHERE id = $1', [id])
     await load()
@@ -241,6 +248,10 @@ export function useFinances() {
         input.entry_mode ?? 'manual',
       ]
     )
+    const rows = await db.select<{ id: number }[]>('SELECT last_insert_rowid() AS id')
+    if (rows[0]?.id) {
+      await upsertTransactionSearchIndex(rows[0].id)
+    }
     await load()
     await refreshSnapshot(input.date)
   }
@@ -275,6 +286,7 @@ export function useFinances() {
 
     values.push(id)
     await db.execute(`UPDATE transactions SET ${fields.join(', ')} WHERE id = $${idx}`, values)
+    await upsertTransactionSearchIndex(id)
     await load()
     await refreshSnapshot(patch.date || existing.date)
   }
@@ -283,6 +295,7 @@ export function useFinances() {
     const db = await getDb()
     const existing = transactions.value.find(tx => tx.id === id)
     await db.execute('DELETE FROM transactions WHERE id = $1', [id])
+    await deleteTransactionSearchIndex(id)
     await load()
     await refreshSnapshot(existing?.date || toISO(new Date()))
   }
@@ -316,6 +329,7 @@ export function useFinances() {
     values.push(id)
     await db.execute(`UPDATE transaction_categories SET ${fields.join(', ')} WHERE id = $${idx}`, values)
     await load()
+    await rebuildTransactionsSearchIndex()
   }
 
   async function deleteTransactionCategory(id: number) {
@@ -323,6 +337,7 @@ export function useFinances() {
     await db.execute('UPDATE transactions SET category_id = NULL WHERE category_id = $1', [id])
     await db.execute('DELETE FROM transaction_categories WHERE id = $1', [id])
     await load()
+    await rebuildTransactionsSearchIndex()
   }
 
   async function createSubscription(input: SubscriptionInput) {

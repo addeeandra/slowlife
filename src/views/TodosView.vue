@@ -2,25 +2,22 @@
 import { ref, computed } from 'vue'
 import PageHeader from '../components/PageHeader.vue'
 import TodoRow from '../components/todos/TodoRow.vue'
-import TodoForm from '../components/todos/TodoForm.vue'
 import { useTodos } from '../composables/useTodos'
+import { useTodoDialog } from '../composables/useTodoDialog'
 import type { Todo, TodoStatus, TodoPriority } from '../core/types'
 import { TODO_PRIORITIES, TODO_STATUSES } from '../core/constants'
 
 const {
   todosByStatus,
-  createTodo,
-  updateTodo,
-  deleteTodo,
   toggleStatus,
   openCount,
 } = useTodos()
 
-const formOpen = ref(false)
-const editingTodo = ref<Todo | null>(null)
 const filterStatus = ref<TodoStatus | 'all'>('all')
 const filterPriority = ref<TodoPriority | 'all'>('all')
 const sortBy = ref<'priority' | 'due_date' | 'created_at'>('priority')
+
+const { openNew, openEdit } = useTodoDialog()
 
 const collapsed = ref<Record<string, boolean>>({
   done: true,
@@ -54,43 +51,6 @@ const groups = computed(() => {
 
   return result
 })
-
-function openNew() {
-  editingTodo.value = null
-  formOpen.value = true
-}
-
-function openEdit(todo: Todo) {
-  editingTodo.value = todo
-  formOpen.value = true
-}
-
-async function handleSave(data: {
-  title: string
-  description: string | null
-  priority: TodoPriority
-  complexity: Todo['complexity']
-  status: TodoStatus
-  space_id: string | null
-  category_id: string | null
-  project_id: string | null
-  due_date: string | null
-}) {
-  if (editingTodo.value) {
-    const completedAt = data.status === 'done' && editingTodo.value.status !== 'done'
-      ? new Date().toISOString().replace('T', ' ').slice(0, 19)
-      : data.status !== 'done' ? null : editingTodo.value.completed_at
-    await updateTodo(editingTodo.value.id, { ...data, completed_at: completedAt })
-  } else {
-    await createTodo(data)
-  }
-  formOpen.value = false
-}
-
-async function handleDelete(id: number) {
-  await deleteTodo(id)
-  formOpen.value = false
-}
 
 function toggleCollapse(status: string) {
   collapsed.value[status] = !collapsed.value[status]
@@ -147,14 +107,6 @@ function toggleCollapse(status: string) {
       </div>
     </div>
   </div>
-
-  <TodoForm
-    :open="formOpen"
-    :todo="editingTodo"
-    @save="handleSave"
-    @delete="handleDelete"
-    @close="formOpen = false"
-  />
 </template>
 
 <style scoped>

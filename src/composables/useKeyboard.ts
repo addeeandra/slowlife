@@ -1,18 +1,35 @@
 import { useRouter } from 'vue-router'
+import { useCommandPalette } from './useCommandPalette'
 import { useSidebar } from './useSidebar'
 import { useQuickCapture } from './useQuickCapture'
 
 let handler: ((e: KeyboardEvent) => void) | null = null
 
+function isEditableTarget(target: EventTarget | null) {
+  const el = target as HTMLElement | null
+  if (!el) return false
+  const tag = el.tagName.toLowerCase()
+  return tag === 'input' || tag === 'textarea' || tag === 'select' || el.isContentEditable
+}
+
 export function useKeyboard() {
   const router = useRouter()
   const { toggle } = useSidebar()
   const { open } = useQuickCapture()
+  const { open: openPalette } = useCommandPalette()
 
   function init() {
     if (handler) return
     handler = (e: KeyboardEvent) => {
       if (!e.ctrlKey) return
+      if (isEditableTarget(e.target) && e.key.toLowerCase() !== 'k') return
+
+      if (e.key === 'k' && !e.shiftKey) {
+        e.preventDefault()
+        openPalette()
+        return
+      }
+
       switch (e.key) {
         case '1':
           e.preventDefault()
