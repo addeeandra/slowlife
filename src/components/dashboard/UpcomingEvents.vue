@@ -18,7 +18,7 @@ function dateLabel(dateStr: string): string {
 <template>
   <div class="c s4">
     <div class="c-t">
-      upcoming
+      upcoming events
       <router-link to="/events">all</router-link>
     </div>
     <div class="ev-list">

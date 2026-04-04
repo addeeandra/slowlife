@@ -33,7 +33,7 @@ async function persistOrder() {
 
 <template>
   <div class="c s4">
-    <div class="c-t">pinned</div>
+    <div class="c-t">pinned projects</div>
 
     <div v-if="!localPins.length" class="empty">nothing pinned</div>
 

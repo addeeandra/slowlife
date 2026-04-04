@@ -9,7 +9,7 @@ const subs = computed(() => sortedSubscriptions.value.slice(0, 4))
 </script>
 
 <template>
-  <div class="c s5">
+  <div class="c s4">
     <div class="c-t">
       subscriptions
       <router-link to="/finances">manage</router-link>

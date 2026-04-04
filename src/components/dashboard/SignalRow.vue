@@ -48,6 +48,11 @@ watch(censorFinance, value => {
       <div class="s-c">{{ dominantMoodThisWeek || 'no data' }}</div>
     </div>
     <div class="sig">
+      <div class="s-l">todos</div>
+      <div class="s-v">{{ openCount }}</div>
+      <div class="s-c">{{ overdueTodos.length ? `${overdueTodos.length} overdue` : 'open' }}</div>
+    </div>
+    <div class="sig">
       <div class="s-l">net worth</div>
       <button type="button" class="s-v s-toggle" @click="censorFinance = !censorFinance">
         {{ censorFinance ? '••••••' : formatMoney(netWorth, financeSettings.base_currency) }}
@@ -60,11 +65,6 @@ watch(censorFinance, value => {
         {{ censorFinance ? '••••••' : formatMoney(totalSubsMonthly, financeSettings.base_currency) }}
       </button>
       <div class="s-c">{{ activeSubscriptions.length }} active · {{ censorFinance ? 'hide' : 'reveal' }}</div>
-    </div>
-    <div class="sig">
-      <div class="s-l">todos</div>
-      <div class="s-v">{{ openCount }}</div>
-      <div class="s-c">{{ overdueTodos.length ? `${overdueTodos.length} overdue` : 'open' }}</div>
     </div>
   </div>
 </template>

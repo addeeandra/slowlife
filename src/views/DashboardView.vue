@@ -18,12 +18,14 @@ import FocusRateCard from '../components/dashboard/FocusRateCard.vue'
     <div class="dg">
       <NudgeCard />
       <SignalRow />
-      <ActivityHeatmap />
+      <UpcomingEvents />
       <PinnedProjects />
       <TodoFocus />
-      <FocusRateCard />
-      <UpcomingEvents />
-      <MoodWeek />
+      <ActivityHeatmap />
+      <div class="s4 df">
+        <FocusRateCard class="grow" />
+        <MoodWeek />
+      </div>
       <SubscriptionsCard />
       <RecentEntries />
     </div>
@@ -42,6 +44,16 @@ import FocusRateCard from '../components/dashboard/FocusRateCard.vue'
   display: grid;
   grid-template-columns: repeat(12, 1fr);
   gap: 10px;
+}
+
+.df {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.grow {
+  flex-grow: 1;
 }
 
 @media (max-width: 768px) {
