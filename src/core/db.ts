@@ -220,6 +220,7 @@ async function migrate(db: Database) {
   await migrateFinances(db)
   await migrateEvents(db)
   await migrateSearch(db)
+  await migrateTodos(db)
 }
 
 async function migrateFinances(db: Database) {
@@ -313,4 +314,8 @@ async function migrateSearch(db: Database) {
   await rebuildEventsSearchIndex()
   await rebuildTransactionsSearchIndex()
   await rebuildTodosSearchIndex()
+}
+
+async function migrateTodos(db: Database) {
+  try { await db.execute('ALTER TABLE todos ADD COLUMN is_inattentive INTEGER NOT NULL DEFAULT 0') } catch (_) { /* column already exists */ }
 }

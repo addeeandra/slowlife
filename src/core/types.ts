@@ -242,6 +242,7 @@ export interface Todo {
   due_date: string | null
   completed_at: string | null
   created_at: string
+  is_inattentive: number
 }
 
 export interface CommandPaletteNavigationResult {

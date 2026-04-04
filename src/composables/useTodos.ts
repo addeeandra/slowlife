@@ -85,9 +85,20 @@ export function useTodos() {
       cancelled: 'open',
     }
     const newStatus = next[todo.status]
-    const completedAt = newStatus === 'done' ? new Date().toISOString().replace('T', ' ').slice(0, 19) : null
+    const now = new Date()
+    const completedAt = newStatus === 'done' ? now.toISOString().replace('T', ' ').slice(0, 19) : null
 
-    await updateTodo(id, { status: newStatus, completed_at: completedAt })
+    let isInattentive = todo.is_inattentive
+    if (newStatus === 'done') {
+      const createdAt = new Date(todo.created_at.replace(' ', 'T') + 'Z')
+      const elapsedSec = (now.getTime() - createdAt.getTime()) / 1000
+      const isLowPriority = ['P2', 'P3', 'P4'].includes(todo.priority)
+      isInattentive = elapsedSec <= 15 && isLowPriority ? 1 : 0
+    } else if (newStatus === 'open') {
+      isInattentive = 0
+    }
+
+    await updateTodo(id, { status: newStatus, completed_at: completedAt, is_inattentive: isInattentive })
   }
 
   const openTodos = computed(() =>
@@ -107,6 +118,44 @@ export function useTodos() {
       .sort((a, b) => a.priority.localeCompare(b.priority) || (a.due_date || '9').localeCompare(b.due_date || '9'))
       .slice(0, 5)
   )
+
+  function focusStatsForRange(from: string, to: string) {
+    const { i, total } = todos.value.reduce(
+      (acc, t) => {
+        if (t.status !== 'done' || !t.completed_at) return acc
+        const d = t.completed_at.slice(0, 10)
+        if (d < from || d > to) return acc
+        acc.total++
+        if (t.is_inattentive === 1) acc.i++
+        return acc
+      },
+      { i: 0, total: 0 }
+    )
+    return { i, a: total - i, rate: total > 0 ? i / total : 0 }
+  }
+
+  const focusToday = computed(() => {
+    const today = toISO(new Date())
+    return focusStatsForRange(today, today)
+  })
+
+  const focusThisWeek = computed(() => {
+    const now = new Date()
+    const from = new Date(now)
+    from.setDate(now.getDate() - 6)
+    return focusStatsForRange(toISO(from), toISO(now))
+  })
+
+  const focusHistory = computed(() => {
+    const now = new Date()
+    return Array.from({ length: 7 }, (_, idx) => {
+      const d = new Date(now)
+      d.setDate(now.getDate() - (6 - idx))
+      const ds = toISO(d)
+      const stats = focusStatsForRange(ds, ds)
+      return { date: ds, ...stats }
+    })
+  })
 
   function todosByStatus() {
     const groups: Record<TodoStatus, Todo[]> = { open: [], in_progress: [], done: [], cancelled: [] }
@@ -131,5 +180,8 @@ export function useTodos() {
     overdueTodos,
     highPriorityOpen,
     todosByStatus,
+    focusToday,
+    focusThisWeek,
+    focusHistory,
   }
 }
