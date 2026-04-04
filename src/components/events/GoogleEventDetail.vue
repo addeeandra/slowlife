@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import DOMPurify from 'dompurify'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import BaseModal from '../BaseModal.vue'
 import type { EventOccurrence, GoogleCalendar } from '../../core/types'
 import { DAY_ABBR, MONTH_ABBR } from '../../core/constants'
 
@@ -39,9 +40,8 @@ async function openOriginal() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="gd-backdrop" @click="emit('close')"></div>
-    <div v-if="open && event" class="gd-modal">
+  <BaseModal :open="open && !!event" width="min(520px, 94vw)" top="10%" @close="emit('close')">
+    <div v-if="event" class="gd-modal-inner">
       <div class="gd-head">
         <div>
           <div class="gd-title">{{ event.title }}</div>
@@ -71,28 +71,12 @@ async function openOriginal() {
         <button class="btn" :disabled="!event.external_url" @click="openOriginal">open in google calendar</button>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.gd-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.gd-modal {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(520px, 94vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.gd-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .gd-head {

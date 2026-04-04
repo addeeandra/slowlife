@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, watch, computed } from 'vue'
+import BaseModal from '../BaseModal.vue'
 import type { Event, EventType, RecurrenceRule } from '../../core/types'
 import { EVENT_TYPES, RECURRENCE_PRESETS } from '../../core/constants'
 import { useSpaces } from '../../composables/useSpaces'
@@ -54,13 +55,8 @@ const spaceCategories = computed(() =>
 
 const typeKeys = Object.keys(EVENT_TYPES) as EventType[]
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') emit('close')
-}
-
 watch(() => props.open, (open) => {
   if (open) {
-    document.addEventListener('keydown', onKeydown)
     confirmDelete.value = false
     if (props.event) {
       title.value = props.event.title
@@ -95,12 +91,8 @@ watch(() => props.open, (open) => {
       categoryId.value = props.draftContext?.category_id ?? null
       recurrenceIdx.value = 0
     }
-  } else {
-    document.removeEventListener('keydown', onKeydown)
   }
 })
-
-onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 function pickSpace(id: string | null) {
   spaceId.value = id
@@ -137,9 +129,8 @@ function handleDelete() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="ef-backdrop" @click="emit('close')"></div>
-    <div v-if="open" class="ef-modal">
+  <BaseModal :open="open" width="min(560px, 96vw)" top="6%" @close="emit('close')">
+    <div class="ef-modal-inner">
       <div class="ef-head">
         <div class="ef-title">{{ isEdit ? 'edit event' : 'new event' }}</div>
         <button type="button" class="b-close" @click="emit('close')">esc</button>
@@ -269,30 +260,12 @@ function handleDelete() {
         </div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.ef-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.ef-modal {
-  position: fixed;
-  top: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, 96vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.ef-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-  max-height: 88vh;
-  overflow-y: auto;
 }
 
 .ef-head {

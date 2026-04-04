@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import BaseModal from './BaseModal.vue'
 import { formatMoney } from '../core/constants'
 import { useCommandPalette } from '../composables/useCommandPalette'
 import { useEventDialog } from '../composables/useEventDialog'
@@ -107,9 +108,8 @@ function execute(result = activeResult()) {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="isOpen" class="cp-backdrop" @click="close"></div>
-    <div v-if="isOpen" class="cp-modal">
+  <BaseModal :open="isOpen" width="min(860px, 96vw)" top="8%" :scrollable="false" @close="close">
+    <div class="cp-modal-inner">
       <div class="cp-head">
         <input
           ref="inputRef"
@@ -162,27 +162,12 @@ function execute(result = activeResult()) {
         </div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.cp-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.cp-modal {
-  position: fixed;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(860px, 96vw);
+.cp-modal-inner {
   background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .cp-head {

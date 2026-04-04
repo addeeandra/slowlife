@@ -112,9 +112,8 @@ export function useQuickCapture() {
     }
   }
 
-  function close(e: Event) {
-    e.preventDefault()
-
+  function close(e?: Event) {
+    e?.preventDefault()
     isOpen.value = false
     text.value = ''
   }

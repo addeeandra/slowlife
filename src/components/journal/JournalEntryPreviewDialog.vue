@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import BaseModal from '../BaseModal.vue'
 import type { JournalEntry, MoodKey } from '../../core/types'
 import { MONTH_ABBR, MOODS } from '../../core/constants'
 import { useJournal } from '../../composables/useJournal'
@@ -77,9 +78,8 @@ async function remove() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="jp-backdrop" @click="emit('close')"></div>
-    <div v-if="open && entry" class="jp-modal">
+  <BaseModal :open="open && !!entry" width="min(620px, 96vw)" top="8%" @close="emit('close')">
+    <div v-if="entry" class="jp-modal-inner">
       <div class="jp-head">
         <div>
           <div class="jp-title">{{ title }}</div>
@@ -112,30 +112,12 @@ async function remove() {
         <button class="btn danger" @click="remove">{{ confirmDelete ? 'confirm delete' : 'delete' }}</button>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.jp-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.jp-modal {
-  position: fixed;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(620px, 96vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.jp-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-  max-height: 86vh;
-  overflow-y: auto;
 }
 
 .jp-head {

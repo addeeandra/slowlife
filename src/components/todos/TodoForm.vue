@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, watch, computed } from 'vue'
+import BaseModal from '../BaseModal.vue'
 import type { Todo, TodoPriority, TodoComplexity, TodoStatus } from '../../core/types'
 import { TODO_PRIORITIES, TODO_COMPLEXITIES, TODO_STATUSES } from '../../core/constants'
 import { useSpaces } from '../../composables/useSpaces'
@@ -62,13 +63,8 @@ const priorityKeys = Object.keys(TODO_PRIORITIES) as TodoPriority[]
 const complexityKeys = Object.keys(TODO_COMPLEXITIES) as TodoComplexity[]
 const statusKeys = Object.keys(TODO_STATUSES) as TodoStatus[]
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') emit('close')
-}
-
 watch(() => props.open, (open) => {
   if (open) {
-    document.addEventListener('keydown', onKeydown)
     confirmDelete.value = false
     if (props.todo) {
       title.value = props.todo.title
@@ -93,12 +89,8 @@ watch(() => props.open, (open) => {
       dueDate.value = ''
       isInattentive.value = 0
     }
-  } else {
-    document.removeEventListener('keydown', onKeydown)
   }
 })
-
-onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 function pickSpace(id: string | null) {
   spaceId.value = id
@@ -138,9 +130,8 @@ function handleDelete() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="ef-backdrop" @click="emit('close')"></div>
-    <div v-if="open" class="ef-modal">
+  <BaseModal :open="open" width="min(560px, 96vw)" top="6%" @close="emit('close')">
+    <div class="ef-modal-inner">
       <div class="ef-head">
         <div class="ef-title">{{ isEdit ? 'edit todo' : 'new todo' }}</div>
         <button type="button" class="b-close" @click="emit('close')">esc</button>
@@ -308,30 +299,12 @@ function handleDelete() {
         </div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.ef-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.ef-modal {
-  position: fixed;
-  top: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, 96vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.ef-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
-  max-height: 88vh;
-  overflow-y: auto;
 }
 
 .ef-head {

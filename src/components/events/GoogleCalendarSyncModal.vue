@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import BaseModal from '../BaseModal.vue'
 import type { GoogleCalendar } from '../../core/types'
 
 const props = defineProps<{
@@ -52,9 +53,8 @@ function toggle(calendarId: string) {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="gs-backdrop" @click="emit('close')"></div>
-    <div v-if="open" class="gs-modal">
+  <BaseModal :open="open" width="min(560px, 96vw)" top="8%" @close="emit('close')">
+    <div class="gs-modal-inner">
       <div class="gs-head">
         <div>
           <div class="gs-title">google calendar sync</div>
@@ -142,28 +142,12 @@ function toggle(calendarId: string) {
         </div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.gs-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.gs-modal {
-  position: fixed;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(560px, 96vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.gs-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .gs-head, .gs-actions {

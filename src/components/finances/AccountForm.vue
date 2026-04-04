@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, watch, computed } from 'vue'
+import BaseModal from '../BaseModal.vue'
 import type { Account } from '../../core/types'
 
 const props = defineProps<{
@@ -29,13 +30,8 @@ const canAdjust = computed(() =>
   !!props.account && adjustmentDate.value.length > 0 && Number.isFinite(Number(adjustmentBalance.value))
 )
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') emit('close')
-}
-
 watch(() => props.open, (open) => {
   if (open) {
-    document.addEventListener('keydown', onKeydown)
     confirmDelete.value = false
     if (props.account) {
       name.value = props.account.name
@@ -52,12 +48,8 @@ watch(() => props.open, (open) => {
       adjustmentDate.value = new Date().toISOString().slice(0, 10)
       adjustmentDescription.value = ''
     }
-  } else {
-    document.removeEventListener('keydown', onKeydown)
   }
 })
-
-onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 function handleSave() {
   if (!canSave.value) return
@@ -88,9 +80,8 @@ function handleDelete() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="ff-backdrop" @click="emit('close')"></div>
-    <div v-if="open" class="ff-modal">
+  <BaseModal :open="open" width="min(460px, 96vw)" top="8%" @close="emit('close')">
+    <div class="ff-modal-inner">
       <div class="ff-head">
         <div class="ff-title">{{ isEdit ? 'edit account' : 'new account' }}</div>
         <button type="button" class="b-close" @click="emit('close')">esc</button>
@@ -151,30 +142,12 @@ function handleDelete() {
         </div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.ff-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.ff-modal {
-  position: fixed;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(460px, 96vw);
-  max-height: 88vh;
-  overflow-y: auto;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.ff-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .ff-head {

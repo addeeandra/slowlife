@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, computed, onBeforeUnmount } from 'vue'
+import { ref, watch, computed } from 'vue'
+import BaseModal from '../BaseModal.vue'
 import type { ExchangeRate } from '../../core/types'
 
 const props = defineProps<{
@@ -22,13 +23,8 @@ const effectiveDate = ref('')
 const isEdit = computed(() => !!props.rate)
 const canSave = computed(() => fromCurrency.value.trim().length === 3 && Number(rate.value) > 0 && effectiveDate.value.length > 0)
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') emit('close')
-}
-
 watch(() => props.open, open => {
   if (open) {
-    document.addEventListener('keydown', onKeydown)
     if (props.rate) {
       fromCurrency.value = props.rate.from_currency
       toCurrency.value = props.rate.to_currency
@@ -40,12 +36,8 @@ watch(() => props.open, open => {
       rate.value = ''
       effectiveDate.value = new Date().toISOString().slice(0, 10)
     }
-  } else {
-    document.removeEventListener('keydown', onKeydown)
   }
 })
-
-onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
 
 function handleSave() {
   if (!canSave.value) return
@@ -64,9 +56,8 @@ function handleDelete() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="open" class="ff-backdrop" @click="emit('close')"></div>
-    <div v-if="open" class="ff-modal">
+  <BaseModal :open="open" width="min(480px, 96vw)" top="8%" @close="emit('close')">
+    <div class="ff-modal-inner">
       <div class="ff-head">
         <div class="ff-title">{{ isEdit ? 'edit exchange rate' : 'new exchange rate' }}</div>
         <button type="button" class="b-close" @click="emit('close')">esc</button>
@@ -84,12 +75,11 @@ function handleDelete() {
         <div class="ff-actions"><button class="btn ghost" @click="emit('close')">cancel</button><button class="btn" :disabled="!canSave" @click="handleSave">save</button></div>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.ff-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); z-index: 120; }
-.ff-modal { position: fixed; top: 8%; left: 50%; transform: translateX(-50%); width: min(480px, 96vw); max-height: 88vh; overflow-y: auto; background: var(--bg); border: 1px solid var(--border); z-index: 130; padding: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35); }
+.ff-modal-inner { padding: 16px; }
 .ff-head, .ff-footer, .ff-row { display: flex; gap: 8px; }
 .ff-head, .ff-footer { align-items: center; justify-content: space-between; }
 .ff-title { font-family: var(--mono); font-size: 0.9rem; }

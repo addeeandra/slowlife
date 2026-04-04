@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import BaseModal from './BaseModal.vue'
 import { useSpaces } from '../composables/useSpaces'
 import { useFocusMode, type FocusTarget } from '../composables/useFocusMode'
 
@@ -35,14 +36,7 @@ watch(isLauncherOpen, (open) => {
     projectId.value = lastTarget.value?.projectId || projects.value.find(
       item => item.space_id === spaceId.value && item.category_id === categoryId.value
     )?.id || null
-    document.addEventListener('keydown', onKeydown)
-  } else {
-    document.removeEventListener('keydown', onKeydown)
   }
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', onKeydown)
 })
 
 watch(spaceId, () => {
@@ -57,14 +51,6 @@ watch(categoryId, () => {
   }
 })
 
-function onKeydown(e: KeyboardEvent) {
-  if (e.key === 'Escape') closeLauncher()
-  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && canEnter.value) {
-    e.preventDefault()
-    void submit()
-  }
-}
-
 async function submit() {
   if (!canEnter.value) return
   await enter({
@@ -77,9 +63,8 @@ async function submit() {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="isLauncherOpen" class="fm-backdrop" @click="closeLauncher"></div>
-    <div v-if="isLauncherOpen" class="fm-modal">
+  <BaseModal :open="isLauncherOpen" width="min(520px, 94vw)" top="10%" @close="closeLauncher">
+    <div class="fm-modal-inner" @keydown.ctrl.enter.prevent="submit" @keydown.meta.enter.prevent="submit">
       <div class="fm-head">
         <div>
           <div class="fm-title">enter focus mode</div>
@@ -126,28 +111,12 @@ async function submit() {
         <button class="btn" :disabled="!canEnter" @click="submit">enter</button>
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.fm-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 120;
-}
-
-.fm-modal {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(520px, 94vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
+.fm-modal-inner {
   padding: 18px;
-  z-index: 130;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .fm-head {

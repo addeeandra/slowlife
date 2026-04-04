@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import BaseModal from './BaseModal.vue'
 import { useSpaces } from '../composables/useSpaces'
 import { useQuickCapture } from '../composables/useQuickCapture'
 import MoodPicker from './journal/MoodPicker.vue'
@@ -37,9 +38,8 @@ function pickProject(id: string | null) {
 </script>
 
 <template>
-  <Teleport to="body">
-    <div v-if="isOpen" class="qc-backdrop" @click="close"></div>
-    <div v-if="isOpen" class="qc-modal">
+  <BaseModal :open="isOpen" width="min(700px, 96vw)" top="6%" @close="close">
+    <div class="qc-modal-inner">
       <div class="qc-head">
         <div>
           <div class="qc-title">quick capture</div>
@@ -106,7 +106,6 @@ function pickProject(id: string | null) {
           id="qc-editor"
           v-model="text"
           placeholder="capture a thought..."
-          @keydown.escape="close"
           @keydown.meta.enter.prevent="save"
           @keydown.ctrl.enter.prevent="save"
         ></textarea>
@@ -129,28 +128,12 @@ function pickProject(id: string | null) {
         <TagRow :space="selectedSpace" v-model="selectedTags" />
       </div>
     </div>
-  </Teleport>
+  </BaseModal>
 </template>
 
 <style scoped>
-.qc-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 120;
-}
-
-.qc-modal {
-  position: fixed;
-  top: 6%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(700px, 96vw);
-  background: var(--bg);
-  border: 1px solid var(--border);
-  z-index: 130;
+.qc-modal-inner {
   padding: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
 }
 
 .qc-head {

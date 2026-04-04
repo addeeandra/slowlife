@@ -61,6 +61,7 @@ slowlife-app/
     components/
       AppSidebar.vue      # sidebar with nav, space tabs, category tree
       AppFab.vue          # floating shortcut help button
+      BaseModal.vue       # shared modal shell (backdrop, positioning, Escape, scrollable)
       CommandPalette.vue  # global search + navigation modal
       FocusModeLauncher.vue # focus mode target picker modal (Ctrl+0)
       InputDialog.vue     # reusable text input dialog
@@ -255,21 +256,47 @@ Each component should be self-contained with scoped styles, but use global style
 
 ## Adding a New Modal / Dialog
 
-All modals follow the same structural conventions. When adding a new one:
+All modals use `BaseModal` (`src/components/BaseModal.vue`), which handles the backdrop, positioning, Escape key, and scrolling.
 
-1. Use `<Teleport to="body">` with a backdrop div (`position: fixed; inset: 0`) and a modal div
-2. Use global `.btn`, `.btn.ghost`, `.btn.danger`, and `.b-close` from `tokens.css` — do not redefine them in scoped styles
-3. Set `max-height: 88vh; overflow-y: auto` on the modal container so it scrolls on small viewports
-4. Set `top: 8%; left: 50%; transform: translateX(-50%)` for consistent vertical placement
-5. Add `.ff-input:focus { outline: none; border-color: var(--accent) }` for form inputs
-6. Add a `@media (max-width: 768px)` breakpoint that stacks flex rows and footers vertically
-7. Handle Escape key via a `keydown` listener added on open and removed on close/unmount
+```vue
+<BaseModal :open="isOpen" width="min(520px, 96vw)" top="8%" @close="emit('close')">
+  <div class="my-modal-inner">
+    <!-- content -->
+  </div>
+</BaseModal>
+```
+
+**Props:**
+
+| Prop | Default | Notes |
+|------|---------|-------|
+| `open` | — | required; controls visibility |
+| `width` | `min(520px, 96vw)` | CSS value passed to the modal div |
+| `top` | `8%` | vertical offset from viewport top |
+| `scrollable` | `true` | adds `max-height: 88vh; overflow-y: auto` |
+
+**What BaseModal handles for you:** backdrop, `Teleport to="body"`, `z-index`, Escape → `@close`, `box-shadow`, `border`, centering. Do not re-implement any of these.
+
+**What you still own in the inner div:**
+- `padding` (typically `16px` or `18px`)
+- Inner layout, form fields, and action buttons
+- Use global `.btn`, `.btn.ghost`, `.btn.danger`, and `.b-close` from `tokens.css` — do not redefine them in scoped styles
+- Add `input:focus, select:focus { outline: none; border-color: var(--accent) }` for form inputs
+- Add a `@media (max-width: 768px)` breakpoint that stacks flex rows and footers vertically
+
+**Extra keyboard shortcuts** (beyond Escape): add them on the inner div so they bubble from focused children — do not add a separate `document` listener:
+
+```vue
+<div class="my-modal-inner" @keydown.ctrl.enter.prevent="submit" @keydown.meta.enter.prevent="submit">
+```
 
 ## Common Mistakes / Avoid
 
 - DO NOT use `window.prompt()` — create a dialog instead
+- DO NOT use `<Teleport to="body">` manually in a modal — use `BaseModal` instead
+- DO NOT add a `document.addEventListener('keydown', ...)` for Escape — `BaseModal` handles it
 - DO NOT redefine `.btn` or `.b-close` in scoped styles — use the global classes from `tokens.css`
-- DO NOT forget `max-height` + `overflow-y: auto` on modals — forms can overflow the viewport
+- DO NOT set `position: fixed`, `z-index`, `box-shadow`, or centering on the inner div — `BaseModal` owns the shell
 - DO NOT forget `:focus` styles on form inputs or `@media` responsive breakpoints for flex rows
 
 ## Questions?
