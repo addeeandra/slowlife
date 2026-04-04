@@ -87,6 +87,7 @@ async function handleTodoSave(data: {
   category_id: string | null
   project_id: string | null
   due_date: string | null
+  is_inattentive: number
 }) {
   if (editingTodo.value) {
     const completedAt = data.status === 'done' && editingTodo.value.status !== 'done'

@@ -56,7 +56,7 @@ slowlife-app/
       useEventDialog.ts   # shared event form/detail dialog state
       useTodoDialog.ts    # shared todo form dialog state
       useJournalPreviewDialog.ts # shared journal entry preview dialog state
-    styles/tokens.css     # design tokens + shared utility classes (.c, .btn, .b-close)
+    styles/tokens.css     # design tokens + shared utility classes (.c, .btn, .b-close, .s3-.s7, .s12)
     components/
       AppSidebar.vue      # sidebar with nav, space tabs, category tree
       AppFab.vue          # floating shortcut help button
@@ -66,7 +66,7 @@ slowlife-app/
       QuickCaptureModal.vue # quick capture modal
       sidebar/            # SpaceTabs, CategoryTree, StreakFooter
       dashboard/          # NudgeCard, SignalRow, ActivityHeatmap, PinnedProjects,
-                          # UpcomingEvents, TodoFocus, SubscriptionsCard, MoodWeek, RecentEntries
+                          # UpcomingEvents, TodoFocus, FocusRateCard, SubscriptionsCard, MoodWeek, RecentEntries
       journal/            # DateBar, MoodPicker, WritingPrompt, EntryEditor, TagRow,
                           # TimelineEntry, JournalEntryPreviewDialog
       events/             # EventRow, EventForm, CalendarMonth, CalendarWeek, CalendarNav,

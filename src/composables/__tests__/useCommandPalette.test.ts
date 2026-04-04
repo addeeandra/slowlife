@@ -106,6 +106,7 @@ describe('useCommandPalette', () => {
           due_date: null,
           completed_at: null,
           created_at: '2026-04-01',
+          is_inattentive: 0,
         },
         {
           id: 2,
@@ -120,6 +121,7 @@ describe('useCommandPalette', () => {
           due_date: null,
           completed_at: '2026-04-01',
           created_at: '2026-03-30',
+          is_inattentive: 0,
         },
       ],
     })
@@ -223,6 +225,7 @@ describe('useCommandPalette', () => {
           due_date: null,
           completed_at: null,
           created_at: '2026-04-01',
+          is_inattentive: 0,
         },
         {
           id: 2,
@@ -237,6 +240,7 @@ describe('useCommandPalette', () => {
           due_date: null,
           completed_at: null,
           created_at: '2026-04-01',
+          is_inattentive: 0,
         },
       ],
     })

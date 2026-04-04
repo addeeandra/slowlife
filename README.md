@@ -33,6 +33,7 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 - **Pinned projects**: recent activity at a glance
 - **Mood trend**: 7-day view
 - **Upcoming items**: events, renewals, focus todos
+- **Focus rate**: daily/weekly inattentive behavior tracking with ratio visualization
 
 ### Events
 - **Coverage**: meetings, agendas, and holidays
@@ -48,6 +49,7 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 - **Assignment**: space, category, or project
 - **Due dates**: with overdue detection
 - **Views**: group, filter, and sort
+- **Focus rate**: inattentive task detection (auto + manual flag) with R = i/(a+i) metric
 
 ### Finances
 - **Accounts**: ledger-based balances from initial balance + transactions

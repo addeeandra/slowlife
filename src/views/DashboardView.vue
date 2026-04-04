@@ -9,6 +9,7 @@ import SubscriptionsCard from '../components/dashboard/SubscriptionsCard.vue'
 import MoodWeek from '../components/dashboard/MoodWeek.vue'
 import RecentEntries from '../components/dashboard/RecentEntries.vue'
 import TodoFocus from '../components/dashboard/TodoFocus.vue'
+import FocusRateCard from '../components/dashboard/FocusRateCard.vue'
 </script>
 
 <template>
@@ -20,9 +21,10 @@ import TodoFocus from '../components/dashboard/TodoFocus.vue'
       <ActivityHeatmap />
       <PinnedProjects />
       <TodoFocus />
+      <FocusRateCard />
       <UpcomingEvents />
-      <SubscriptionsCard />
       <MoodWeek />
+      <SubscriptionsCard />
       <RecentEntries />
     </div>
   </div>

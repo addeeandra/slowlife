@@ -8,7 +8,7 @@ const days = computed(() => moodByDay())
 </script>
 
 <template>
-  <div class="c s3">
+  <div class="c s4">
     <div class="c-t">mood</div>
     <div class="mw">
       <div v-for="(d, i) in days" :key="i" class="md">

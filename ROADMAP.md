@@ -77,6 +77,7 @@ A personal task system with priority and complexity scoring.
 - [x] Todos view with status grouping, filtering, and sorting
 - [x] Dashboard: open todos signal card + focus list (top priority items)
 - [x] Sidebar navigation and keyboard shortcut (Ctrl+4)
+- [x] Focus rate tracking: inattentive task detection (auto: ≤15s + P2–P4, or manual flag) with R = i/(a+i) daily/weekly metric and 7-day chart
 
 ## Phase 6 — Financial Tracking ✓
 

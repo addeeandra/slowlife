@@ -20,6 +20,7 @@ const emit = defineEmits<{
     category_id: string | null
     project_id: string | null
     due_date: string | null
+    is_inattentive: number
   }]
   delete: [id: number]
   close: []
@@ -36,6 +37,7 @@ const spaceId = ref<string | null>(null)
 const categoryId = ref<string | null>(null)
 const projectId = ref<string | null>(null)
 const dueDate = ref('')
+const isInattentive = ref(0)
 const confirmDelete = ref(false)
 
 const isEdit = computed(() => !!props.todo)
@@ -73,6 +75,7 @@ watch(() => props.open, (open) => {
       categoryId.value = props.todo.category_id
       projectId.value = props.todo.project_id
       dueDate.value = props.todo.due_date || ''
+      isInattentive.value = props.todo.is_inattentive ?? 0
     } else {
       title.value = ''
       description.value = ''
@@ -83,6 +86,7 @@ watch(() => props.open, (open) => {
       categoryId.value = null
       projectId.value = null
       dueDate.value = ''
+      isInattentive.value = 0
     }
   } else {
     document.removeEventListener('keydown', onKeydown)
@@ -114,6 +118,7 @@ function handleSave() {
     category_id: categoryId.value,
     project_id: projectId.value,
     due_date: dueDate.value || null,
+    is_inattentive: isInattentive.value,
   })
 }
 
@@ -201,6 +206,17 @@ function handleDelete() {
             {{ TODO_STATUSES[s].label }}
           </button>
         </div>
+      </div>
+
+      <div v-if="isEdit && status === 'done'" class="ef-field">
+        <label class="ef-check">
+          <input
+            type="checkbox"
+            :checked="isInattentive === 1"
+            @change="isInattentive = ($event.target as HTMLInputElement).checked ? 1 : 0"
+          />
+          <span class="ef-check-label">mark as inattentive</span>
+        </label>
       </div>
 
       <div class="ef-field">
@@ -406,6 +422,20 @@ function handleDelete() {
   height: 6px;
   border-radius: 999px;
   flex-shrink: 0;
+}
+
+.ef-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--text-mid);
+}
+
+.ef-check-label {
+  user-select: none;
 }
 
 .ef-footer {

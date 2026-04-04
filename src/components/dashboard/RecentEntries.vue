@@ -44,7 +44,7 @@ function navigate(entry: JournalEntry) {
 </script>
 
 <template>
-  <div class="c s12">
+  <div class="c s7">
     <div class="c-t">recent</div>
     <div class="rec">
       <div
