@@ -1,151 +1,83 @@
 # Roadmap
 
-This is the complete roadmap for slowlife, organized by phase. Each phase builds on the previous one. Items are roughly ordered by priority within each phase.
+Organized by phase. Each phase builds on the previous one.
 
 ---
 
 ## Phase 1 — Foundation ✓
 
-Migrate the validated prototype into a real application.
-
-- [x] Migrate design tokens (colors, typography, spacing) from prototype
-- [x] Build sidebar component with full navigation tree
-- [x] Build dashboard view with grid layout
-- [x] Build journal write view (editor, mood picker, prompts, tags)
-- [x] Build journal timeline view
-- [x] Build events view
-- [x] Build finances view (accounts, subscriptions, transactions)
-- [x] SQLite schema and migrations (journal_entries, events, accounts, transactions, subscriptions, spaces, categories, projects, pinned)
-- [x] CRUD operations for all entities
-- [x] Keyboard shortcuts (Ctrl+1/2/3/4, Ctrl+N, Ctrl+S)
-- [x] Floating shortcut help panel
-- [x] Breadcrumb navigation with clickable segments
-- [x] Activity heatmap (20-week contribution grid)
-- [x] Signal cards on dashboard (streak, weekly activity, mood, net worth, sub burn, open todos)
-- [x] Pinned projects on dashboard with last-entry and weekly signals
-- [x] Mood trend (7-day visual)
-- [x] Quiet-day nudge (time-aware prompt when no entries today)
-- [x] Add/remove categories and projects from sidebar
-- [x] Context-aware writing prompts (casual vs work)
-- [x] Context-aware tag sets (casual vs work)
-- [x] Word count in editor
-- [x] Entry saved feedback
-- [x] First-run seed data (spaces, categories, projects, events, accounts, subscriptions, transactions)
-- [x] Mobile-responsive sidebar (overlay + toggle on small screens)
+- [x] Design tokens, sidebar, and all core views (dashboard, journal, events, finances)
+- [x] SQLite schema, migrations, and CRUD for all entities
+- [x] Dashboard signal cards, activity heatmap, pinned projects, mood trend
+- [x] Keyboard shortcuts, floating shortcut help, breadcrumb navigation
+- [x] First-run seed data
 
 ## Phase 2 — Core Experience ✓
 
-Polish the daily-use experience. Make it feel right.
+- [x] Edit/delete entries, categories, and projects inline
+- [x] Pin/unpin and drag-to-reorder pinned projects
+- [x] Collapsible sidebar: auto-open on desktop, overlay on mobile (Ctrl+S)
+- [x] Smooth animations and transitions
 
-- [x] Pin/unpin projects from the sidebar (CategoryTree)
-- [x] Edit/delete journal entries (inline on timeline)
-- [x] Edit/delete categories and projects from sidebar (inline, with confirm)
-- [x] Drag-to-reorder pinned projects (dashboard, sortable + persistence)
-- [x] Smooth animations and transitions (centralized tokens)
+## Phase 3 — Quick Capture ✓
 
-## Phase 3 — Quick Capture ���
-
-Reduce friction for capturing thoughts.
-
-- [x] Global quick capture shortcut (system-wide, even when app is minimized)
-- [x] Quick capture modal — write, pick space/category, save, dismiss
-- [x] System tray icon with quick capture trigger
-- [x] Auto-focus editor on capture
+- [x] System-wide quick capture shortcut (Ctrl+N), works when minimized
+- [x] Quick capture modal with space/category picker
+- [x] System tray trigger
 
 ## Phase 4 — Events & Calendar ✓
 
-Build out the events system into a proper calendar.
-
-- [x] Calendar month view
-- [x] Calendar week view
-- [x] Create/edit/delete events
-- [x] Event types: meeting, agenda, holiday, reminder
-- [x] Event categories: assign space/category to an event
-- [x] Recurring events
-- [x] Subscription renewal dates shown on calendar
-- [x] Google Calendar sync (read)
+- [x] Month and week calendar views
+- [x] Event CRUD with types (meeting, agenda, holiday, reminder) and recurrence
+- [x] Google Calendar sync (read-only)
+- [x] Subscription renewal dates on calendar
 
 ## Phase 5 — Todos & Task Tracking ✓
 
-A personal task system with priority and complexity scoring.
-
-- [x] Create/edit/delete todos
-- [x] Priority levels (P0-P4) and complexity levels (C0-C4)
-- [x] Assign todos to space/category/project
-- [x] Status workflow (open, in progress, done, cancelled)
-- [x] Due dates with overdue detection
-- [x] Todos view with status grouping, filtering, and sorting
-- [x] Dashboard: open todos signal card + focus list (top priority items)
-- [x] Sidebar navigation and keyboard shortcut (Ctrl+4)
-- [x] Focus rate tracking: inattentive task detection (auto: ≤15s + P2–P4, or manual flag) with R = i/(a+i) daily/weekly metric and 7-day chart
+- [x] Todo CRUD with priority (P0–P4), complexity (C0–C4), status workflow, and due dates
+- [x] Views: status grouping, filtering, sorting
+- [x] Focus rate tracking: inattentive task detection with R = i/(a+i) metric
+- [x] Focus mode: context-locked panel (journal + todos + events) for a category or project (Ctrl+0)
 
 ## Phase 6 — Financial Tracking ✓
 
-Expand finances beyond basic tracking.
-
-- [x] Create/edit/delete accounts
-- [x] Create/edit/delete transactions
-- [x] Transaction categories
-- [x] Monthly budget overview
-- [x] Income vs expense trend chart
-- [x] Subscription management (add, edit, cancel tracking)
-- [x] Net worth over time chart
+- [x] Account, transaction, and subscription CRUD
+- [x] Monthly budgets, income/expense trend, net worth history
 - [x] Multi-currency support (IDR, USD, SGD, CNY)
 
 ## Phase 7 — Search & Insights
 
-Help users find and understand their data.
-
-- [x] Full-text search across all journal entries
-- [x] Search across events and transactions
-- [x] Command palette (Ctrl+K) for quick navigation and search
+- [x] Full-text search and command palette (Ctrl+K)
 - [ ] Writing frequency analytics
 - [ ] Spending pattern insights
 
 ## Phase 8 — Data Portability
 
-Users own their data. Make it easy to move.
-
-- [ ] Export journal entries (Markdown, JSON)
-- [ ] Export financial data (CSV)
+- [ ] Export journal (Markdown, JSON) and finances (CSV)
 - [ ] Database backup/restore
-- [ ] Import from other journaling apps (Day One, Obsidian)
+- [ ] Import from Day One, Obsidian
 
 ## Phase 9 — Cross-Device Sync
 
-Sync data across devices without a traditional backend.
-
-- [ ] cr-sqlite integration (CRDT-based merge)
-- [ ] Sync relay server (minimal — just passes data, no business logic)
-- [ ] Conflict resolution UI (if needed)
-- [ ] Sync status indicator
-- [ ] Selective sync (choose which spaces to sync)
+- [ ] cr-sqlite (CRDT-based merge)
+- [ ] Minimal sync relay server
+- [ ] Conflict resolution UI and sync status indicator
 
 ## Phase 10 — Mobile
 
-Take slowlife on the go via Tauri v2 mobile support.
-
-- [ ] Responsive layout adaptations
-- [ ] Tauri iOS build
-- [ ] Tauri Android build
-- [ ] Mobile-optimized quick capture
-- [ ] Push notifications for events/reminders
+- [ ] Tauri iOS and Android builds
+- [ ] Responsive layout and mobile-optimized quick capture
+- [ ] Push notifications
 
 ## Phase 11 — Extensibility
 
-Open up the platform for personal customization.
-
-- [ ] Custom spaces (beyond Casual/Work)
-- [ ] Custom tag sets per space
-- [ ] Theming (light mode, custom color schemes)
-- [ ] Plugin system for custom dashboard widgets
-- [ ] API for external integrations
+- [ ] Custom spaces and tag sets
+- [ ] Theming (light mode, custom colors)
+- [ ] Plugin system and external API
 
 ---
 
 ## Principles
-
-These guide every decision:
 
 1. **Signal over noise** — every metric shown must be actionable or meaningful
 2. **Offline-first** — the app must work fully without internet

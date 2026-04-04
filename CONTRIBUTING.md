@@ -42,7 +42,7 @@ slowlife-app/
       search.ts           # FTS index helpers and search queries
       seed.ts             # first-run sample data
     composables/
-      useSidebar.ts       # sidebar open/close state
+      useSidebar.ts       # sidebar open/close state; auto-open on desktop, overlay on mobile
       useSpaces.ts        # spaces/categories/projects tree + CRUD
       useJournal.ts       # journal entries CRUD, streak, heatmap, mood stats
       useEvents.ts        # events CRUD, date grouping
@@ -50,17 +50,19 @@ slowlife-app/
       useFinances.ts      # ledger balances, transactions, subscriptions, categories, reports, exchange rates
       useTodos.ts         # todos CRUD, status workflow, priority filtering
       usePinned.ts        # pinned items with resolved metadata
-      useKeyboard.ts      # global ctrl+key shortcuts
+      useKeyboard.ts      # global shortcuts: Ctrl+0 (focus mode), Ctrl+1–4 (nav), Ctrl+N (quick capture), Ctrl+S (sidebar), Ctrl+K (command palette), Esc (exit focus)
       useQuickCapture.ts  # quick capture modal state
       useCommandPalette.ts # command palette search + navigation
       useEventDialog.ts   # shared event form/detail dialog state
       useTodoDialog.ts    # shared todo form dialog state
       useJournalPreviewDialog.ts # shared journal entry preview dialog state
+      useFocusMode.ts     # focus mode state: target selection, launcher, enter/exit, localStorage persistence
     styles/tokens.css     # design tokens + shared utility classes (.c, .btn, .b-close, .s3-.s7, .s12)
     components/
       AppSidebar.vue      # sidebar with nav, space tabs, category tree
       AppFab.vue          # floating shortcut help button
       CommandPalette.vue  # global search + navigation modal
+      FocusModeLauncher.vue # focus mode target picker modal (Ctrl+0)
       InputDialog.vue     # reusable text input dialog
       PageHeader.vue      # shared title + breadcrumb
       QuickCaptureModal.vue # quick capture modal
@@ -76,7 +78,7 @@ slowlife-app/
                           # BudgetOverview, IncomeExpenseTrend, NetWorthTrend,
                           # AccountForm, TransactionForm, SubscriptionForm,
                           # TransactionCategoryForm, ExchangeRateForm
-    views/                # DashboardView, JournalView, EventsView, TodosView, FinancesView
+    views/                # DashboardView, JournalView, EventsView, TodosView, FinancesView, FocusModeView
   src-tauri/              # Rust backend (Tauri)
     src/lib.rs            # plugin registration + desktop OAuth callback
     src/main.rs           # desktop entry point

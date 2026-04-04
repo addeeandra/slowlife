@@ -60,11 +60,18 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 - **Subscriptions**: active/cancelled tracking, grouped by billing cycle
 - **Currency**: base-currency totals with manual local exchange rates (IDR, USD, SGD, CNY)
 
+### Focus Mode
+- **Context-locked view**: pick a category or project and hide everything else
+- **All-in-one panel**: journal editor, todos, and upcoming events for the chosen context
+- **Persistent target**: last-used focus context is remembered across sessions
+- **Sidebar-free**: sidebar and FAB are hidden; exit via Esc or the exit button
+
 ### Desktop Experience
 - **Runtime**: native app via Tauri
 - **Database**: local SQLite
 - **Command palette**: Ctrl+K for global search and navigation
-- **Shortcuts**: navigation and quick capture
+- **Shortcuts**: navigation, quick capture (Ctrl+N), focus mode (Ctrl+0), sidebar toggle (Ctrl+S)
+- **Sidebar toggle**: collapsible on desktop, overlay on mobile
 - **System tray**: supported
 
 ## Roadmap Preview
