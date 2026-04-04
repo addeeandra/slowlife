@@ -127,6 +127,7 @@ async function handleSave() {
 <style scoped>
 .journal-area {
   max-width: 580px;
+  margin: 0 auto;
 }
 
 .tl-sep {

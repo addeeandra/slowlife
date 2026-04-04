@@ -357,6 +357,7 @@ function updateBaseCurrency(value: string | number | null) {
 <style scoped>
 .page-area {
   max-width: 720px;
+  margin: 0 auto;
 }
 
 .fin-tabs {

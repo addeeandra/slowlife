@@ -28,7 +28,13 @@ import type { Todo, TodoPriority, TodoStatus } from './core/types'
 
 const route = useRoute()
 const { init, destroy } = useKeyboard()
-const { isOpen: sidebarOpen, toggle: toggleSidebar, close: closeSidebar } = useSidebar()
+const {
+  isOpen: sidebarOpen,
+  init: initSidebar,
+  destroy: destroySidebar,
+  toggle: toggleSidebar,
+  close: closeSidebar,
+} = useSidebar()
 const { init: initQuickCapture, destroy: destroyQuickCapture } = useQuickCapture()
 const { createEvent, updateEvent, deleteEvent } = useEvents()
 useFinances()
@@ -56,6 +62,7 @@ const isFocusRoute = computed(() => route.name === 'focus')
 
 onMounted(async () => {
   init()
+  initSidebar()
   initQuickCapture()
   if (import.meta.env.PROD) {
     window.addEventListener('contextmenu', blockContextMenu)
@@ -74,6 +81,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   destroy()
+  destroySidebar()
   destroyQuickCapture()
   if (import.meta.env.PROD) {
     window.removeEventListener('contextmenu', blockContextMenu)
@@ -137,7 +145,7 @@ async function handleTodoDelete(id: number) {
 
   <div class="shell">
     <AppSidebar v-if="!isFocusRoute" />
-    <main class="main" :class="{ 'main-focus': isFocusRoute }">
+    <main class="main" :class="{ 'main-focus': isFocusRoute, 'main-sidebar-open': sidebarOpen && !isFocusRoute }">
       <router-view />
     </main>
   </div>
@@ -184,8 +192,13 @@ async function handleTodoDelete(id: number) {
 
 .main {
   flex: 1;
-  margin-left: var(--sidebar-w);
+  margin-left: 0;
   padding: 16px 24px 60px;
+  transition: margin-left var(--dur-slow) var(--ease);
+}
+
+.main.main-sidebar-open {
+  margin-left: var(--sidebar-w);
 }
 
 .main.main-focus {
@@ -218,10 +231,6 @@ async function handleTodoDelete(id: number) {
   z-index: 15;
 }
 
-.sb-overlay.open {
-  display: block;
-}
-
 @media (max-width: 768px) {
   .main {
     margin-left: 0;
@@ -230,6 +239,10 @@ async function handleTodoDelete(id: number) {
 
   .sb-toggle {
     display: flex;
+  }
+
+  .sb-overlay.open {
+    display: block;
   }
 }
 </style>

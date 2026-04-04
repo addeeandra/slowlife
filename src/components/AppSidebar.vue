@@ -7,7 +7,7 @@ import StreakFooter from './sidebar/StreakFooter.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { isOpen, close } = useSidebar()
+const { isOpen, closeIfMobile } = useSidebar()
 
 function isActive(name: string) {
   return route.name === name
@@ -15,7 +15,7 @@ function isActive(name: string) {
 
 function navigateTo(path: string) {
   router.push(path)
-  if (window.innerWidth <= 768) close()
+  closeIfMobile()
 }
 </script>
 
@@ -80,7 +80,12 @@ function navigateTo(path: string) {
   bottom: 0;
   z-index: 20;
   overflow-y: auto;
+  transform: translateX(-100%);
   transition: transform var(--dur-slow) var(--ease);
+}
+
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .sb-brand {
@@ -150,11 +155,11 @@ function navigateTo(path: string) {
 
 @media (max-width: 768px) {
   .sidebar {
-    transform: translateX(-100%);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   }
 
   .sidebar.open {
-    transform: translateX(0);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
   }
 }
 </style>

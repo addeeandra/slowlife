@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useQuickCapture } from '../composables/useQuickCapture'
 
 const isOpen = ref(false)
-const { open } = useQuickCapture()
 
 function toggle() {
   isOpen.value = !isOpen.value
-}
-
-function triggerQuickCapture() {
-  open()
 }
 </script>
 
