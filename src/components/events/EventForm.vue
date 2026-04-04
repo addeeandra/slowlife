@@ -8,6 +8,10 @@ const props = defineProps<{
   open: boolean
   event?: Event | null
   prefillDate?: string | null
+  draftContext?: {
+    space_id: string | null
+    category_id: string | null
+  } | null
 }>()
 
 const emit = defineEmits<{
@@ -87,8 +91,8 @@ watch(() => props.open, (open) => {
       endTime.value = ''
       type.value = 'agenda'
       description.value = ''
-      spaceId.value = null
-      categoryId.value = null
+      spaceId.value = props.draftContext?.space_id ?? null
+      categoryId.value = props.draftContext?.category_id ?? null
       recurrenceIdx.value = 0
     }
   } else {

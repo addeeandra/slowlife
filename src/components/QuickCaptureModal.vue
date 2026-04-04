@@ -43,7 +43,7 @@ function pickProject(id: string | null) {
       <div class="qc-head">
         <div>
           <div class="qc-title">quick capture</div>
-          <div class="qc-hint">ctrl+shift+k</div>
+          <div class="qc-hint">ctrl+n</div>
         </div>
         <button type="button" class="b-close" @click="close">esc</button>
       </div>

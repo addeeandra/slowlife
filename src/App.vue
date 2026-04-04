@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import AppSidebar from './components/AppSidebar.vue'
 import AppFab from './components/AppFab.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import QuickCaptureModal from './components/QuickCaptureModal.vue'
+import FocusModeLauncher from './components/FocusModeLauncher.vue'
 import EventForm from './components/events/EventForm.vue'
 import GoogleEventDetail from './components/events/GoogleEventDetail.vue'
 import JournalEntryPreviewDialog from './components/journal/JournalEntryPreviewDialog.vue'
@@ -21,18 +23,36 @@ import { useEventDialog } from './composables/useEventDialog'
 import { useGoogleCalendarSync } from './composables/useGoogleCalendarSync'
 import { useJournalPreviewDialog } from './composables/useJournalPreviewDialog'
 import { useTodoDialog } from './composables/useTodoDialog'
+import { useFocusMode } from './composables/useFocusMode'
 import type { Todo, TodoPriority, TodoStatus } from './core/types'
 
+const route = useRoute()
 const { init, destroy } = useKeyboard()
 const { isOpen: sidebarOpen, toggle: toggleSidebar, close: closeSidebar } = useSidebar()
 const { init: initQuickCapture, destroy: destroyQuickCapture } = useQuickCapture()
 const { createEvent, updateEvent, deleteEvent } = useEvents()
 useFinances()
 const { calendars, load: loadGoogleSync } = useGoogleCalendarSync()
-const { formOpen: eventFormOpen, editingEvent, prefillDate, googleEvent, closeForm: closeEventForm, closeGoogleDetail } = useEventDialog()
+const {
+  formOpen: eventFormOpen,
+  editingEvent,
+  prefillDate,
+  draftContext: eventDraftContext,
+  googleEvent,
+  closeForm: closeEventForm,
+  closeGoogleDetail,
+} = useEventDialog()
 const { isOpen: journalPreviewOpen, entry: journalPreviewEntry, closeEntry: closeJournalPreview } = useJournalPreviewDialog()
-const { formOpen: todoFormOpen, editingTodo, closeForm: closeTodoForm } = useTodoDialog()
+const {
+  formOpen: todoFormOpen,
+  editingTodo,
+  draftTodoContext,
+  closeForm: closeTodoForm,
+} = useTodoDialog()
 const { createTodo, updateTodo, deleteTodo } = useTodos()
+const { syncKnownTargets } = useFocusMode()
+
+const isFocusRoute = computed(() => route.name === 'focus')
 
 onMounted(async () => {
   init()
@@ -49,6 +69,7 @@ onMounted(async () => {
     useTodos().load(),
     loadGoogleSync(),
   ])
+  syncKnownTargets()
 })
 
 onUnmounted(() => {
@@ -62,6 +83,10 @@ onUnmounted(() => {
 function blockContextMenu(e: MouseEvent) {
   e.preventDefault()
 }
+
+watch(isFocusRoute, (isFocus) => {
+  if (isFocus) closeSidebar()
+})
 
 async function handleEventSave(data: Parameters<typeof createEvent>[0]) {
   if (editingEvent.value) {
@@ -107,23 +132,25 @@ async function handleTodoDelete(id: number) {
 </script>
 
 <template>
-  <button v-if="!sidebarOpen" class="sb-toggle" @click="toggleSidebar">&#9776;</button>
-  <div class="sb-overlay" :class="{ open: sidebarOpen }" @click="closeSidebar"></div>
+  <button v-if="!sidebarOpen && !isFocusRoute" class="sb-toggle" @click="toggleSidebar">&#9776;</button>
+  <div v-if="!isFocusRoute" class="sb-overlay" :class="{ open: sidebarOpen }" @click="closeSidebar"></div>
 
   <div class="shell">
-    <AppSidebar />
-    <main class="main">
+    <AppSidebar v-if="!isFocusRoute" />
+    <main class="main" :class="{ 'main-focus': isFocusRoute }">
       <router-view />
     </main>
   </div>
 
-  <AppFab />
+  <AppFab v-if="!isFocusRoute" />
   <CommandPalette />
   <QuickCaptureModal />
+  <FocusModeLauncher />
   <EventForm
     :open="eventFormOpen"
     :event="editingEvent"
     :prefill-date="prefillDate"
+    :draft-context="eventDraftContext"
     @save="handleEventSave"
     @delete="handleEventDelete"
     @close="closeEventForm"
@@ -142,6 +169,7 @@ async function handleTodoDelete(id: number) {
   <TodoForm
     :open="todoFormOpen"
     :todo="editingTodo"
+    :draft-context="draftTodoContext"
     @save="handleTodoSave"
     @delete="handleTodoDelete"
     @close="closeTodoForm"
@@ -158,6 +186,11 @@ async function handleTodoDelete(id: number) {
   flex: 1;
   margin-left: var(--sidebar-w);
   padding: 16px 24px 60px;
+}
+
+.main.main-focus {
+  margin-left: 0;
+  padding: 16px 20px 20px;
 }
 
 .sb-toggle {

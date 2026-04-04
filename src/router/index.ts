@@ -28,6 +28,11 @@ const router = createRouter({
       name: 'todos',
       component: () => import('../views/TodosView.vue'),
     },
+    {
+      path: '/focus',
+      name: 'focus',
+      component: () => import('../views/FocusModeView.vue'),
+    },
   ],
 })
 

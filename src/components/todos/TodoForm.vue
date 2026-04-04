@@ -7,6 +7,11 @@ import { useSpaces } from '../../composables/useSpaces'
 const props = defineProps<{
   open: boolean
   todo?: Todo | null
+  draftContext?: {
+    space_id: string | null
+    category_id: string | null
+    project_id: string | null
+  } | null
 }>()
 
 const emit = defineEmits<{
@@ -82,9 +87,9 @@ watch(() => props.open, (open) => {
       priority.value = 'P2'
       complexity.value = 'C2'
       status.value = 'open'
-      spaceId.value = null
-      categoryId.value = null
-      projectId.value = null
+      spaceId.value = props.draftContext?.space_id ?? null
+      categoryId.value = props.draftContext?.category_id ?? null
+      projectId.value = props.draftContext?.project_id ?? null
       dueDate.value = ''
       isInattentive.value = 0
     }

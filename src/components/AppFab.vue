@@ -22,14 +22,10 @@ function triggerQuickCapture() {
     <div class="sc-r"><span class="sc-l">events</span><span class="sc-k">ctrl+2</span></div>
     <div class="sc-r"><span class="sc-l">finances</span><span class="sc-k">ctrl+3</span></div>
     <div class="sc-r"><span class="sc-l">todos</span><span class="sc-k">ctrl+4</span></div>
-    <div class="sc-r"><span class="sc-l">new entry</span><span class="sc-k">ctrl+n</span></div>
+    <div class="sc-r"><span class="sc-l">focus mode</span><span class="sc-k">ctrl+0</span></div>
+    <div class="sc-r"><span class="sc-l">quick capture</span><span class="sc-k">ctrl+n</span></div>
     <div class="sc-r"><span class="sc-l">toggle sidebar</span><span class="sc-k">ctrl+s</span></div>
     <div class="sc-r"><span class="sc-l">command palette</span><span class="sc-k">ctrl+k</span></div>
-    <div class="sc-r">
-      <span class="sc-l">quick capture</span>
-      <span class="sc-k">ctrl+shift+k</span>
-      <button class="sc-btn" @click="triggerQuickCapture">open</button>
-    </div>
   </div>
   <Teleport to="body">
     <div v-if="isOpen" class="fab-backdrop" @click="isOpen = false"></div>
