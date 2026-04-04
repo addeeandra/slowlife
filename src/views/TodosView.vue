@@ -74,52 +74,59 @@ function toggleCollapse(status: string) {
 <template>
   <PageHeader title="todos" :meta="`${openCount} open`" />
 
-  <div class="td-bar">
-    <div class="td-filters">
-      <div class="td-filter">
-        <span class="td-fl">status</span>
-        <div class="td-sel-wrap">
-          <Select v-model="filterStatus" :options="statusOptions" compact />
+  <div class="page-area">
+    <div class="td-bar">
+      <div class="td-filters">
+        <div class="td-filter">
+          <span class="td-fl">status</span>
+          <div class="td-sel-wrap">
+            <Select v-model="filterStatus" :options="statusOptions" compact />
+          </div>
+        </div>
+        <div class="td-filter">
+          <span class="td-fl">priority</span>
+          <div class="td-sel-wrap td-sel-wide">
+            <Select v-model="filterPriority" :options="priorityOptions" compact />
+          </div>
+        </div>
+        <div class="td-filter">
+          <span class="td-fl">sort</span>
+          <div class="td-sel-wrap">
+            <Select v-model="sortBy" :options="sortOptions" compact />
+          </div>
         </div>
       </div>
-      <div class="td-filter">
-        <span class="td-fl">priority</span>
-        <div class="td-sel-wrap td-sel-wide">
-          <Select v-model="filterPriority" :options="priorityOptions" compact />
-        </div>
-      </div>
-      <div class="td-filter">
-        <span class="td-fl">sort</span>
-        <div class="td-sel-wrap">
-          <Select v-model="sortBy" :options="sortOptions" compact />
-        </div>
-      </div>
+      <button class="td-new" @click="openNew">+ new</button>
     </div>
-    <button class="td-new" @click="openNew">+ new</button>
-  </div>
 
-  <div class="td-groups">
-    <div v-for="group in groups" :key="group.status" class="td-group">
-      <button class="td-gh" @click="toggleCollapse(group.status)">
-        <span class="td-arrow">{{ collapsed[group.status] ? '\u25B6' : '\u25BC' }}</span>
-        <span class="td-gl">{{ group.label }}</span>
-        <span class="td-gc">{{ group.items.length }}</span>
-      </button>
-      <div v-if="!collapsed[group.status]" class="td-list">
-        <TodoRow
-          v-for="todo in group.items"
-          :key="todo.id"
-          :todo="todo"
-          @toggle="toggleStatus"
-          @click="openEdit"
-        />
-        <div v-if="group.items.length === 0" class="td-empty">no items</div>
+    <div class="td-groups">
+      <div v-for="group in groups" :key="group.status" class="td-group">
+        <button class="td-gh" @click="toggleCollapse(group.status)">
+          <span class="td-arrow">{{ collapsed[group.status] ? '\u25B6' : '\u25BC' }}</span>
+          <span class="td-gl">{{ group.label }}</span>
+          <span class="td-gc">{{ group.items.length }}</span>
+        </button>
+        <div v-if="!collapsed[group.status]" class="td-list">
+          <TodoRow
+            v-for="todo in group.items"
+            :key="todo.id"
+            :todo="todo"
+            @toggle="toggleStatus"
+            @click="openEdit"
+          />
+          <div v-if="group.items.length === 0" class="td-empty">no items</div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.page-area {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
 .td-bar {
   display: flex;
   align-items: center;
