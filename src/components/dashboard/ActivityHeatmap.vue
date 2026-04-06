@@ -10,7 +10,7 @@ const months = computed(() => heatmapMonths())
 
 <template>
   <div class="c s4">
-    <div class="c-t">activity</div>
+    <div class="c-t">journal activity</div>
     <div class="hm-months">
       <span v-for="m in months" :key="m">{{ m }}</span>
     </div>

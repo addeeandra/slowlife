@@ -41,7 +41,7 @@ const maxRate = computed(() =>
 
 <template>
   <div class="c s4">
-    <div class="c-t">focus rate</div>
+    <div class="c-t">inattentive rate</div>
 
     <div v-if="!hasAnyData" class="fr-empty">no completed todos yet</div>
 

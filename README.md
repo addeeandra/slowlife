@@ -30,10 +30,10 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 ### Dashboard
 - **Signal cards**: streaks, mood, net worth, burn, todos
 - **Activity heatmap**: 20-week view
-- **Pinned projects**: recent activity at a glance
+- **Pinned journals**: recent activity at a glance
 - **Mood trend**: 7-day view
 - **Upcoming items**: events, renewals, focus todos
-- **Focus rate**: daily/weekly inattentive behavior tracking with ratio visualization
+- **Inattentive rate**: daily/weekly inattentive behavior tracking with ratio visualization
 
 ### Events
 - **Coverage**: meetings, agendas, and holidays
