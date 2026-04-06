@@ -300,6 +300,27 @@ export function useFinances() {
     await refreshSnapshot(existing?.date || toISO(new Date()))
   }
 
+  async function createTransfer(input: { from_account_id: number; to_account_id: number; amount: number; date: string }) {
+    const fromAccount = accounts.value.find(a => a.id === input.from_account_id)
+    const toAccount = accounts.value.find(a => a.id === input.to_account_id)
+    await createTransaction({
+      account_id: input.from_account_id,
+      description: `transfer to ${toAccount?.name ?? 'account'}`,
+      amount: input.amount,
+      type: 'expense',
+      date: input.date,
+      category_id: null,
+    })
+    await createTransaction({
+      account_id: input.to_account_id,
+      description: `transfer from ${fromAccount?.name ?? 'account'}`,
+      amount: input.amount,
+      type: 'income',
+      date: input.date,
+      category_id: null,
+    })
+  }
+
   async function createTransactionCategory(input: TransactionCategoryInput) {
     const db = await getDb()
     const nextSort = transactionCategories.value.filter(category => category.kind === input.kind).length
@@ -556,6 +577,7 @@ export function useFinances() {
     createTransaction,
     updateTransaction,
     deleteTransaction,
+    createTransfer,
     createTransactionCategory,
     updateTransactionCategory,
     deleteTransactionCategory,

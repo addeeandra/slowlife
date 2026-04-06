@@ -8,6 +8,7 @@ import SubscriptionRow from '../components/finances/SubscriptionRow.vue'
 import TransactionRow from '../components/finances/TransactionRow.vue'
 import AccountForm from '../components/finances/AccountForm.vue'
 import TransactionForm from '../components/finances/TransactionForm.vue'
+import TransferForm from '../components/finances/TransferForm.vue'
 import SubscriptionForm from '../components/finances/SubscriptionForm.vue'
 import TransactionCategoryForm from '../components/finances/TransactionCategoryForm.vue'
 import ExchangeRateForm from '../components/finances/ExchangeRateForm.vue'
@@ -36,6 +37,7 @@ const {
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  createTransfer,
   createSubscription,
   updateSubscription,
   cancelSubscription,
@@ -56,6 +58,7 @@ const activeTab = ref<FinanceTab>('main')
 
 const accountFormOpen = ref(false)
 const transactionFormOpen = ref(false)
+const transferFormOpen = ref(false)
 const subscriptionFormOpen = ref(false)
 const categoryFormOpen = ref(false)
 const rateFormOpen = ref(false)
@@ -102,6 +105,7 @@ const selectedAccountCurrentBalance = computed(() =>
 function closeAllForms() {
   accountFormOpen.value = false
   transactionFormOpen.value = false
+  transferFormOpen.value = false
   subscriptionFormOpen.value = false
   categoryFormOpen.value = false
   rateFormOpen.value = false
@@ -140,6 +144,11 @@ async function saveTransaction(data: {
   } else {
     await createTransaction(data)
   }
+  closeAllForms()
+}
+
+async function handleTransfer(data: { from_account_id: number; to_account_id: number; amount: number; date: string }) {
+  await createTransfer(data)
   closeAllForms()
 }
 
@@ -210,6 +219,7 @@ function updateBaseCurrency(value: string | number | null) {
               <span v-if="selectedAccountIds.length" class="simple-sub">{{ selectedAccountIds.length }} selected</span>
               <button class="mini-btn" @click="selectedAccount = null; accountFormOpen = true">new account</button>
               <button class="mini-btn" @click="selectedTransaction = null; transactionFormOpen = true">new tx</button>
+              <button class="mini-btn" @click="transferFormOpen = true">transfer</button>
             </div>
           </div>
           <div class="accounts-grid">
@@ -321,6 +331,12 @@ function updateBaseCurrency(value: string | number | null) {
         :transaction="selectedTransaction"
         @save="saveTransaction"
         @delete="id => deleteTransaction(id).then(closeAllForms)"
+        @close="closeAllForms"
+      />
+
+      <TransferForm
+        :open="transferFormOpen"
+        @save="handleTransfer"
         @close="closeAllForms"
       />
 
