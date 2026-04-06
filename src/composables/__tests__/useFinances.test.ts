@@ -66,6 +66,19 @@ describe('useFinances', () => {
     expect(totalSubsMonthly.value).toBe(175_000)
   })
 
+  it('converts yearly and quarterly subscriptions to monthly equivalent', async () => {
+    const subs: Subscription[] = [
+      { id: 1, name: 'Monthly', amount: 100_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-15', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
+      { id: 2, name: 'Yearly', amount: 1_200_000, currency: 'IDR', cycle: 'yearly', next_date: '2026-04-20', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
+      { id: 3, name: 'Quarterly', amount: 300_000, currency: 'IDR', cycle: 'quarterly', next_date: '2026-04-20', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
+    ]
+
+    const { totalSubsMonthly } = await loadFinances([], [], subs)
+
+    // 100_000 + 1_200_000/12 + 300_000/3 = 100_000 + 100_000 + 100_000 = 300_000
+    expect(totalSubsMonthly.value).toBe(300_000)
+  })
+
   it('sorts subscriptions by next_date', async () => {
     const subs: Subscription[] = [
       { id: 1, name: 'Netflix', amount: 120_000, currency: 'IDR', cycle: 'monthly', next_date: '2026-04-20', color: '#fff', cancelled_at: null, created_at: '2026-01-01' },
