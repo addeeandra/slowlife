@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import BaseModal from './BaseModal.vue'
+import Select from './Select.vue'
 import { useSpaces } from '../composables/useSpaces'
 import { useFocusMode, type FocusTarget } from '../composables/useFocusMode'
 
@@ -19,6 +20,10 @@ const spaceCategories = computed(() =>
 const categoryProjects = computed(() =>
   projects.value.filter(item => item.space_id === spaceId.value && item.category_id === categoryId.value)
 )
+
+const spaceOptions = computed(() => spaces.value.map(s => ({ value: s.id, label: s.label })))
+const categoryOptions = computed(() => spaceCategories.value.map(c => ({ value: c.id, label: c.label })))
+const projectOptions = computed(() => categoryProjects.value.map(p => ({ value: p.id, label: p.label })))
 
 const canEnter = computed(() => {
   if (!spaceId.value || !categoryId.value) return false
@@ -82,24 +87,18 @@ async function submit() {
       </div>
 
       <div class="fm-field">
-        <label class="fm-label" for="focus-space">space</label>
-        <select id="focus-space" v-model="spaceId" class="fm-select">
-          <option v-for="space in spaces" :key="space.id" :value="space.id">{{ space.label }}</option>
-        </select>
+        <div class="fm-label">space</div>
+        <Select v-model="spaceId" :options="spaceOptions" placeholder="select space" />
       </div>
 
       <div class="fm-field">
-        <label class="fm-label" for="focus-category">category</label>
-        <select id="focus-category" v-model="categoryId" class="fm-select">
-          <option v-for="category in spaceCategories" :key="category.id" :value="category.id">{{ category.label }}</option>
-        </select>
+        <div class="fm-label">category</div>
+        <Select v-model="categoryId" :options="categoryOptions" placeholder="select category" />
       </div>
 
       <div v-if="kind === 'project'" class="fm-field">
-        <label class="fm-label" for="focus-project">project</label>
-        <select id="focus-project" v-model="projectId" class="fm-select">
-          <option v-for="project in categoryProjects" :key="project.id" :value="project.id">{{ project.label }}</option>
-        </select>
+        <div class="fm-label">project</div>
+        <Select v-model="projectId" :options="projectOptions" placeholder="select project" />
       </div>
 
       <div class="fm-note">
@@ -168,21 +167,6 @@ async function submit() {
   color: var(--accent);
   border-color: var(--accent);
   background: var(--accent-dim);
-}
-
-.fm-select {
-  width: 100%;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
-  outline: none;
-}
-
-.fm-select:focus {
-  border-color: var(--accent);
 }
 
 .fm-note {
