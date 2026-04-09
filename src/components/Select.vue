@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch, type CSSProperties } from 'vue'
 
 export interface SelectOption {
   value: string | number | null
@@ -26,8 +26,10 @@ const emit = defineEmits<{
 
 const rootRef = ref<HTMLElement | null>(null)
 const triggerRef = ref<HTMLButtonElement | null>(null)
+const menuRef = ref<HTMLElement | null>(null)
 const isOpen = ref(false)
 const activeIndex = ref(-1)
+const menuStyle = ref<CSSProperties>({})
 
 const enabledOptions = computed(() => props.options.filter(option => !option.disabled))
 const selectedIndex = computed(() => props.options.findIndex(option => option.value === props.modelValue))
@@ -39,22 +41,25 @@ watch(isOpen, (open) => {
       ? selectedIndex.value
       : props.options.findIndex(option => !option.disabled)
     activeIndex.value = initialIndex
+    updateMenuPosition()
     document.addEventListener('pointerdown', handlePointerDown)
     document.addEventListener('keydown', handleDocumentKeydown)
     window.addEventListener('resize', close)
+    document.addEventListener('scroll', handleScroll, true)
   } else {
     activeIndex.value = -1
-    document.removeEventListener('pointerdown', handlePointerDown)
-    document.removeEventListener('keydown', handleDocumentKeydown)
-    window.removeEventListener('resize', close)
+    removeListeners()
   }
 })
 
-onBeforeUnmount(() => {
+onBeforeUnmount(removeListeners)
+
+function removeListeners() {
   document.removeEventListener('pointerdown', handlePointerDown)
   document.removeEventListener('keydown', handleDocumentKeydown)
   window.removeEventListener('resize', close)
-})
+  document.removeEventListener('scroll', handleScroll, true)
+}
 
 function toggle() {
   if (props.disabled) return
@@ -131,8 +136,25 @@ function handleDocumentKeydown(event: KeyboardEvent) {
   }
 }
 
+function updateMenuPosition() {
+  if (!triggerRef.value) return
+  const rect = triggerRef.value.getBoundingClientRect()
+  const gap = props.compact ? 2 : 4
+  menuStyle.value = {
+    top: `${rect.bottom + gap}px`,
+    left: `${rect.left}px`,
+    width: `${rect.width}px`,
+  }
+}
+
+function handleScroll(event: Event) {
+  if (menuRef.value?.contains(event.target as Node)) return
+  close()
+}
+
 function handlePointerDown(event: PointerEvent) {
-  if (!rootRef.value?.contains(event.target as Node)) {
+  const target = event.target as Node
+  if (!rootRef.value?.contains(target) && !menuRef.value?.contains(target)) {
     close()
   }
 }
@@ -162,7 +184,10 @@ function handleOptionMouseenter(index: number) {
       <span class="sl-select-caret">v</span>
     </button>
 
-    <div v-if="isOpen" class="sl-select-menu" role="listbox">
+  </div>
+
+  <Teleport to="body">
+    <div v-if="isOpen" ref="menuRef" class="sl-select-menu" role="listbox" :style="menuStyle">
       <button
         v-for="(option, index) in options"
         :key="`${String(option.value)}-${index}`"
@@ -185,7 +210,7 @@ function handleOptionMouseenter(index: number) {
         <span v-if="modelValue === option.value" class="sl-select-mark">selected</span>
       </button>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -264,20 +289,13 @@ function handleOptionMouseenter(index: number) {
 }
 
 .sl-select-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  z-index: 30;
+  position: fixed;
+  z-index: 140;
   max-height: 220px;
   overflow-y: auto;
   background: var(--bg);
   border: 1px solid var(--border);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
-}
-
-.sl-select.compact .sl-select-menu {
-  top: calc(100% + 2px);
 }
 
 .sl-select-option {
