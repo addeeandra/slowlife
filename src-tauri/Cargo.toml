@@ -1,6 +1,6 @@
 [package]
 name = "slowlife"
-version = "0.0.2"
+version = "0.0.3"
 description = "slowlife — your pace, your space"
 authors = ["addeeandra"]
 edition = "2021"
