@@ -2,14 +2,15 @@
 import { computed, ref, watch } from 'vue'
 import BaseModal from '../BaseModal.vue'
 import Select from '../Select.vue'
-import { useFinances } from '../../composables/useFinances'
+import { useFinances, type TransferInput } from '../../composables/useFinances'
+import { toISO } from '../../core/constants'
 
 const props = defineProps<{
   open: boolean
 }>()
 
 const emit = defineEmits<{
-  save: [data: { from_account_id: number; to_account_id: number; amount: number; date: string }]
+  save: [data: TransferInput]
   close: []
 }>()
 
@@ -30,17 +31,16 @@ const toAccountOptions = computed(() => accountOptions.value.map(option => ({
   disabled: option.value === fromAccountId.value,
 })))
 
-const canSave = computed(() => {
-  const numericAmount = Number(amount.value)
-  return !!fromAccountId.value && !!toAccountId.value && fromAccountId.value !== toAccountId.value && numericAmount > 0 && date.value.length > 0
-})
+const canSave = computed(() =>
+  !!fromAccountId.value && !!toAccountId.value && fromAccountId.value !== toAccountId.value && Number(amount.value) > 0 && date.value.length > 0
+)
 
 watch(() => props.open, (open) => {
   if (open) {
     fromAccountId.value = accounts.value[0]?.id ?? null
     toAccountId.value = accounts.value[1]?.id ?? null
     amount.value = ''
-    date.value = new Date().toISOString().slice(0, 10)
+    date.value = toISO(new Date())
   }
 })
 

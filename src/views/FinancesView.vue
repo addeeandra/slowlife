@@ -15,7 +15,7 @@ import ExchangeRateForm from '../components/finances/ExchangeRateForm.vue'
 import BudgetOverview from '../components/finances/BudgetOverview.vue'
 import IncomeExpenseTrend from '../components/finances/IncomeExpenseTrend.vue'
 import NetWorthTrend from '../components/finances/NetWorthTrend.vue'
-import { useFinances } from '../composables/useFinances'
+import { useFinances, type TransferInput } from '../composables/useFinances'
 import { formatMoney } from '../core/constants'
 import type { Account, ExchangeRate, Subscription, Transaction, TransactionCategory } from '../core/types'
 
@@ -147,7 +147,7 @@ async function saveTransaction(data: {
   closeAllForms()
 }
 
-async function handleTransfer(data: { from_account_id: number; to_account_id: number; amount: number; date: string }) {
+async function handleTransfer(data: TransferInput) {
   await createTransfer(data)
   closeAllForms()
 }

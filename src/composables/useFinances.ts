@@ -42,6 +42,13 @@ export interface TransactionInput {
   entry_mode?: TransactionEntryMode
 }
 
+export interface TransferInput {
+  from_account_id: number
+  to_account_id: number
+  amount: number
+  date: string
+}
+
 export interface TransactionCategoryInput {
   label: string
   kind: 'income' | 'expense'
@@ -300,7 +307,7 @@ export function useFinances() {
     await refreshSnapshot(existing?.date || toISO(new Date()))
   }
 
-  async function createTransfer(input: { from_account_id: number; to_account_id: number; amount: number; date: string }) {
+  async function createTransfer(input: TransferInput) {
     const fromAccount = accounts.value.find(a => a.id === input.from_account_id)
     const toAccount = accounts.value.find(a => a.id === input.to_account_id)
     await createTransaction({
