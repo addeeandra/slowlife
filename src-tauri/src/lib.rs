@@ -251,9 +251,30 @@ pub fn run() {
                 let app_handle = app.handle();
                 if let Some(main_window) = app_handle.get_webview_window("main") {
                     main_window.clone().on_window_event(move |event| {
+                        // reference: https://github.com/tauri-apps/tauri/issues/10580#issuecomment-2816902942
                         if let WindowEvent::CloseRequested { api, .. } = event {
                             api.prevent_close();
-                            let _ = main_window.hide();
+                            #[cfg(target_os = "macos")]
+                            {
+                                match main_window.is_fullscreen() {
+                                    Ok(true) => {
+                                        let app_handle = main_window.app_handle().clone();
+                                        let window_label = main_window.label().to_string();
+
+                                        let _ = main_window.set_fullscreen(false);
+
+                                        tauri::async_runtime::spawn(async move {
+                                            std::thread::sleep(std::time::Duration::from_millis(700));
+                                            if let Some(win) = app_handle.get_webview_window(&window_label) {
+                                                win.hide().unwrap();
+                                            }
+                                        });
+                                    }
+                                    _ => {
+                                        main_window.hide().unwrap();
+                                    }
+                                }
+                            }
                         }
                     });
                 }
