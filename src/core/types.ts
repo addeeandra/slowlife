@@ -157,12 +157,14 @@ export interface TransactionCategory {
   created_at: string
 }
 
+export type SubscriptionCycle = 'monthly' | 'quarterly' | 'yearly'
+
 export interface Subscription {
   id: number
   name: string
   amount: number
   currency: string
-  cycle: string
+  cycle: SubscriptionCycle
   next_date: string
   color: string
   cancelled_at: string | null

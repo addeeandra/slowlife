@@ -17,7 +17,7 @@ import IncomeExpenseTrend from '../components/finances/IncomeExpenseTrend.vue'
 import NetWorthTrend from '../components/finances/NetWorthTrend.vue'
 import { useFinances, type TransferInput } from '../composables/useFinances'
 import { formatMoney } from '../core/constants'
-import type { Account, ExchangeRate, Subscription, Transaction, TransactionCategory } from '../core/types'
+import type { Account, ExchangeRate, Subscription, SubscriptionCycle, Transaction, TransactionCategory } from '../core/types'
 
 type FinanceTab = 'main' | 'reports' | 'settings'
 
@@ -152,7 +152,7 @@ async function handleTransfer(data: TransferInput) {
   closeAllForms()
 }
 
-async function saveSubscription(data: { name: string; amount: number; currency: string; cycle: string; next_date: string; color: string }) {
+async function saveSubscription(data: { name: string; amount: number; currency: string; cycle: SubscriptionCycle; next_date: string; color: string }) {
   if (selectedSubscription.value) {
     await updateSubscription(selectedSubscription.value.id, data)
   } else {

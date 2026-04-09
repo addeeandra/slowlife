@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import BaseModal from '../BaseModal.vue'
 import Select from '../Select.vue'
-import type { Subscription } from '../../core/types'
+import type { Subscription, SubscriptionCycle } from '../../core/types'
 
 const props = defineProps<{
   open: boolean
@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  save: [data: { name: string; amount: number; currency: string; cycle: string; next_date: string; color: string }]
+  save: [data: { name: string; amount: number; currency: string; cycle: SubscriptionCycle; next_date: string; color: string }]
   cancel: [id: number]
   restore: [id: number]
   delete: [id: number]
@@ -20,7 +20,7 @@ const emit = defineEmits<{
 const name = ref('')
 const amount = ref('')
 const currency = ref('IDR')
-const cycle = ref('monthly')
+const cycle = ref<SubscriptionCycle>('monthly')
 const nextDate = ref('')
 const color = ref('#c4956a')
 

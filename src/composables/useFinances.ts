@@ -504,7 +504,12 @@ export function useFinances() {
   )
 
   const totalSubsMonthly = computed(() =>
-    activeSubscriptions.value.reduce((sum, subscription) => sum + (subscriptionAmountInBase(subscription) ?? 0), 0)
+    activeSubscriptions.value.reduce((sum, subscription) => {
+      const base = subscriptionAmountInBase(subscription) ?? 0
+      if (subscription.cycle === 'yearly') return sum + base / 12
+      if (subscription.cycle === 'quarterly') return sum + base / 3
+      return sum + base
+    }, 0)
   )
 
   const sortedSubscriptions = computed(() =>
