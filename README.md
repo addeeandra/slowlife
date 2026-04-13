@@ -60,9 +60,16 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 - **Subscriptions**: active/cancelled tracking, grouped by billing cycle
 - **Currency**: base-currency totals with manual local exchange rates (IDR, USD, SGD, CNY)
 
+### Assets
+- **Scoped bookmarks**: save URLs to a space, category, or project
+- **Tags**: filter assets by tag within focus mode
+- **Open tracking**: records last-opened timestamp per asset
+- **Dashboard card**: recent assets sorted by last interaction
+- **Focus mode panel**: assets panel alongside journal, todos, and events
+
 ### Focus Mode
 - **Context-locked view**: pick a category or project and hide everything else
-- **All-in-one panel**: journal editor, todos, and upcoming events for the chosen context
+- **All-in-one panel**: journal editor, todos, events, and assets for the chosen context
 - **Persistent target**: last-used focus context is remembered across sessions
 - **Sidebar-free**: sidebar and FAB are hidden; exit via Esc or the exit button
 
@@ -84,6 +91,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 - [x] Todos with priority/complexity scoring
 - [x] Financial CRUD, reporting, and multi-currency tracking
 - [x] Full-text search and command palette (Ctrl+K)
+- [x] Scoped asset bookmarks with tag filtering and open tracking
 - [ ] cr-sqlite for cross-device sync
 - [ ] Mobile support via Tauri v2
 

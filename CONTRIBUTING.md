@@ -57,6 +57,8 @@ slowlife-app/
       useTodoDialog.ts    # shared todo form dialog state
       useJournalPreviewDialog.ts # shared journal entry preview dialog state
       useFocusMode.ts     # focus mode state: target selection, launcher, enter/exit, localStorage persistence
+      useAssets.ts        # asset CRUD, open tracking, focus/recent queries
+      useAssetDialog.ts   # shared asset form dialog state; exports AssetContext type
     styles/tokens.css     # design tokens + shared utility classes (.c, .btn, .b-close, .s3-.s7, .s12)
     components/
       AppSidebar.vue      # sidebar with nav, space tabs, category tree
@@ -69,7 +71,9 @@ slowlife-app/
       QuickCaptureModal.vue # quick capture modal
       sidebar/            # SpaceTabs, CategoryTree, StreakFooter
       dashboard/          # NudgeCard, SignalRow, ActivityHeatmap, PinnedProjects,
-                          # UpcomingEvents, TodoFocus, FocusRateCard, SubscriptionsCard, MoodWeek, RecentEntries
+                          # UpcomingEvents, TodoFocus, FocusRateCard, SubscriptionsCard, MoodWeek, RecentEntries,
+                          # RecentAssets
+      assets/             # AssetForm, AssetRow
       journal/            # DateBar, MoodPicker, WritingPrompt, EntryEditor, TagRow,
                           # TimelineEntry, JournalEntryPreviewDialog
       events/             # EventRow, EventForm, CalendarMonth, CalendarWeek, CalendarNav,
@@ -250,6 +254,7 @@ Components are organized by feature area:
 - `components/events/` — event display components
 - `components/todos/` — todo row and form components
 - `components/finances/` — finance display components
+- `components/assets/` — asset row and form components
 - `components/` — shared components (PageHeader, AppFab, AppSidebar)
 
 Each component should be self-contained with scoped styles, but use global styles for atomic/molecule component if available. Use composables for data access — don't call `getDb()` directly from components.

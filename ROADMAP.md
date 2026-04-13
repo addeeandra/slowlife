@@ -49,30 +49,39 @@ Organized by phase. Each phase builds on the previous one.
 
 - [x] Full-text search and command palette (Ctrl+K)
 
-## Phase 8 — Cross-Device Sync
+## Phase 8 — Assets ✓
+
+- [x] URL bookmarks scoped to space, category, or project
+- [x] Tags with per-tag filtering in focus mode
+- [x] Open tracking: last-opened timestamp per asset
+- [x] Dashboard card: recent assets by last interaction
+- [x] Focus mode panel: assets alongside journal, todos, and events
+- [x] Cascade delete when a category or project is removed
+
+## Phase 9 — Cross-Device Sync
 
 - [ ] cr-sqlite (CRDT-based merge)
 - [ ] Minimal sync relay server
 - [ ] Conflict resolution UI and sync status indicator
 
-## Phase 9 — Mobile
+## Phase 10 — Mobile
 
 - [ ] Tauri iOS and Android builds
 - [ ] Responsive layout and mobile-optimized quick capture
 - [ ] Push notifications
 
-## Phase 10 - More Insights
+## Phase 11 — More Insights
 
 - [ ] Writing frequency analytics
 - [ ] Spending pattern insights
 
-## Phase 11 — Data Portability
+## Phase 12 — Data Portability
 
 - [ ] Export journal (Markdown, JSON) and finances (CSV)
 - [ ] Database backup/restore
 - [ ] Import from Day One, Obsidian
 
-## Phase 12 — Extensibility
+## Phase 13 — Extensibility
 
 - [ ] Custom spaces and tag sets
 - [ ] Theming (light mode, custom colors)
