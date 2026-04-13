@@ -221,6 +221,7 @@ async function migrate(db: Database) {
   await migrateEvents(db)
   await migrateSearch(db)
   await migrateTodos(db)
+  await migrateAssets(db)
 }
 
 async function migrateFinances(db: Database) {
@@ -318,4 +319,24 @@ async function migrateSearch(db: Database) {
 
 async function migrateTodos(db: Database) {
   try { await db.execute('ALTER TABLE todos ADD COLUMN is_inattentive INTEGER NOT NULL DEFAULT 0') } catch (_) { /* column already exists */ }
+}
+
+async function migrateAssets(db: Database) {
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS assets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      url TEXT NOT NULL,
+      description TEXT,
+      tags TEXT NOT NULL DEFAULT '[]',
+      space_id TEXT NOT NULL,
+      category_id TEXT NOT NULL,
+      project_id TEXT,
+      last_opened_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `)
+
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_assets_scope ON assets(space_id, category_id, project_id)')
+  await db.execute('CREATE INDEX IF NOT EXISTS idx_assets_last_opened_at ON assets(last_opened_at)')
 }

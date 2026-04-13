@@ -5,13 +5,16 @@ import EntryEditor from '../components/journal/EntryEditor.vue'
 import TimelineEntry from '../components/journal/TimelineEntry.vue'
 import TodoRow from '../components/todos/TodoRow.vue'
 import EventRow from '../components/events/EventRow.vue'
+import AssetRow from '../components/assets/AssetRow.vue'
 import { useFocusMode } from '../composables/useFocusMode'
 import { useJournal } from '../composables/useJournal'
 import { useTodos } from '../composables/useTodos'
 import { useEvents } from '../composables/useEvents'
+import { useAssets } from '../composables/useAssets'
 import { useSpaces } from '../composables/useSpaces'
 import { useTodoDialog } from '../composables/useTodoDialog'
 import { useEventDialog } from '../composables/useEventDialog'
+import { useAssetDialog } from '../composables/useAssetDialog'
 import { toISO } from '../core/constants'
 
 const router = useRouter()
@@ -19,11 +22,14 @@ const { activeTarget, targetLabel, exit, openLauncher } = useFocusMode()
 const { saveEntry, entries } = useJournal()
 const { todos, toggleStatus } = useTodos()
 const { events } = useEvents()
+const { assetsForFocus, uniqueTags, openAsset } = useAssets()
 const { spaces } = useSpaces()
 const { openEdit: openTodoEdit, openNewWithContext: openTodoCreate } = useTodoDialog()
 const { openEvent, openCreateWithContext } = useEventDialog()
+const { openEdit: openAssetEdit, openNewWithContext: openAssetCreate } = useAssetDialog()
 
 const journalText = ref('')
+const selectedAssetTag = ref<string | null>(null)
 
 const focusSpace = computed(() => spaces.value.find(item => item.id === activeTarget.value?.spaceId) || null)
 
@@ -60,7 +66,16 @@ const focusedEvents = computed(() => {
     .filter(event => event.space_id === activeTarget.value?.spaceId && event.category_id === activeTarget.value?.categoryId)
     .filter(event => event.date >= today)
     .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''))
-    .slice(0, 18)
+    .slice(0, 12)
+})
+
+const focusAssets = computed(() => assetsForFocus(activeTarget.value))
+
+const assetTags = computed(() => uniqueTags(focusAssets.value))
+
+const filteredAssets = computed(() => {
+  if (!selectedAssetTag.value) return focusAssets.value
+  return focusAssets.value.filter(asset => asset.tags.includes(selectedAssetTag.value || ''))
 })
 
 const journalMeta = computed(() => focusedEntries.value.length === 1 ? '1 note' : `${focusedEntries.value.length} notes`)
@@ -69,8 +84,14 @@ const todoMeta = computed(() => {
   return openCount === 1 ? '1 active' : `${openCount} active`
 })
 const eventMeta = computed(() => focusedEvents.value.length === 1 ? '1 upcoming' : `${focusedEvents.value.length} upcoming`)
+const assetMeta = computed(() => {
+  const count = filteredAssets.value.length
+  const countLabel = count === 1 ? '1 link' : `${count} links`
+  return selectedAssetTag.value ? `${countLabel} · #${selectedAssetTag.value}` : countLabel
+})
 
 watch(activeTarget, async (target) => {
+  selectedAssetTag.value = null
   if (!target) {
     openLauncher()
     await router.replace('/')
@@ -105,6 +126,24 @@ function createEvent() {
     date: toISO(new Date()),
     space_id: activeTarget.value.spaceId,
     category_id: activeTarget.value.categoryId,
+  })
+}
+
+function createAsset() {
+  if (!activeTarget.value) return
+  openAssetCreate({
+    space_id: activeTarget.value.spaceId,
+    category_id: activeTarget.value.categoryId,
+    project_id: activeTarget.value.kind === 'project' ? activeTarget.value.projectId : null,
+  })
+}
+
+function editAsset(asset: (typeof filteredAssets.value)[number]) {
+  if (!activeTarget.value) return
+  openAssetEdit(asset, {
+    space_id: activeTarget.value.spaceId,
+    category_id: activeTarget.value.categoryId,
+    project_id: activeTarget.value.kind === 'project' ? activeTarget.value.projectId : null,
   })
 }
 
@@ -166,22 +205,61 @@ function createEvent() {
         </div>
       </section>
 
-      <section class="focus-panel">
-        <div class="focus-panel-head">
-          <div>
-            <div class="focus-panel-title">events</div>
-            <div class="focus-panel-meta">{{ eventMeta }}</div>
+      <div class="focus-side-stack">
+        <section class="focus-panel">
+          <div class="focus-panel-head">
+            <div>
+              <div class="focus-panel-title">events</div>
+              <div class="focus-panel-meta">{{ eventMeta }}</div>
+            </div>
+            <button class="mini-btn" @click="createEvent">+ event</button>
           </div>
-          <button class="mini-btn" @click="createEvent">+ event</button>
-        </div>
-        <div class="focus-list">
-          <div v-for="event in focusedEvents" :key="`${event.id}-${event.date}`" class="focus-event-row">
-            <div class="focus-event-date">{{ event.date }}</div>
-            <EventRow :event="event" @select="openEvent" />
+          <div class="focus-list">
+            <div v-for="event in focusedEvents" :key="`${event.id}-${event.date}`" class="focus-event-row">
+              <div class="focus-event-date">{{ event.date }}</div>
+              <EventRow :event="event" @select="openEvent" />
+            </div>
+            <div v-if="!focusedEvents.length" class="focus-empty">no upcoming category events.</div>
           </div>
-          <div v-if="!focusedEvents.length" class="focus-empty">no upcoming category events.</div>
-        </div>
-      </section>
+        </section>
+
+        <section class="focus-panel">
+          <div class="focus-panel-head">
+            <div>
+              <div class="focus-panel-title">assets</div>
+              <div class="focus-panel-meta">{{ assetMeta }}</div>
+            </div>
+            <button class="mini-btn" @click="createAsset">+ asset</button>
+          </div>
+
+          <div v-if="assetTags.length" class="focus-asset-filters">
+            <button class="focus-filter" :class="{ active: selectedAssetTag === null }" @click="selectedAssetTag = null">all</button>
+            <button
+              v-for="tag in assetTags"
+              :key="tag"
+              class="focus-filter"
+              :class="{ active: selectedAssetTag === tag }"
+              @click="selectedAssetTag = tag"
+            >
+              #{{ tag }}
+            </button>
+          </div>
+
+          <div class="focus-list">
+            <AssetRow
+              v-for="asset in filteredAssets"
+              :key="asset.id"
+              :asset="asset"
+              :show-scope="activeTarget?.kind === 'project'"
+              @open="openAsset"
+              @edit="editAsset"
+            />
+            <div v-if="!filteredAssets.length" class="focus-empty">
+              {{ selectedAssetTag ? `no assets tagged #${selectedAssetTag}.` : 'no assets in this focus context yet.' }}
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   </div>
 </template>
@@ -239,6 +317,17 @@ function createEvent() {
   flex: 1;
 }
 
+.focus-side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+.focus-side-stack .focus-panel {
+  flex: 1;
+}
+
 .focus-panel {
   min-height: 0;
   display: flex;
@@ -282,6 +371,29 @@ function createEvent() {
   padding: 20px 8px;
   font-size: 0.68rem;
   color: var(--text-dim);
+}
+
+.focus-asset-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.focus-filter {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+
+.focus-filter.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
 }
 
 .focus-event-row {

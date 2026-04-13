@@ -74,6 +74,13 @@ export async function seedIfEmpty(db: Database) {
     await db.execute("INSERT INTO todos (title, description, priority, complexity, due_date) VALUES ('renew passport', 'check embassy website for appointment slots', 'P1', 'C1', '2026-04-15')")
     await db.execute("INSERT INTO todos (title, priority, complexity, status) VALUES ('update resume', 'P4', 'C1', 'done')")
 
+    // assets
+    await db.execute("INSERT INTO assets (title, url, description, tags, space_id, category_id, project_id, last_opened_at, created_at) VALUES ('github repo', 'https://github.com/addeeandra/slowlife', 'main repository and issue tracker for the app', '[\"code\",\"github\"]', 'casual', 'side-projects', 'slowlife-app', '2026-04-02T09:10:00.000Z', '2026-04-01T08:00:00.000Z')")
+    await db.execute("INSERT INTO assets (title, url, description, tags, space_id, category_id, project_id, last_opened_at, created_at) VALUES ('project alpha board', 'https://jira.example.com/boards/alpha', 'delivery board for sprint planning and status', '[\"planning\",\"jira\"]', 'work', 'company-x', 'project-alpha', '2026-04-03T02:30:00.000Z', '2026-04-01T08:15:00.000Z')")
+    await db.execute("INSERT INTO assets (title, url, description, tags, space_id, category_id, project_id, last_opened_at, created_at) VALUES ('team docs', 'https://docs.google.com/document/d/team-docs', 'shared notes and handoff docs for company x', '[\"documents\",\"google-docs\"]', 'work', 'company-x', NULL, '2026-04-03T07:45:00.000Z', '2026-04-01T08:30:00.000Z')")
+    await db.execute("INSERT INTO assets (title, url, description, tags, space_id, category_id, project_id, created_at) VALUES ('design handoff sheet', 'https://docs.google.com/spreadsheets/d/design-handoff', 'tracking deliverables and launch status', '[\"documents\",\"sheets\"]', 'work', 'company-x', 'project-alpha', '2026-04-01T08:45:00.000Z')")
+    await db.execute("INSERT INTO assets (title, url, description, tags, space_id, category_id, project_id, created_at) VALUES ('study tracker', 'https://lark.example.com/wiki/study-tracker', 'weekly learning plan and notes', '[\"documents\",\"wiki\"]', 'casual', 'education', NULL, '2026-04-01T09:00:00.000Z')")
+
     // transactions
     await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (1, 'salary', 8500000, 'income', '2026-03-31', 1, 'manual')")
     await db.execute("INSERT INTO transactions (account_id, description, amount, type, date, category_id, entry_mode) VALUES (1, 'groceries', -285000, 'expense', '2026-03-30', 3, 'manual')")

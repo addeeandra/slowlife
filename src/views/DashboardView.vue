@@ -8,6 +8,7 @@ import UpcomingEvents from '../components/dashboard/UpcomingEvents.vue'
 import SubscriptionsCard from '../components/dashboard/SubscriptionsCard.vue'
 import MoodWeek from '../components/dashboard/MoodWeek.vue'
 import RecentEntries from '../components/dashboard/RecentEntries.vue'
+import RecentAssets from '../components/dashboard/RecentAssets.vue'
 import TodoFocus from '../components/dashboard/TodoFocus.vue'
 import FocusRateCard from '../components/dashboard/FocusRateCard.vue'
 </script>
@@ -28,6 +29,7 @@ import FocusRateCard from '../components/dashboard/FocusRateCard.vue'
       </div>
       <SubscriptionsCard />
       <RecentEntries />
+      <RecentAssets />
     </div>
   </div>
 </template>

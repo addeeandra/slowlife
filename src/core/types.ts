@@ -214,6 +214,19 @@ export interface Project {
   sort_order: number
 }
 
+export interface Asset {
+  id: number
+  title: string
+  url: string
+  description: string | null
+  tags: string[]
+  space_id: string
+  category_id: string
+  project_id: string | null
+  last_opened_at: string | null
+  created_at: string
+}
+
 export interface Pinned {
   id: number
   space_id: string

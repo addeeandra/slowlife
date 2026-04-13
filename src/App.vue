@@ -6,6 +6,7 @@ import AppFab from './components/AppFab.vue'
 import CommandPalette from './components/CommandPalette.vue'
 import QuickCaptureModal from './components/QuickCaptureModal.vue'
 import FocusModeLauncher from './components/FocusModeLauncher.vue'
+import AssetForm from './components/assets/AssetForm.vue'
 import EventForm from './components/events/EventForm.vue'
 import GoogleEventDetail from './components/events/GoogleEventDetail.vue'
 import JournalEntryPreviewDialog from './components/journal/JournalEntryPreviewDialog.vue'
@@ -17,12 +18,14 @@ import { useEvents } from './composables/useEvents'
 import { useFinances } from './composables/useFinances'
 import { usePinned } from './composables/usePinned'
 import { useTodos } from './composables/useTodos'
+import { useAssets, type AssetInput } from './composables/useAssets'
 import { useSidebar } from './composables/useSidebar'
 import { useQuickCapture } from './composables/useQuickCapture'
 import { useEventDialog } from './composables/useEventDialog'
 import { useGoogleCalendarSync } from './composables/useGoogleCalendarSync'
 import { useJournalPreviewDialog } from './composables/useJournalPreviewDialog'
 import { useTodoDialog } from './composables/useTodoDialog'
+import { useAssetDialog } from './composables/useAssetDialog'
 import { useFocusMode } from './composables/useFocusMode'
 import type { Todo, TodoPriority, TodoStatus } from './core/types'
 
@@ -56,6 +59,13 @@ const {
   closeForm: closeTodoForm,
 } = useTodoDialog()
 const { createTodo, updateTodo, deleteTodo } = useTodos()
+const {
+  formOpen: assetFormOpen,
+  editingAsset,
+  draftContext: assetDraftContext,
+  closeForm: closeAssetForm,
+} = useAssetDialog()
+const { createAsset, updateAsset, deleteAsset } = useAssets()
 const { syncKnownTargets } = useFocusMode()
 
 const isFocusRoute = computed(() => route.name === 'focus')
@@ -74,6 +84,7 @@ onMounted(async () => {
     useFinances().load(),
     usePinned().load(),
     useTodos().load(),
+    useAssets().load(),
     loadGoogleSync(),
   ])
   syncKnownTargets()
@@ -137,6 +148,20 @@ async function handleTodoDelete(id: number) {
   await deleteTodo(id)
   closeTodoForm()
 }
+
+async function handleAssetSave(data: AssetInput) {
+  if (editingAsset.value) {
+    await updateAsset(editingAsset.value.id, data)
+  } else {
+    await createAsset(data)
+  }
+  closeAssetForm()
+}
+
+async function handleAssetDelete(id: number) {
+  await deleteAsset(id)
+  closeAssetForm()
+}
 </script>
 
 <template>
@@ -181,6 +206,14 @@ async function handleTodoDelete(id: number) {
     @save="handleTodoSave"
     @delete="handleTodoDelete"
     @close="closeTodoForm"
+  />
+  <AssetForm
+    :open="assetFormOpen"
+    :asset="editingAsset"
+    :draft-context="assetDraftContext"
+    @save="handleAssetSave"
+    @delete="handleAssetDelete"
+    @close="closeAssetForm"
   />
 </template>
 

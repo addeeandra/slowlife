@@ -74,6 +74,7 @@ export function useSpaces() {
 
   async function deleteCategory(id: string, spaceId: string) {
     const db = await getDb()
+    await db.execute('DELETE FROM assets WHERE category_id = $1 AND space_id = $2', [id, spaceId])
     await db.execute('DELETE FROM projects WHERE category_id = $1 AND space_id = $2', [id, spaceId])
     await db.execute('DELETE FROM categories WHERE id = $1 AND space_id = $2', [id, spaceId])
     await load()
@@ -90,6 +91,10 @@ export function useSpaces() {
 
   async function deleteProject(id: string, categoryId: string, spaceId: string) {
     const db = await getDb()
+    await db.execute(
+      'DELETE FROM assets WHERE project_id = $1 AND category_id = $2 AND space_id = $3',
+      [id, categoryId, spaceId]
+    )
     await db.execute(
       'DELETE FROM projects WHERE id = $1 AND category_id = $2 AND space_id = $3',
       [id, categoryId, spaceId]
