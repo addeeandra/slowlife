@@ -45,31 +45,34 @@ Organized by phase. Each phase builds on the previous one.
 - [x] Monthly budgets, income/expense trend, net worth history
 - [x] Multi-currency support (IDR, USD, SGD, CNY)
 
-## Phase 7 — Search & Insights
+## Phase 7 — Search
 
 - [x] Full-text search and command palette (Ctrl+K)
-- [ ] Writing frequency analytics
-- [ ] Spending pattern insights
 
-## Phase 8 — Data Portability
-
-- [ ] Export journal (Markdown, JSON) and finances (CSV)
-- [ ] Database backup/restore
-- [ ] Import from Day One, Obsidian
-
-## Phase 9 — Cross-Device Sync
+## Phase 8 — Cross-Device Sync
 
 - [ ] cr-sqlite (CRDT-based merge)
 - [ ] Minimal sync relay server
 - [ ] Conflict resolution UI and sync status indicator
 
-## Phase 10 — Mobile
+## Phase 9 — Mobile
 
 - [ ] Tauri iOS and Android builds
 - [ ] Responsive layout and mobile-optimized quick capture
 - [ ] Push notifications
 
-## Phase 11 — Extensibility
+## Phase 10 - More Insights
+
+- [ ] Writing frequency analytics
+- [ ] Spending pattern insights
+
+## Phase 11 — Data Portability
+
+- [ ] Export journal (Markdown, JSON) and finances (CSV)
+- [ ] Database backup/restore
+- [ ] Import from Day One, Obsidian
+
+## Phase 12 — Extensibility
 
 - [ ] Custom spaces and tag sets
 - [ ] Theming (light mode, custom colors)
