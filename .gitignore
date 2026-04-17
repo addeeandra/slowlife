@@ -29,3 +29,8 @@ dist-ssr
 # configs
 .env
 opencode.jsonc
+src-sync/.env
+src-sync/target
+src-sync/*.db
+src-sync/*.db-shm
+src-sync/*.db-wal
