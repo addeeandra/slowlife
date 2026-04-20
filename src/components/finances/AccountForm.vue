@@ -10,7 +10,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  save: [data: { name: string; initial_balance: number; currency: string }]
+  save: [data: { name: string; initial_balance: number; currency: string; include_in_stats: number }]
   adjust: [data: { target_balance: number; date: string; description: string | null }]
   delete: [id: number]
   close: []
@@ -19,6 +19,7 @@ const emit = defineEmits<{
 const name = ref('')
 const initialBalance = ref('0')
 const currency = ref('IDR')
+const includeInStats = ref(true)
 const adjustmentBalance = ref('')
 const adjustmentDate = ref('')
 const adjustmentDescription = ref('')
@@ -37,6 +38,7 @@ watch(() => props.open, (open) => {
       name.value = props.account.name
       initialBalance.value = String(props.account.initial_balance)
       currency.value = props.account.currency
+      includeInStats.value = props.account.include_in_stats === 1
       adjustmentBalance.value = String(props.currentBalance ?? 0)
       adjustmentDate.value = new Date().toISOString().slice(0, 10)
       adjustmentDescription.value = ''
@@ -44,6 +46,7 @@ watch(() => props.open, (open) => {
       name.value = ''
       initialBalance.value = '0'
       currency.value = 'IDR'
+      includeInStats.value = true
       adjustmentBalance.value = ''
       adjustmentDate.value = new Date().toISOString().slice(0, 10)
       adjustmentDescription.value = ''
@@ -57,6 +60,7 @@ function handleSave() {
     name: name.value.trim(),
     initial_balance: Number(initialBalance.value),
     currency: currency.value.trim().toUpperCase() || 'IDR',
+    include_in_stats: includeInStats.value ? 1 : 0,
   })
 }
 
@@ -107,6 +111,14 @@ function handleDelete() {
           <input v-model="currency" type="text" maxlength="3" class="ff-input ff-sm ff-upper" />
         </div>
       </div>
+
+      <label class="ff-check-row">
+        <input v-model="includeInStats" type="checkbox" class="ff-check" />
+        <span>
+          <span class="ff-check-label">include in stats</span>
+          <span class="ff-check-copy">dashboard, reports, net worth, income/expense, and budgets</span>
+        </span>
+      </label>
 
       <div v-if="isEdit" class="ff-adjust">
         <div class="ff-adjust-head">balance adjustment</div>
@@ -194,6 +206,31 @@ function handleDelete() {
 .ff-input:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+.ff-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 0.68rem;
+  color: var(--text);
+}
+
+.ff-check {
+  margin-top: 2px;
+  accent-color: var(--accent);
+}
+
+.ff-check-label {
+  display: block;
+}
+
+.ff-check-copy {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.58rem;
+  color: var(--text-dim);
 }
 
 .ff-sm {

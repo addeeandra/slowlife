@@ -43,9 +43,9 @@ export async function seedIfEmpty(db: Database) {
     await db.execute("INSERT INTO events (title, date, time, type, color, description) VALUES ('submit tax docs', '2026-04-10', '09:00', 'reminder', '#c46a6a', 'deadline for annual tax filing')")
 
     // accounts
-    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency) VALUES ('main account', 4250000, -6410010, 'IDR')")
-    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency) VALUES ('savings', 12800000, 12800000, 'IDR')")
-    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency) VALUES ('cash', 350000, 385000, 'IDR')")
+    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency, include_in_stats) VALUES ('main account', 4250000, -6410010, 'IDR', 1)")
+    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency, include_in_stats) VALUES ('savings', 12800000, 12800000, 'IDR', 1)")
+    await db.execute("INSERT INTO accounts (name, balance, initial_balance, currency, include_in_stats) VALUES ('cash', 350000, 385000, 'IDR', 1)")
 
     await db.execute("INSERT OR IGNORE INTO finance_settings (id, base_currency) VALUES (1, 'IDR')")
 

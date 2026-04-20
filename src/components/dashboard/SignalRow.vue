@@ -9,7 +9,7 @@ import { formatMoney } from '../../core/constants'
 const STORAGE_KEY = 'slowlife.dashboard.censor-finance'
 
 const { streak, daysActiveThisWeek, dominantMoodThisWeek } = useJournal()
-const { netWorth, totalSubsMonthly, accounts, activeSubscriptions, financeSettings } = useFinances()
+const { netWorth, totalSubsMonthly, accounts, includedAccounts, activeSubscriptions, financeSettings } = useFinances()
 const { openCount, overdueTodos } = useTodos()
 
 const censorFinance = ref(true)
@@ -57,7 +57,7 @@ watch(censorFinance, value => {
       <button type="button" class="s-v s-toggle" @click="censorFinance = !censorFinance">
         {{ censorFinance ? '••••••' : formatMoney(netWorth, financeSettings.base_currency) }}
       </button>
-      <div class="s-c">{{ accounts.length }} accts · {{ censorFinance ? 'hide' : 'reveal' }}</div>
+      <div class="s-c">{{ includedAccounts.length }}/{{ accounts.length }} included · {{ censorFinance ? 'hide' : 'reveal' }}</div>
     </div>
     <div class="sig">
       <div class="s-l">subs/mo</div>

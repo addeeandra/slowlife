@@ -127,6 +127,7 @@ export interface Account {
   name: string
   initial_balance: number
   currency: string
+  include_in_stats: number
   created_at: string
 }
 

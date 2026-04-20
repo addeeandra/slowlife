@@ -30,6 +30,7 @@ export interface AccountInput {
   name: string
   initial_balance?: number
   currency?: string
+  include_in_stats?: number
 }
 
 export interface TransactionInput {
@@ -94,7 +95,7 @@ export function useFinances() {
   async function load() {
     const db = await getDb()
     accounts.value = await db.select<Account[]>(
-      'SELECT id, name, initial_balance, currency, created_at FROM accounts ORDER BY created_at DESC'
+      'SELECT id, name, initial_balance, currency, include_in_stats, created_at FROM accounts ORDER BY created_at DESC'
     )
     transactions.value = await db.select<Transaction[]>(
       'SELECT id, account_id, description, amount, type, date, category_id, entry_mode, created_at FROM transactions ORDER BY date DESC, id DESC'
@@ -115,8 +116,19 @@ export function useFinances() {
     )
   }
 
-  function accountTransactions(accountId: number) {
-    return transactions.value.filter(tx => tx.account_id === accountId)
+  const transactionsByAccount = computed(() => {
+    const map = new Map<number, Transaction[]>()
+    for (const tx of transactions.value) {
+      const list = map.get(tx.account_id)
+      if (list) list.push(tx)
+      else map.set(tx.account_id, [tx])
+    }
+    return map
+  })
+
+  function accountTransactions(accountId: number, onDate?: string) {
+    const txs = transactionsByAccount.value.get(accountId) ?? []
+    return onDate ? txs.filter(tx => tx.date <= onDate) : txs
   }
 
   function transactionCategoryLabel(id: number | null) {
@@ -142,17 +154,17 @@ export function useFinances() {
     return rate === null ? null : amount * rate
   }
 
-  function accountBalance(accountId: number) {
+  function accountBalance(accountId: number, onDate?: string) {
     const account = accounts.value.find(item => item.id === accountId)
     if (!account) return 0
-    const movement = accountTransactions(accountId).reduce((sum, tx) => sum + tx.amount, 0)
+    const movement = accountTransactions(accountId, onDate).reduce((sum, tx) => sum + tx.amount, 0)
     return account.initial_balance + movement
   }
 
-  function convertedAccountBalance(accountId: number) {
+  function convertedAccountBalance(accountId: number, onDate?: string) {
     const account = accounts.value.find(item => item.id === accountId)
     if (!account) return null
-    return convertToBase(accountBalance(accountId), account.currency)
+    return convertToBase(accountBalance(accountId, onDate), account.currency, onDate)
   }
 
   function transactionAmountInBase(transaction: Transaction) {
@@ -164,12 +176,26 @@ export function useFinances() {
     return convertToBase(subscription.amount, subscription.currency, subscription.next_date)
   }
 
-  async function refreshSnapshot(date: string = toISO(new Date())) {
-    const db = await getDb()
-    const total = accounts.value.reduce((sum, account) => {
-      const converted = convertedAccountBalance(account.id)
+  const includedAccounts = computed(() =>
+    accounts.value.filter(account => account.include_in_stats === 1)
+  )
+
+  const includedAccountIds = computed(() => new Set(includedAccounts.value.map(account => account.id)))
+
+  const includedTransactions = computed(() =>
+    transactions.value.filter(tx => includedAccountIds.value.has(tx.account_id))
+  )
+
+  function netWorthTotalForDate(date: string) {
+    return includedAccounts.value.reduce((sum, account) => {
+      const converted = convertedAccountBalance(account.id, date)
       return sum + (converted ?? 0)
     }, 0)
+  }
+
+  async function refreshSnapshot(date: string = toISO(new Date())) {
+    const db = await getDb()
+    const total = netWorthTotalForDate(date)
 
     await db.execute(
       `INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency)
@@ -183,11 +209,33 @@ export function useFinances() {
     )
   }
 
+  async function rebuildSnapshots() {
+    const snapshotDates = [...new Set(netWorthSnapshots.value.map(snapshot => snapshot.snapshot_date))].sort()
+    if (!snapshotDates.length) {
+      await refreshSnapshot()
+      return
+    }
+
+    const db = await getDb()
+    for (const date of snapshotDates) {
+      await db.execute(
+        `INSERT INTO net_worth_snapshots (snapshot_date, net_worth, base_currency)
+         VALUES ($1, $2, $3)
+         ON CONFLICT(snapshot_date) DO UPDATE SET net_worth = excluded.net_worth, base_currency = excluded.base_currency`,
+        [date, netWorthTotalForDate(date), financeSettings.value.base_currency]
+      )
+    }
+
+    netWorthSnapshots.value = await db.select<NetWorthSnapshot[]>(
+      'SELECT * FROM net_worth_snapshots ORDER BY snapshot_date ASC, id ASC'
+    )
+  }
+
   async function createAccount(input: AccountInput) {
     const db = await getDb()
     await db.execute(
-      'INSERT INTO accounts (name, initial_balance, currency) VALUES ($1, $2, $3)',
-      [input.name, input.initial_balance ?? 0, input.currency ?? 'IDR']
+      'INSERT INTO accounts (name, initial_balance, currency, include_in_stats) VALUES ($1, $2, $3, $4)',
+      [input.name, input.initial_balance ?? 0, input.currency ?? 'IDR', input.include_in_stats ?? 1]
     )
     await load()
     await refreshSnapshot()
@@ -212,7 +260,7 @@ export function useFinances() {
     await db.execute(`UPDATE accounts SET ${fields.join(', ')} WHERE id = $${idx}`, values)
     await load()
     await rebuildTransactionsSearchIndex()
-    await refreshSnapshot()
+    await rebuildSnapshots()
   }
 
   async function adjustAccountBalance(id: number, targetBalance: number, date: string, description?: string) {
@@ -488,17 +536,19 @@ export function useFinances() {
   )
 
   const netWorth = computed(() =>
-    accountBalances.value.reduce((sum, account) => sum + (account.converted_balance ?? 0), 0)
+    accountBalances.value
+      .filter(account => includedAccountIds.value.has(account.id))
+      .reduce((sum, account) => sum + (account.converted_balance ?? 0), 0)
   )
 
   const totalIncome = computed(() =>
-    transactions.value
+    includedTransactions.value
       .filter(t => t.type === 'income')
       .reduce((sum, tx) => sum + (transactionAmountInBase(tx) ?? 0), 0)
   )
 
   const totalExpenses = computed(() =>
-    transactions.value
+    includedTransactions.value
       .filter(t => t.type === 'expense')
       .reduce((sum, tx) => sum + Math.abs(transactionAmountInBase(tx) ?? 0), 0)
   )
@@ -517,7 +567,7 @@ export function useFinances() {
   )
 
   function transactionsForMonth(key: string) {
-    return transactions.value.filter(tx => monthKey(tx.date) === key)
+    return includedTransactions.value.filter(tx => monthKey(tx.date) === key)
   }
 
   function monthlyBudgetRows(key: string) {
@@ -543,7 +593,7 @@ export function useFinances() {
   }
 
   function incomeExpenseTrend(monthCount: number = 6) {
-    const keys = [...new Set(transactions.value.map(tx => monthKey(tx.date)))].sort().slice(-monthCount)
+    const keys = [...new Set(includedTransactions.value.map(tx => monthKey(tx.date)))].sort().slice(-monthCount)
     return keys.map(key => {
       const monthTransactions = transactionsForMonth(key)
       const income = monthTransactions
@@ -571,6 +621,7 @@ export function useFinances() {
 
   return {
     accounts,
+    includedAccounts,
     accountBalances,
     transactions,
     subscriptions,

@@ -50,6 +50,7 @@ async function migrate(db: Database) {
       name TEXT NOT NULL,
       balance REAL NOT NULL DEFAULT 0,
       currency TEXT NOT NULL DEFAULT 'IDR',
+      include_in_stats INTEGER NOT NULL DEFAULT 1,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `)
@@ -226,6 +227,7 @@ async function migrate(db: Database) {
 
 async function migrateFinances(db: Database) {
   try { await db.execute('ALTER TABLE accounts ADD COLUMN initial_balance REAL') } catch (_) { /* column already exists */ }
+  try { await db.execute('ALTER TABLE accounts ADD COLUMN include_in_stats INTEGER NOT NULL DEFAULT 1') } catch (_) { /* column already exists */ }
   try { await db.execute('ALTER TABLE transactions ADD COLUMN category_id INTEGER') } catch (_) { /* column already exists */ }
   try { await db.execute("ALTER TABLE transactions ADD COLUMN entry_mode TEXT DEFAULT 'manual'") } catch (_) { /* column already exists */ }
   try { await db.execute('ALTER TABLE subscriptions ADD COLUMN cancelled_at TEXT') } catch (_) { /* column already exists */ }
@@ -241,6 +243,7 @@ async function migrateFinances(db: Database) {
   `)
 
   await db.execute('UPDATE accounts SET initial_balance = COALESCE(initial_balance, 0)')
+  await db.execute('UPDATE accounts SET include_in_stats = COALESCE(include_in_stats, 1)')
   await db.execute("UPDATE transactions SET entry_mode = 'manual' WHERE entry_mode IS NULL")
 }
 

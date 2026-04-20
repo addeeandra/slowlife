@@ -116,7 +116,7 @@ function closeAllForms() {
   selectedRate.value = null
 }
 
-async function saveAccount(data: { name: string; initial_balance: number; currency: string }) {
+async function saveAccount(data: { name: string; initial_balance: number; currency: string; include_in_stats: number }) {
   if (selectedAccount.value) {
     await updateAccount(selectedAccount.value.id, data)
   } else {
@@ -218,8 +218,8 @@ function updateBaseCurrency(value: string | number | null) {
             <div class="head-actions">
               <span v-if="selectedAccountIds.length" class="simple-sub">{{ selectedAccountIds.length }} selected</span>
               <button class="mini-btn" @click="selectedAccount = null; accountFormOpen = true">new account</button>
-              <button class="mini-btn" @click="selectedTransaction = null; transactionFormOpen = true">new tx</button>
               <button class="mini-btn" @click="transferFormOpen = true">transfer</button>
+              <button class="mini-btn" @click="selectedTransaction = null; transactionFormOpen = true">new tx</button>
             </div>
           </div>
           <div class="accounts-grid">

@@ -25,6 +25,7 @@ function handleEdit(e: MouseEvent) {
     <span class="f-n">
       {{ account.name }}
       <span class="f-sub">init {{ formatMoney(account.initial_balance, account.currency) }}</span>
+      <span v-if="account.include_in_stats !== 1" class="f-flag">excluded from stats</span>
     </span>
     <span class="f-right">
       <span class="f-v">{{ formatMoney(account.current_balance ?? account.initial_balance, account.currency) }}</span>
@@ -84,6 +85,17 @@ function handleEdit(e: MouseEvent) {
 .f-sub {
   font-size: 0.55rem;
   color: var(--text-dim);
+}
+
+.f-flag {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 1px 5px;
+  font-size: 0.52rem;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
 }
 
 .edit-btn {
