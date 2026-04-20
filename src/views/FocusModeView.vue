@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import type { MoodKey } from '../core/types'
 import EntryEditor from '../components/journal/EntryEditor.vue'
+import MoodPicker from '../components/journal/MoodPicker.vue'
+import TagRow from '../components/journal/TagRow.vue'
 import TimelineEntry from '../components/journal/TimelineEntry.vue'
 import TodoRow from '../components/todos/TodoRow.vue'
 import EventRow from '../components/events/EventRow.vue'
 import AssetRow from '../components/assets/AssetRow.vue'
+import Select from '../components/Select.vue'
 import { useFocusMode } from '../composables/useFocusMode'
 import { useJournal } from '../composables/useJournal'
 import { useTodos } from '../composables/useTodos'
@@ -23,25 +27,49 @@ const { saveEntry, entries } = useJournal()
 const { todos, toggleStatus } = useTodos()
 const { events } = useEvents()
 const { assetsForFocus, uniqueTags, openAsset } = useAssets()
-const { spaces } = useSpaces()
+const { spaces, projects } = useSpaces()
 const { openEdit: openTodoEdit, openNewWithContext: openTodoCreate } = useTodoDialog()
 const { openEvent, openCreateWithContext } = useEventDialog()
 const { openEdit: openAssetEdit, openNewWithContext: openAssetCreate } = useAssetDialog()
 
+const JOURNAL_PAGE_SIZE = 8
+
 const journalText = ref('')
+const selectedMood = ref<MoodKey | null>(null)
+const selectedTags = ref<Set<string>>(new Set())
+const selectedJournalProjectId = ref<string | null>(null)
 const selectedAssetTag = ref<string | null>(null)
+const visibleJournalCount = ref(JOURNAL_PAGE_SIZE)
 
 const focusSpace = computed(() => spaces.value.find(item => item.id === activeTarget.value?.spaceId) || null)
 
-const focusedEntries = computed(() => {
+const focusProjects = computed(() => {
+  if (!activeTarget.value) return []
+  return projects.value.filter(project =>
+    project.space_id === activeTarget.value?.spaceId && project.category_id === activeTarget.value?.categoryId
+  )
+})
+
+const showJournalProjectSelect = computed(() => activeTarget.value?.kind === 'category' && focusProjects.value.length > 0)
+
+const journalProjectOptions = computed(() => [
+  { value: null, label: 'category-level' },
+  ...focusProjects.value.map(project => ({ value: project.id, label: project.label })),
+])
+
+const allFocusedEntries = computed(() => {
   if (!activeTarget.value) return []
   return entries.value.filter(entry => {
     const matchesCategory = entry.space === activeTarget.value?.spaceId && entry.category === activeTarget.value?.categoryId
     if (!matchesCategory) return false
     if (activeTarget.value?.kind === 'project') return entry.item === activeTarget.value.projectId
     return true
-  }).slice(0, 8)
+  })
 })
+
+const focusedEntries = computed(() => allFocusedEntries.value.slice(0, visibleJournalCount.value))
+
+const hasMoreFocusedEntries = computed(() => focusedEntries.value.length < allFocusedEntries.value.length)
 
 const focusedTodos = computed(() => {
   if (!activeTarget.value) return []
@@ -88,7 +116,7 @@ const filteredAssets = computed(() => {
   return focusAssets.value.filter(asset => asset.tags.includes(selectedAssetTag.value || ''))
 })
 
-const journalMeta = computed(() => focusedEntries.value.length === 1 ? '1 note' : `${focusedEntries.value.length} notes`)
+const journalMeta = computed(() => allFocusedEntries.value.length === 1 ? '1 note' : `${allFocusedEntries.value.length} notes`)
 const todoMeta = computed(() => {
   const openCount = focusedTodoGroups.value.in_progress.length + focusedTodoGroups.value.open.length
   return openCount === 1 ? '1 active' : `${openCount} active`
@@ -100,8 +128,17 @@ const assetMeta = computed(() => {
   return selectedAssetTag.value ? `${countLabel} · #${selectedAssetTag.value}` : countLabel
 })
 
+function resetJournalComposer() {
+  journalText.value = ''
+  selectedMood.value = null
+  selectedTags.value = new Set()
+}
+
 watch(activeTarget, async (target) => {
+  resetJournalComposer()
+  selectedJournalProjectId.value = null
   selectedAssetTag.value = null
+  visibleJournalCount.value = JOURNAL_PAGE_SIZE
   if (!target) {
     openLauncher()
     await router.replace('/')
@@ -113,12 +150,15 @@ async function handleSaveJournal() {
   await saveEntry(
     activeTarget.value.spaceId,
     activeTarget.value.categoryId,
-    activeTarget.value.kind === 'project' ? activeTarget.value.projectId : null,
+    activeTarget.value.kind === 'project' ? activeTarget.value.projectId : selectedJournalProjectId.value,
     journalText.value.trim(),
-    null,
-    []
+    selectedMood.value,
+    [...selectedTags.value]
   )
-  journalText.value = ''
+  resetJournalComposer()
+  if (activeTarget.value.kind === 'category') {
+    selectedJournalProjectId.value = null
+  }
 }
 
 function createTodo() {
@@ -157,6 +197,17 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
   })
 }
 
+function loadMoreJournalEntries() {
+  visibleJournalCount.value += JOURNAL_PAGE_SIZE
+}
+
+const focusProjectLabelMap = computed(() => new Map(focusProjects.value.map(p => [p.id, p.label])))
+
+function journalScopeLabel(entry: (typeof focusedEntries.value)[number]) {
+  if (entry.item) return focusProjectLabelMap.value.get(entry.item) ?? entry.item
+  return 'category-level'
+}
+
 </script>
 
 <template>
@@ -185,14 +236,25 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
             <div class="focus-panel-meta">{{ journalMeta }}</div>
           </div>
         </div>
+        <div v-if="showJournalProjectSelect" class="focus-journal-project">
+          <div class="focus-list-label">project target</div>
+          <Select v-model="selectedJournalProjectId" :options="journalProjectOptions" compact />
+        </div>
         <EntryEditor v-model="journalText" @save="handleSaveJournal" />
-        <div v-if="!focusedEntries.length" class="focus-empty">no notes in this focus context yet.</div>
+        <MoodPicker v-model="selectedMood" />
+        <TagRow :space="focusSpace?.id || 'casual'" v-model="selectedTags" />
+
+        <div class="tl-sep"></div>
+
+        <div v-if="!allFocusedEntries.length" class="focus-empty">no notes in this focus context yet.</div>
         <TimelineEntry
           v-for="entry in focusedEntries"
           :key="entry.id"
           :entry="entry"
           :space="focusSpace?.id || 'casual'"
+          :scope-label="journalScopeLabel(entry)"
         />
+        <button v-if="hasMoreFocusedEntries" class="mini-btn focus-load-more" @click="loadMoreJournalEntries">load more</button>
       </section>
 
       <section class="focus-panel">
@@ -312,6 +374,12 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
 </template>
 
 <style scoped>
+.tl-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
 .focus-shell {
   min-height: calc(100vh - 32px);
   display: flex;
@@ -413,6 +481,10 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
   margin-top: 2px;
 }
 
+.focus-journal-project {
+  margin-bottom: 12px;
+}
+
 .focus-list {
   overflow: auto;
   min-height: 0;
@@ -430,6 +502,13 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-dim);
+}
+
+.focus-load-more {
+  align-self: flex-start;
+  margin-top: 8px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .focus-empty {

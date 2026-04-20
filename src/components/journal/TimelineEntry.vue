@@ -7,7 +7,11 @@ import { renderMarkdown } from '../../core/markdown'
 import MoodPicker from './MoodPicker.vue'
 import TagRow from './TagRow.vue'
 
-const props = defineProps<{ entry: JournalEntry; space: string }>()
+const props = defineProps<{
+  entry: JournalEntry
+  space: string
+  scopeLabel?: string
+}>()
 
 const { updateEntry, deleteEntry } = useJournal()
 
@@ -101,7 +105,10 @@ async function confirmDelete() {
   <!-- Read mode -->
   <div v-else class="tl-entry" @click="toggleExpand" @dblclick.stop="startEdit">
     <div class="tl-hdr">
-      <span class="tl-date">{{ formatDate(entry.created_at) }}</span>
+      <div class="tl-hdr-meta">
+        <span class="tl-date">{{ formatDate(entry.created_at) }}</span>
+        <span v-if="scopeLabel" class="tl-scope">{{ scopeLabel }}</span>
+      </div>
       <div class="tl-hdr-acts">
         <button v-if="isExpanded" class="tl-act" @click.stop="startEdit">✎</button>
         <span v-if="entry.mood" class="tl-mood">{{ MOODS[entry.mood as MoodKey] }}</span>
@@ -147,9 +154,24 @@ async function confirmDelete() {
   margin-bottom: 6px;
 }
 
+.tl-hdr-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .tl-date {
   font-size: 0.65rem;
   color: var(--text-dim);
+}
+
+.tl-scope {
+  font-size: 0.54rem;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  background: var(--bg-hover);
+  padding: 1px 5px;
 }
 
 .tl-mood {
