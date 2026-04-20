@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { getDb } from '../core/db'
+import { compareNewestFirst } from '../core/constants'
 import type { Asset } from '../core/types'
 import type { FocusTarget } from './useFocusMode'
 
@@ -60,9 +61,6 @@ function mapRow(row: AssetRow): Asset {
   }
 }
 
-function compareNewest(first: string | null, second: string | null) {
-  return (second || '').localeCompare(first || '')
-}
 
 export function useAssets() {
   async function load() {
@@ -136,7 +134,7 @@ export function useAssets() {
           ? asset.project_id === null
           : asset.project_id === null || asset.project_id === target.projectId)
       )
-      .sort((a, b) => compareNewest(a.last_opened_at, b.last_opened_at) || compareNewest(a.created_at, b.created_at))
+      .sort((a, b) => compareNewestFirst(a.last_opened_at, b.last_opened_at) || compareNewestFirst(a.created_at, b.created_at))
   }
 
   function uniqueTags(list: Asset[]) {
@@ -146,7 +144,7 @@ export function useAssets() {
   function recentAssets(count: number = 4): Asset[] {
     return assets.value
       .filter(asset => !!asset.last_opened_at)
-      .sort((a, b) => compareNewest(a.last_opened_at, b.last_opened_at))
+      .sort((a, b) => compareNewestFirst(a.last_opened_at, b.last_opened_at))
       .slice(0, count)
   }
 

@@ -87,6 +87,10 @@ export function sortByDateTime<T extends { occurrence_date?: string; date?: stri
   return ad.localeCompare(bd) || (a.time || '').localeCompare(b.time || '')
 }
 
+export function compareNewestFirst(a: string | null, b: string | null): number {
+  return (b || '').localeCompare(a || '')
+}
+
 export function renewalLabel(nextDate: string): string {
   const nd = new Date(nextDate + 'T00:00:00')
   const diff = Math.ceil((nd.getTime() - new Date().getTime()) / 864e5)

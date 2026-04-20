@@ -15,7 +15,7 @@ import { useSpaces } from '../composables/useSpaces'
 import { useTodoDialog } from '../composables/useTodoDialog'
 import { useEventDialog } from '../composables/useEventDialog'
 import { useAssetDialog } from '../composables/useAssetDialog'
-import { toISO } from '../core/constants'
+import { toISO, compareNewestFirst } from '../core/constants'
 
 const router = useRouter()
 const { activeTarget, targetLabel, exit, openLauncher } = useFocusMode()
@@ -52,11 +52,21 @@ const focusedTodos = computed(() => {
       if (activeTarget.value?.kind === 'project') return todo.project_id === activeTarget.value.projectId
       return true
     })
-    .sort((a, b) => {
-      const statusWeight = a.status === 'done' || a.status === 'cancelled' ? 1 : 0
-      const otherStatusWeight = b.status === 'done' || b.status === 'cancelled' ? 1 : 0
-      return statusWeight - otherStatusWeight || a.priority.localeCompare(b.priority) || (a.due_date || '9').localeCompare(b.due_date || '9')
-    })
+})
+
+const focusedTodoGroups = computed(() => {
+  type T = (typeof focusedTodos.value)[number]
+  const groups = { in_progress: [] as T[], open: [] as T[], done: [] as T[], cancelled: [] as T[] }
+  for (const todo of focusedTodos.value) {
+    groups[todo.status]?.push(todo)
+  }
+  const compareActive = (a: T, b: T) =>
+    a.priority.localeCompare(b.priority) || (a.due_date || '9').localeCompare(b.due_date || '9')
+  groups.in_progress.sort(compareActive)
+  groups.open.sort(compareActive)
+  groups.done.sort((a, b) => compareNewestFirst(a.completed_at, b.completed_at) || compareNewestFirst(a.created_at, b.created_at))
+  groups.cancelled.sort((a, b) => compareNewestFirst(a.created_at, b.created_at))
+  return groups
 })
 
 const focusedEvents = computed(() => {
@@ -80,7 +90,7 @@ const filteredAssets = computed(() => {
 
 const journalMeta = computed(() => focusedEntries.value.length === 1 ? '1 note' : `${focusedEntries.value.length} notes`)
 const todoMeta = computed(() => {
-  const openCount = focusedTodos.value.filter(todo => todo.status === 'open' || todo.status === 'in_progress').length
+  const openCount = focusedTodoGroups.value.in_progress.length + focusedTodoGroups.value.open.length
   return openCount === 1 ? '1 active' : `${openCount} active`
 })
 const eventMeta = computed(() => focusedEvents.value.length === 1 ? '1 upcoming' : `${focusedEvents.value.length} upcoming`)
@@ -194,19 +204,56 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
           <button class="mini-btn" @click="createTodo">+ todo</button>
         </div>
         <div class="focus-list">
-          <TodoRow
-            v-for="todo in focusedTodos"
-            :key="todo.id"
-            :todo="todo"
-            @toggle="toggleStatus"
-            @click="openTodoEdit"
-          />
+          <div v-if="focusedTodoGroups.in_progress.length" class="focus-list-group">
+            <div class="focus-list-label">in progress</div>
+            <TodoRow
+              v-for="todo in focusedTodoGroups.in_progress"
+              :key="todo.id"
+              :todo="todo"
+              @toggle="toggleStatus"
+              @click="openTodoEdit"
+            />
+          </div>
+
+          <div v-if="focusedTodoGroups.open.length" class="focus-list-group">
+            <div class="focus-list-label">open</div>
+            <TodoRow
+              v-for="todo in focusedTodoGroups.open"
+              :key="todo.id"
+              :todo="todo"
+              @toggle="toggleStatus"
+              @click="openTodoEdit"
+            />
+          </div>
+
+          <div v-if="focusedTodoGroups.done.length" class="focus-list-group">
+            <div class="focus-list-label">completed</div>
+            <TodoRow
+              v-for="todo in focusedTodoGroups.done"
+              :key="todo.id"
+              :todo="todo"
+              @toggle="toggleStatus"
+              @click="openTodoEdit"
+            />
+          </div>
+
+          <div v-if="focusedTodoGroups.cancelled.length" class="focus-list-group">
+            <div class="focus-list-label">cancelled</div>
+            <TodoRow
+              v-for="todo in focusedTodoGroups.cancelled"
+              :key="todo.id"
+              :todo="todo"
+              @toggle="toggleStatus"
+              @click="openTodoEdit"
+            />
+          </div>
+
           <div v-if="!focusedTodos.length" class="focus-empty">no todos for this focus target.</div>
         </div>
       </section>
 
       <div class="focus-side-stack">
-        <section class="focus-panel">
+        <section class="focus-panel focus-events-panel">
           <div class="focus-panel-head">
             <div>
               <div class="focus-panel-title">events</div>
@@ -337,6 +384,10 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
   padding: 12px;
 }
 
+.focus-events-panel {
+  max-height: 40vh;
+}
+
 .focus-journal {
   overflow: auto;
 }
@@ -365,6 +416,20 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
 .focus-list {
   overflow: auto;
   min-height: 0;
+}
+
+.focus-list-group + .focus-list-group {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.focus-list-label {
+  margin-bottom: 6px;
+  font-size: 0.56rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
 }
 
 .focus-empty {
@@ -416,6 +481,10 @@ function editAsset(asset: (typeof filteredAssets.value)[number]) {
 @media (max-width: 1200px) {
   .focus-grid {
     grid-template-columns: 1fr;
+  }
+
+  .focus-events-panel {
+    max-height: none;
   }
 
   .focus-panel,
