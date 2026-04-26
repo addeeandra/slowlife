@@ -122,7 +122,7 @@ function toggle(calendarId: string) {
         </div>
       </template>
 
-      <div v-if="$attrs['data-confirm-disconnect']" class="gs-confirm">
+      <div v-if="dataConfirmDisconnect" class="gs-confirm">
         <div class="gs-confirm-text">disconnecting removes all synced google events from slowlife. continue?</div>
         <div class="gs-confirm-actions">
           <button class="btn ghost" type="button" @click="emit('cancelDisconnect')">cancel</button>
@@ -131,7 +131,7 @@ function toggle(calendarId: string) {
       </div>
 
       <div class="gs-actions">
-        <button v-if="connected" class="btn danger" type="button" :disabled="syncing || !!$attrs['data-confirm-disconnect']" @click="emit('requestDisconnect')">disconnect</button>
+        <button v-if="connected" class="btn danger" type="button" :disabled="syncing || !!dataConfirmDisconnect" @click="emit('requestDisconnect')">disconnect</button>
         <div v-else></div>
         <div class="gs-right">
           <button class="btn ghost" type="button" @click="emit('close')">cancel</button>
