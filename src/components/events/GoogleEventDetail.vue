@@ -58,7 +58,7 @@ async function openOriginal() {
 
       <div v-if="event.description" class="gd-section">
         <div class="gd-label">description</div>
-        <div class="gd-body gd-html" v-html="descriptionHtml"></div>
+        <div class="gd-body prose" v-html="descriptionHtml"></div>
       </div>
 
       <div class="gd-section">
@@ -131,36 +131,12 @@ async function openOriginal() {
 .gd-body {
   font-size: 0.72rem;
   color: var(--text);
-  white-space: pre-wrap;
   line-height: 1.6;
 }
 
 .gd-body.dim {
   color: var(--text-dim);
-}
-
-.gd-html :deep(p),
-.gd-html :deep(ul),
-.gd-html :deep(ol) {
-  margin: 0 0 8px;
-}
-
-.gd-html :deep(ul),
-.gd-html :deep(ol) {
-  padding-left: 18px;
-}
-
-.gd-html :deep(li + li) {
-  margin-top: 4px;
-}
-
-.gd-html :deep(a) {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
-.gd-html :deep(br) {
-  line-height: 1.8;
+  white-space: pre-wrap;
 }
 
 .gd-actions {

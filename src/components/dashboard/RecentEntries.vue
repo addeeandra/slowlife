@@ -62,7 +62,7 @@ function navigate(entry: JournalEntry) {
         <span class="ri-d" :style="{ background: entryMeta(entry).color }"></span>
         <div class="ri-b">
           <div class="ri-m">{{ entryMeta(entry).dateStr }} / {{ entryMeta(entry).location }}</div>
-          <div class="ri-t" v-html="renderedTexts[entry.id]" />
+          <div class="ri-t prose" v-html="renderedTexts[entry.id]" />
         </div>
         <span v-if="entry.mood" class="ri-e">{{ MOODS[entry.mood as MoodKey] }}</span>
       </div>
@@ -121,8 +121,8 @@ function navigate(entry: JournalEntry) {
   overflow: hidden;
 }
 
+/* dashboard preview is line-clamped to 2 lines, so flatten paragraphs inline */
 .ri-t :deep(p) { margin: 0; display: inline; }
-.ri-t :deep(strong) { color: var(--text); }
 
 .ri-e {
   font-size: 0.7rem;
