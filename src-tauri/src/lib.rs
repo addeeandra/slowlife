@@ -215,35 +215,38 @@ async fn start_google_oauth(app: tauri::AppHandle, auth_url: String) -> Result<O
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use tauri::Emitter;
-    tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![start_google_oauth])
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_sql::Builder::new().build())
-        .plugin(
-            tauri_plugin_global_shortcut::Builder::new()
-                .with_shortcuts(["alt+shift+c", "cmdorcontrol+shift+j"])
-                .expect("failed to register global shortcuts")
-                .with_handler(|app, _shortcut, event| {
-                    use tauri::Emitter;
-                    use tauri_plugin_global_shortcut::ShortcutState;
-                    if event.state == ShortcutState::Pressed {
-                        let _ = app.emit("quick-capture", ());
-                        #[cfg(desktop)]
-                        {
-                            use tauri::Manager;
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
+        .plugin(tauri_plugin_sql::Builder::new().build());
+
+    #[cfg(desktop)]
+    let builder = builder.plugin(
+        tauri_plugin_global_shortcut::Builder::new()
+            .with_shortcuts(["alt+shift+c", "cmdorcontrol+shift+j"])
+            .expect("failed to register global shortcuts")
+            .with_handler(|app, _shortcut, event| {
+                use tauri::Emitter;
+                use tauri::Manager;
+                use tauri_plugin_global_shortcut::ShortcutState;
+                if event.state == ShortcutState::Pressed {
+                    let _ = app.emit("quick-capture", ());
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
                     }
-                })
-                .build(),
-        )
+                }
+            })
+            .build(),
+    );
+
+    builder
         .setup(|app| {
+            #[cfg(not(desktop))]
+            let _ = app;
             #[cfg(desktop)]
             {
+                use tauri::Emitter;
                 use tauri::Manager;
                 use tauri::tray::{TrayIconBuilder, TrayIconEvent};
                 use tauri::WindowEvent;
