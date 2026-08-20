@@ -1,21 +1,22 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 
 set -euo pipefail
 
-SCRIPT_DIR=${0:A:h}
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR"
 PACKAGE_JSON="$REPO_ROOT/package.json"
 TAURI_CONFIG="$REPO_ROOT/src-tauri/tauri.conf.json"
 CARGO_TOML="$REPO_ROOT/src-tauri/Cargo.toml"
-DMG_DIR="$REPO_ROOT/src-tauri/target/release/bundle/dmg"
-RELEASE_NOTES=$'Development build for early testers.\n\nThis build is not notarized yet, so macOS may block it on first open. If that happens, right-click the app and choose Open, or allow it in Privacy & Security.'
+BUNDLE_DIR="$REPO_ROOT/src-tauri/target/release/bundle"
+RELEASE_NOTES=$'Development build for early testers.\n\nmacOS: this build is not notarized yet, so macOS may block it on first open. If that happens, right-click the app and choose Open, or allow it in Privacy & Security.\n\nLinux: install the .deb (Debian/Ubuntu) or .rpm (Fedora/openSUSE), or mark the .AppImage executable and run it directly.'
 
 TAG=""
 VERSION=""
 DO_PUSH=0
 AUTO_COMMIT=0
 AUTO_COMMIT_CREATED=0
-DMG_PATH=""
+PLATFORM=""
+ARTIFACTS=()
 
 usage() {
   cat <<'EOF'
@@ -25,19 +26,22 @@ Usage:
   ./local-release v0.0.1-dev --push --auto
 
 Options:
-  --push   Create git tag, push it, create a GitHub prerelease, and upload the DMG
+  --push   Create git tag, push it, create a GitHub prerelease, and upload the bundles
   --auto   With --push, auto-commit managed release version changes if needed
+
+Bundles are produced for the host platform only:
+  macOS   .dmg
+  Linux   .deb, .rpm, .AppImage
 EOF
 }
 
 fail() {
-  print -u2 -- "$1"
+  printf '%s\n' "$1" >&2
   exit 1
 }
 
 require_cmd() {
-  local cmd="$1"
-  command -v "$cmd" >/dev/null 2>&1 || fail "Missing required command: $cmd"
+  command -v "$1" >/dev/null 2>&1 || fail "Missing required command: $1"
 }
 
 confirm() {
@@ -88,12 +92,22 @@ parse_args() {
 }
 
 validate_tag() {
-  [[ "$TAG" =~ '^v([0-9]+\.[0-9]+\.[0-9]+)-dev$' ]] || fail "Tag must match vX.Y.Z-dev"
-  VERSION="${match[1]}"
+  [[ "$TAG" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)-dev$ ]] || fail "Tag must match vX.Y.Z-dev"
+  VERSION="${BASH_REMATCH[1]}"
 }
 
-check_platform() {
-  [[ "$(uname -s)" == "Darwin" ]] || fail "local-release only supports macOS"
+detect_platform() {
+  case "$(uname -s)" in
+    Darwin)
+      PLATFORM="macos"
+      ;;
+    Linux)
+      PLATFORM="linux"
+      ;;
+    *)
+      fail "local-release supports macOS and Linux only"
+      ;;
+  esac
 }
 
 check_requirements() {
@@ -150,33 +164,37 @@ build_release() {
   (cd "$REPO_ROOT" && pnpm tauri build)
 }
 
-find_dmg() {
-  [[ -d "$DMG_DIR" ]] || fail "DMG output directory not found: $DMG_DIR"
+collect_artifacts() {
+  local patterns=()
 
-  local dmg_files
-  dmg_files=("$DMG_DIR"/*.dmg(N))
+  if [[ "$PLATFORM" == "macos" ]]; then
+    patterns=("$BUNDLE_DIR/dmg"/*.dmg)
+  else
+    patterns=(
+      "$BUNDLE_DIR/deb"/*.deb
+      "$BUNDLE_DIR/rpm"/*.rpm
+      "$BUNDLE_DIR/appimage"/*.AppImage
+    )
+  fi
 
-  [[ ${#dmg_files[@]} -gt 0 ]] || fail "No DMG artifact found in $DMG_DIR"
+  ARTIFACTS=()
 
-  DMG_PATH="${dmg_files[1]}"
+  local candidate
+  for candidate in "${patterns[@]}"; do
+    [[ -f "$candidate" ]] && ARTIFACTS+=("$candidate")
+  done
+
+  [[ ${#ARTIFACTS[@]} -gt 0 ]] || fail "No release artifacts found under $BUNDLE_DIR"
 }
 
 print_dirty_status() {
   git -C "$REPO_ROOT" status --short
 }
 
-collect_dirty_files() {
-  git -C "$REPO_ROOT" status --porcelain | awk '{print $2}'
-}
-
+# Avoids mapfile so the script still runs on the bash 3.2 that ships with macOS.
 contains_only_managed_dirty_files() {
-  local files
-  files=(${(@f)$(collect_dirty_files)})
-
-  [[ ${#files[@]} -gt 0 ]] || return 0
-
   local file
-  for file in "${files[@]}"; do
+  while IFS= read -r file; do
     case "$file" in
       package.json|src-tauri/tauri.conf.json|src-tauri/Cargo.toml)
         ;;
@@ -184,7 +202,7 @@ contains_only_managed_dirty_files() {
         return 1
         ;;
     esac
-  done
+  done < <(git -C "$REPO_ROOT" status --porcelain | cut -c4-)
 
   return 0
 }
@@ -194,7 +212,7 @@ handle_dirty_tree_for_push() {
     return
   fi
 
-  print "Working tree has uncommitted changes:"
+  printf '%s\n' "Working tree has uncommitted changes:"
   print_dirty_status
 
   if [[ $AUTO_COMMIT -eq 1 ]]; then
@@ -220,13 +238,20 @@ create_and_push_tag() {
 }
 
 create_github_release() {
-  (cd "$REPO_ROOT" && gh release create "$TAG" "$DMG_PATH" --prerelease --title "$TAG" --notes "$RELEASE_NOTES")
+  (cd "$REPO_ROOT" && gh release create "$TAG" "${ARTIFACTS[@]}" --prerelease --title "$TAG" --notes "$RELEASE_NOTES")
+}
+
+print_artifacts() {
+  local artifact
+  for artifact in "${ARTIFACTS[@]}"; do
+    printf -- 'Built artifact: %s\n' "$artifact"
+  done
 }
 
 main() {
   parse_args "$@"
   validate_tag
-  check_platform
+  detect_platform
   check_requirements
 
   if [[ $DO_PUSH -eq 1 ]]; then
@@ -236,10 +261,10 @@ main() {
 
   update_versions
   build_release
-  find_dmg
+  collect_artifacts
 
   if [[ $DO_PUSH -eq 0 ]]; then
-    print -- "Built DMG: $DMG_PATH"
+    print_artifacts
     exit 0
   fi
 
@@ -249,8 +274,8 @@ main() {
   local release_url
   release_url=$(create_github_release)
 
-  print -- "Built DMG: $DMG_PATH"
-  print -- "Release URL: $release_url"
+  print_artifacts
+  printf -- 'Release URL: %s\n' "$release_url"
 }
 
 main "$@"

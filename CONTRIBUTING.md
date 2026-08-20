@@ -9,6 +9,10 @@ Thanks for your interest in contributing. This document covers the essentials.
 - [Rust](https://www.rust-lang.org/tools/install) (stable toolchain)
 - Tauri v2 system dependencies — see [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
 
+On Linux, install the system packages listed under
+[Linux system dependencies](README.md#linux-system-dependencies) in the README before
+running `pnpm tauri:dev`.
+
 ## Setup
 
 ```bash

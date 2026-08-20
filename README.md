@@ -74,12 +74,13 @@ slowlife is a desktop-first journaling, todos, scheduling, and financial trackin
 - **Sidebar-free**: sidebar and FAB are hidden; exit via Esc or the exit button
 
 ### Desktop Experience
+- **Platforms**: macOS and Linux (X11 and Wayland)
 - **Runtime**: native app via Tauri
 - **Database**: local SQLite
 - **Command palette**: Ctrl+K for global search and navigation
 - **Shortcuts**: navigation, quick capture (Ctrl+N), focus mode (Ctrl+0), sidebar toggle (Ctrl+S)
 - **Sidebar toggle**: collapsible on desktop, overlay on mobile
-- **System tray**: supported
+- **System tray**: closing the window hides it to the tray; the tray menu reopens it, triggers quick capture, or quits
 
 ## Roadmap Preview
 
@@ -114,6 +115,35 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 - [Rust](https://www.rust-lang.org/tools/install) (stable)
 - Tauri v2 system dependencies — see [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
 
+#### Linux system dependencies
+
+Debian / Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install libwebkit2gtk-4.1-dev libjavascriptcoregtk-4.1-dev libsoup-3.0-dev \
+  libgtk-3-dev libglib2.0-dev libayatana-appindicator3-dev librsvg2-dev \
+  libxdo-dev libssl-dev build-essential curl wget file xdg-utils
+```
+
+Fedora:
+
+```bash
+sudo dnf install webkit2gtk4.1-devel javascriptcoregtk4.1-devel libsoup3-devel \
+  gtk3-devel libappindicator-gtk3-devel librsvg2-devel libxdo-devel openssl-devel \
+  xdg-utils @development-tools
+```
+
+Arch:
+
+```bash
+sudo pacman -S webkit2gtk-4.1 libsoup3 gtk3 libayatana-appindicator librsvg \
+  xdotool openssl base-devel xdg-utils
+```
+
+`libayatana-appindicator` (or its equivalent) is what backs the system tray, and
+`xdg-utils` is required to bundle an AppImage.
+
 ### Setup
 
 ```bash
@@ -140,6 +170,28 @@ Dev and production are intentionally isolated:
 ```bash
 pnpm tauri build
 ```
+
+`pnpm tauri build` produces bundles for the host platform:
+
+| Platform | Output |
+|----------|--------|
+| macOS | `.app`, `.dmg` |
+| Linux | `.deb`, `.rpm`, `.AppImage` |
+
+Bundles land in `src-tauri/target/release/bundle/`. Limit the formats with
+`--bundles`, for example `pnpm tauri build --bundles deb`.
+
+### Linux notes
+
+- **System tray**: GNOME does not show tray icons out of the box — install the
+  [AppIndicator extension](https://extensions.gnome.org/extension/615/appindicator-support/).
+  Most other desktops (KDE, XFCE, Cinnamon) work without extra setup.
+- **Global shortcuts**: quick capture (`Alt+Shift+C`) and `Ctrl+Shift+J` are grabbed
+  through X11. If another application already owns a combination, or the session is
+  Wayland-native without XWayland, that shortcut is skipped with a warning on stderr
+  and the rest of the app runs normally.
+- **Data location**: the SQLite database lives under `~/.config/com.addeeandra.slowlife/`
+  (`com.addeeandra.slowlife.dev` for dev builds).
 
 ## Contributing
 

@@ -213,30 +213,135 @@ async fn start_google_oauth(app: tauri::AppHandle, auth_url: String) -> Result<O
     Ok(OAuthStartResponse { auth_url, redirect_uri })
 }
 
+/// Shortcuts are registered at runtime instead of through the plugin builder so a
+/// rejected combination cannot take the whole app down. On Linux the X11 grab fails
+/// when another application already owns the combination, and Wayland sessions can
+/// refuse it outright.
+#[cfg(desktop)]
+const GLOBAL_SHORTCUTS: [&str; 2] = ["alt+shift+c", "cmdorcontrol+shift+j"];
+
+#[cfg(desktop)]
+fn reveal_main_window(app: &tauri::AppHandle) {
+    use tauri::Manager;
+
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.unminimize();
+        let _ = window.set_focus();
+    }
+}
+
+#[cfg(desktop)]
+fn register_global_shortcuts(app: &tauri::AppHandle) {
+    use tauri_plugin_global_shortcut::GlobalShortcutExt;
+
+    for shortcut in GLOBAL_SHORTCUTS {
+        if let Err(error) = app.global_shortcut().register(shortcut) {
+            eprintln!("slowlife: global shortcut {shortcut} unavailable: {error}");
+        }
+    }
+}
+
+#[cfg(desktop)]
+fn setup_close_to_tray(window: tauri::WebviewWindow) {
+    use tauri::WindowEvent;
+
+    window.clone().on_window_event(move |event| {
+        // reference: https://github.com/tauri-apps/tauri/issues/10580#issuecomment-2816902942
+        if let WindowEvent::CloseRequested { api, .. } = event {
+            api.prevent_close();
+
+            #[cfg(target_os = "macos")]
+            {
+                use tauri::Manager;
+
+                if matches!(window.is_fullscreen(), Ok(true)) {
+                    let app_handle = window.app_handle().clone();
+                    let window_label = window.label().to_string();
+
+                    let _ = window.set_fullscreen(false);
+
+                    tauri::async_runtime::spawn(async move {
+                        std::thread::sleep(std::time::Duration::from_millis(700));
+                        if let Some(win) = app_handle.get_webview_window(&window_label) {
+                            let _ = win.hide();
+                        }
+                    });
+
+                    return;
+                }
+            }
+
+            let _ = window.hide();
+        }
+    });
+}
+
+#[cfg(desktop)]
+fn setup_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
+    use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+    use tauri::tray::{TrayIconBuilder, TrayIconEvent};
+    use tauri::Emitter;
+
+    // Linux tray implementations report clicks inconsistently, so every tray action
+    // is reachable from the menu as well.
+    let open_item = MenuItem::with_id(app, "open", "Open slowlife", true, None::<&str>)?;
+    let capture_item = MenuItem::with_id(app, "quick-capture", "Quick capture", true, None::<&str>)?;
+    let quit_item = MenuItem::with_id(app, "quit", "Quit slowlife", true, None::<&str>)?;
+    let menu = Menu::with_items(
+        app,
+        &[
+            &open_item,
+            &capture_item,
+            &PredefinedMenuItem::separator(app)?,
+            &quit_item,
+        ],
+    )?;
+
+    TrayIconBuilder::new()
+        .menu(&menu)
+        .on_menu_event(|app, event| match event.id().as_ref() {
+            "open" => reveal_main_window(app),
+            "quick-capture" => {
+                let _ = app.emit("quick-capture", ());
+                reveal_main_window(app);
+            }
+            "quit" => app.exit(0),
+            _ => {}
+        })
+        .on_tray_icon_event(move |tray, event| {
+            if let TrayIconEvent::Click { .. } = event {
+                let app = tray.app_handle();
+                let _ = app.emit("quick-capture", ());
+                reveal_main_window(app);
+            }
+        })
+        .icon(
+            app.default_window_icon()
+                .cloned()
+                .expect("missing default window icon"),
+        )
+        .show_menu_on_left_click(false)
+        .build(app)?;
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    use tauri::Emitter;
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![start_google_oauth])
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
-                .with_shortcuts(["alt+shift+c", "cmdorcontrol+shift+j"])
-                .expect("failed to register global shortcuts")
                 .with_handler(|app, _shortcut, event| {
                     use tauri::Emitter;
                     use tauri_plugin_global_shortcut::ShortcutState;
                     if event.state == ShortcutState::Pressed {
                         let _ = app.emit("quick-capture", ());
                         #[cfg(desktop)]
-                        {
-                            use tauri::Manager;
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
+                        reveal_main_window(app);
                     }
                 })
                 .build(),
@@ -245,58 +350,16 @@ pub fn run() {
             #[cfg(desktop)]
             {
                 use tauri::Manager;
-                use tauri::tray::{TrayIconBuilder, TrayIconEvent};
-                use tauri::WindowEvent;
 
                 let app_handle = app.handle();
+
+                register_global_shortcuts(app_handle);
+
                 if let Some(main_window) = app_handle.get_webview_window("main") {
-                    main_window.clone().on_window_event(move |event| {
-                        // reference: https://github.com/tauri-apps/tauri/issues/10580#issuecomment-2816902942
-                        if let WindowEvent::CloseRequested { api, .. } = event {
-                            api.prevent_close();
-                            #[cfg(target_os = "macos")]
-                            {
-                                match main_window.is_fullscreen() {
-                                    Ok(true) => {
-                                        let app_handle = main_window.app_handle().clone();
-                                        let window_label = main_window.label().to_string();
-
-                                        let _ = main_window.set_fullscreen(false);
-
-                                        tauri::async_runtime::spawn(async move {
-                                            std::thread::sleep(std::time::Duration::from_millis(700));
-                                            if let Some(win) = app_handle.get_webview_window(&window_label) {
-                                                win.hide().unwrap();
-                                            }
-                                        });
-                                    }
-                                    _ => {
-                                        main_window.hide().unwrap();
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    setup_close_to_tray(main_window);
                 }
 
-                TrayIconBuilder::new()
-                    .on_tray_icon_event(move |tray, event| {
-                        if let TrayIconEvent::Click { .. } = event {
-                            let _ = tray.app_handle().emit("quick-capture", ());
-                            if let Some(window) = tray.app_handle().get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
-                    })
-                    .icon(
-                        app_handle
-                            .default_window_icon()
-                            .cloned()
-                            .expect("missing default window icon"),
-                    )
-                    .show_menu_on_left_click(false)
-                    .build(app)?;
+                setup_tray(app_handle)?;
             }
             Ok(())
         })
