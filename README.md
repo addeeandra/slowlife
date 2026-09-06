@@ -112,7 +112,7 @@ See [ROADMAP.md](ROADMAP.md) for the full roadmap. Key upcoming milestones:
 
 - [Node.js](https://nodejs.org/) >= 18
 - [pnpm](https://pnpm.io/)
-- [Rust](https://www.rust-lang.org/tools/install) (stable)
+- [Rust 1.98.1](https://www.rust-lang.org/tools/install) via rustup
 - Tauri v2 system dependencies — see [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
 
 #### Linux system dependencies
@@ -180,6 +180,10 @@ pnpm tauri build
 
 Bundles land in `src-tauri/target/release/bundle/`. Limit the formats with
 `--bundles`, for example `pnpm tauri build --bundles deb`.
+
+Keep `pnpm-lock.yaml` and `src-tauri/Cargo.lock` together when updating
+dependencies. Tauri checks that its JavaScript API and Rust crate use matching
+major/minor versions; the SQL plugin must also match across both sides.
 
 ### Linux notes
 

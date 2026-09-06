@@ -15,10 +15,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2",
+    "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-global-shortcut": "^2",
     "@tauri-apps/plugin-opener": "^2",
-    "@tauri-apps/plugin-sql": "^2.3.2",
+    "@tauri-apps/plugin-sql": "^2.4.1",
     "dompurify": "^3.3.3",
     "marked": "^17.0.5",
     "vue": "^3.5.13",

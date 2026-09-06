@@ -58,7 +58,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.98.1
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -96,7 +98,9 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.98.1
 
       - uses: Swatinem/rust-cache@v2
         with:

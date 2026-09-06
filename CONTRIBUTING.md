@@ -6,7 +6,7 @@ Thanks for your interest in contributing. This document covers the essentials.
 
 - [Node.js](https://nodejs.org/) >= 18
 - [pnpm](https://pnpm.io/)
-- [Rust](https://www.rust-lang.org/tools/install) (stable toolchain)
+- [Rust 1.98.1](https://www.rust-lang.org/tools/install) via rustup (selected automatically by `rust-toolchain.toml`)
 - Tauri v2 system dependencies — see [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/)
 
 On Linux, install the system packages listed under
